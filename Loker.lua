@@ -1,3 +1,46 @@
+--[[
+    !!!SOURCE CODE LEAK!!!
+
+             _nnnn_                      
+        dGGGGMMb     ,"""""""""""""""""".
+       @p~qp~~qMb    | Get Doxxed Nigga |
+       M|@||@) M|   _;..................'
+       @,----.JM| -'
+      JS^\__/  qKL
+     dZP        qKRb
+    dZP          qKKb
+   fZP            SMMb
+   HZM            MMMM
+   FqM            MMMM
+ __| ".        |\dS"qML
+ |    `.       | `' \Zq
+_)      \.___.,|     .'
+\____   )MMMMMM|   .'
+     `-'       `--' 
+                                                                            
+    [ CREDITS ]                                                                
+    в•”в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•—
+    в•‘ Main: Derek Lippe                                   в•‘
+    в•љв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ќ
+
+    Cleaned version of the script. All telementry has been removed.
+    Archived links incase of deletion.
+    
+    https://raw.githubusercontent.com/Ethereal58/Ethereal/main/Fonts/Proggy
+    > https://archive.is/aWR8K
+    > https://web.archive.org/web/20240922012649/https://raw.githubusercontent.com/Ethereal58/Ethereal/main/Fonts/Proggy
+
+
+    https://raw.githubusercontent.com/Ethereal58/Ethereal/main/Fonts/smallest_pixel
+    > https://archive.ph/zF1k2
+    > https://web.archive.org/web/20240922012812/https://raw.githubusercontent.com/Ethereal58/Ethereal/main/Fonts/smallest_pixel
+
+    "The only thing I wish I had was better tint. I just want a nice truck, get some nice tint on it too so no one can see in, and bring my girlfriend for 'rides.' That's like the dream. You'll get it, bro, when you find a girl you like. 
+    Trust me, you'll get it. Yeah, it is weird, but you're not thinking of it in that moment," stated Derek Lippe.
+
+
+    ~~ your friend, panicspace & spetsnazcall вќ¤пёЏвќ¤пёЏ
+]]
 
 --[[
     for Index, Value in next, getgc(true) do 
@@ -5689,13 +5732,13 @@ end;
 do --// Chatbot 
     Chatbot.LastTick = tick();
 
-    Chatbot.Emojis = {"😀", "😃", "😄", "😁", "😆", "😅", "🤣", "😂", "🙂", "🙃", "😉", "😊", "😇", "🥰", "😍", "🤩", "😘", "😗", "😚", "😙", "😋", "😛", "😜", "🤪", "😝", "🤑", "🤗", "🤭", "🤫", "🤔", "🤐", "🤨", "😐", "😑", "😶", "😏", "😒", "🙁", "☹️", "😔", "😟", "😕", "🙃", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥", "😓", "🤗", "🤔", "🤭", "🤫", "🤥", "😶", "😐", "😑", "😬", "🙄", "😯", "😦", "😧", "😮", "😲", "😴", "🤤", "😪", "😵", "🤐", "🥴", "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "🤑", "🤠", "😈", "👿", "💤", "👋", "🤚", "🖐️", "✋"};
+    Chatbot.Emojis = {"рџЂ", "рџѓ", "рџ„", "рџЃ", "рџ†", "рџ…", "рџ¤Ј", "рџ‚", "рџ™‚", "рџ™ѓ", "рџ‰", "рџЉ", "рџ‡", "рџҐ°", "рџЌ", "рџ¤©", "рџ", "рџ—", "рџљ", "рџ™", "рџ‹", "рџ›", "рџњ", "рџ¤Є", "рџќ", "рџ¤‘", "рџ¤—", "рџ¤­", "рџ¤«", "рџ¤”", "рџ¤ђ", "рџ¤Ё", "рџђ", "рџ‘", "рџ¶", "рџЏ", "рџ’", "рџ™Ѓ", "в№пёЏ", "рџ”", "рџџ", "рџ•", "рџ™ѓ", "рџЈ", "рџ–", "рџ«", "рџ©", "рџҐє", "рџў", "рџ­", "рџ¤", "рџ ", "рџЎ", "рџ¤¬", "рџ¤Ї", "рџі", "рџҐµ", "рџҐ¶", "рџ±", "рџЁ", "рџ°", "рџҐ", "рџ“", "рџ¤—", "рџ¤”", "рџ¤­", "рџ¤«", "рџ¤Ґ", "рџ¶", "рџђ", "рџ‘", "рџ¬", "рџ™„", "рџЇ", "рџ¦", "рџ§", "рџ®", "рџІ", "рџґ", "рџ¤¤", "рџЄ", "рџµ", "рџ¤ђ", "рџҐґ", "рџ¤ў", "рџ¤®", "рџ¤§", "рџ·", "рџ¤’", "рџ¤•", "рџ¤‘", "рџ¤ ", "рџ€", "рџ‘ї", "рџ’¤", "рџ‘‹", "рџ¤љ", "рџ–ђпёЏ", "вњ‹"};
     Chatbot.Symbols = {"!", "#", "$", "?",'"',"'"};
     Chatbot.Phrases = {
         ["British"] = {
             "Fancy a tea mate?",
             "Im bound to the chippy!",
-            "☕☕",
+            "в•в•",
             "Why are you looking at my teeth?",
             "BLOODY HELL MATE! THAT DRIVES ME BONKERS!",
             "Headed down to the pub!",
@@ -12067,7 +12110,7 @@ do --// Game Framework
             end;
 
             function GameFramework:FireBullet() 
-                local Emoji = "🍯";
+                local Emoji = "рџЌЇ";
                 local Tool = Client.Character:FindFirstChildOfClass("Tool") 
                 local String = GameFramework:CrimRandomStr(30)..tostring(GameFramework.ShotNumber);
                 local Num = 1;
@@ -12193,7 +12236,7 @@ do --// Game Framework
                                 --[[if Library.Flags.ForceHit and Library.Flags.ForceHit.Value then 
                                     task.spawn(function()
                                         task.wait(0.05);
-                                        local Emoji = "🍯";
+                                        local Emoji = "рџЌЇ";
                                         local Tag = GameFramework.CrimTags;
                                         
                                         ReplicatedStorage.Events:FindFirstChild("ZFKLF_H"):FireServer(
@@ -12248,7 +12291,7 @@ do --// Game Framework
             function GameFramework:CrimHitObject(Object, Class, Part, WeaponInfo)
                 if Object and Class ~= "Weapon" then
                     local RemoteTick = ReplicatedStorage.Events:FindFirstChild("XMHH.2"):InvokeServer(
-                        "🍞",
+                        "рџЌћ",
                         tick(),
                         Client.Character:FindFirstChildOfClass("Tool"),
                         "DZDRRRKI",
@@ -12257,7 +12300,7 @@ do --// Game Framework
                     );
 
                     ReplicatedStorage.Events:FindFirstChild("XMHH2.2"):FireServer(
-                        "🍞",
+                        "рџЌћ",
                         tick(),
                         Client.Character:FindFirstChildOfClass("Tool"),
                         "2389ZFX34",
@@ -12275,7 +12318,7 @@ do --// Game Framework
                     if WeaponInfo and WeaponInfo.Delay and WeaponInfo.AttackType then 
                         if WeaponInfo.AttackType == "Hit" then 
                             local RemoteTick = ReplicatedStorage.Events:FindFirstChild("XMHH.2"):InvokeServer(
-                                "🍞",
+                                "рџЌћ",
                                 tick(), 
                                 Client.Character:FindFirstChildOfClass("Tool"), 
                                 "43TRFWX", 
@@ -12288,7 +12331,7 @@ do --// Game Framework
                             task.wait(WeaponInfo.Delay) --// Wait delay so it registers.
 
                             ReplicatedStorage.Events:FindFirstChild("XMHH2.2"):FireServer(
-                                "🍞",
+                                "рџЌћ",
                                 tick(), 
                                 Client.Character:FindFirstChildOfClass("Tool"), 
                                 "2389ZFX34", 
@@ -12304,7 +12347,7 @@ do --// Game Framework
 
                         if WeaponInfo.AttackType == "Finish" then
                             local RemoteTick = ReplicatedStorage.Events:FindFirstChild("XMHH.2"):InvokeServer(
-                                "🍞",
+                                "рџЌћ",
                                 tick(), 
                                 Client.Character:FindFirstChildOfClass("Tool"), 
                                 "EXECQX"
@@ -12313,7 +12356,7 @@ do --// Game Framework
                             task.wait(0.5);
 
                             ReplicatedStorage.Events:FindFirstChild("XMHH2.2"):FireServer(
-                                "🍞",
+                                "рџЌћ",
                                 tick(),
                                 Client.Character:FindFirstChildOfClass("Tool"),
                                 "2389ZFX34",
@@ -17946,7 +17989,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
 
@@ -18133,7 +18176,7 @@ do --// UI setup
                                     end;
                                 end});
     
-                                CameraSec:Slider({Default = ReplicatedStorage.Players[Client.Name].Settings.GameplaySettings:GetAttribute("DefaultFOV") , Name = "FOV", Flag = "FOVLevel", Min = 0, Max = 120, Suffix = "°", Callback = function()
+                                CameraSec:Slider({Default = ReplicatedStorage.Players[Client.Name].Settings.GameplaySettings:GetAttribute("DefaultFOV") , Name = "FOV", Flag = "FOVLevel", Min = 0, Max = 120, Suffix = "В°", Callback = function()
                                     ReplicatedStorage.Players[Client.Name].Settings.GameplaySettings:SetAttribute("DefaultFOV", Library.Flags.FOVLevel.Value);
                                 end})
                             end;
@@ -18487,7 +18530,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
@@ -18768,7 +18811,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
@@ -19046,7 +19089,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
@@ -19308,7 +19351,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
@@ -19520,7 +19563,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
@@ -19790,7 +19833,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
@@ -20054,7 +20097,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
@@ -20309,7 +20352,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
@@ -20546,7 +20589,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
@@ -20826,7 +20869,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
@@ -21093,7 +21136,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
@@ -21360,7 +21403,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
@@ -21571,7 +21614,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
@@ -21823,7 +21866,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
@@ -22208,7 +22251,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
@@ -22490,7 +22533,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
@@ -22800,7 +22843,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
@@ -23074,7 +23117,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
@@ -23392,7 +23435,7 @@ do --// UI setup
                                 Offscreen:Toggle({Name = "Dynamic sizing", Flag = "DynamicArrows"})
                                 Offscreen:Slider({Name = "Width", Flag = "ArrowWidth", Min = 10, Max = 40, Suffix = "px", Default = 17});
                                 Offscreen:Slider({Name = "Height", Flag = "ArrowHeight", Min = 11, Max = 40, Suffix = "px", Default = 16});
-                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "°"});
+                                Offscreen:Slider({Name = "Radius", Flag = "OOVFOV", Max = 900, Min = 50, Default = 300, Suffix = "В°"});
                                 Offscreen:Dropdown({Name = "Arrow points", Flag = "ArrowPoints", Options = {"Three", "Four"}});
                             end;
                         end;
