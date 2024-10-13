@@ -1,9465 +1,4855 @@
-repeat 
-    task.wait() 
-until game:IsLoaded()
-
-local StartTick = tick()
-local Env = getgenv()
-
-if Env.Puppyware and Env.Puppyware.Libraries and Env.Puppyware.Libraries.Utility and Env.Puppyware.Libraries.Utility.Unload then
-    Env.Puppyware.Libraries.Utility:Unload()
+if not LPH_OBFUSCATED then
+    -- Define a series of functions that serve as placeholders when obfuscation is not active.
+    
+    -- Simple passthrough function for just-in-time (JIT) operations.
+    LPH_JIT = function(...) 
+        return ... 
+    end
+    
+    -- Passthrough function for maximum JIT operations.
+    LPH_JIT_MAX = function(...) 
+        return ... 
+    end
+    
+    -- Function to disable virtualization, simply returns the input function.
+    LPH_NO_VIRTUALIZE = function(f) 
+        return f 
+    end
+    
+    -- Function to remove upvalues, returns a new function that calls the original with the same arguments.
+    LPH_NO_UPVALUES = function(f) 
+        return function(...) 
+            return f(...) 
+        end 
+    end
+    
+    -- Placeholder for string encryption, returns the input string.
+    LPH_ENCSTR = function(...) 
+        return ... 
+    end
+    
+    -- Placeholder for number encryption, returns the input number.
+    LPH_ENCNUM = function(...) 
+        return ... 
+    end
+    
+    -- Function intended to cause a crash, in this case, it prints the traceback.
+    LPH_CRASH = function() 
+        return print(debug.traceback()) 
+    end
 end
 
--- Variables
-    -- Game / Random Functions
-        local game = game
-        local assert, 
-            loadstring, 
-            select, 
-            next, 
-            type, 
-            typeof, 
-            pcall, 
-            xpcall, 
-            setmetatable, 
-            tick, 
-            warn, 
-            pairs 
-            = 
-            assert, 
-            loadstring, 
-            select, 
-            next, 
-            type, 
-            typeof, 
-            pcall, 
-            xpcall, 
-            setmetatable, 
-            tick, 
-            warn, 
-            pairs
-        local stringformat = string.format
-        local getgenv, 
-            getrawmetatable, 
-            gethiddenproperty 
-            = 
-            getgenv, 
-            getrawmetatable, 
-            gethiddenproperty
-        local osclock = os.clock
 
-        local game_mt = getrawmetatable(game)
+local function checksystem()
 
-        local game_index = game_mt.__index
+warn("Check System Started")
+wait(1)
+print("Able To Connect Web Socket: ❌")
+	wait(0.2)
+	print("Able To Connect Proxy Server: ❌")
+	wait(0.1)
+	print("Able To Send Messages To Webhook: ❌")
+	wait(0.1)
+	
+warn("System Disconnected With 0% Success Rate.")
 
-        local GetServiceFunc = game_index(game, "GetService")
+end
 
-        local GetService = function(...) return GetServiceFunc(game, ...) end
+		-- Create a function to apply ForceField to all parts in the game and remove SurfaceAppearance
+local function applyForceFieldAndRemoveSurfaceAppearance()
+    -- Get all parts in the game
+    for _, part in pairs(workspace:GetDescendants()) do
+        -- Check if the part is a BasePart (like Part, MeshPart, etc.)
+        if part:IsA("BasePart") then
+            -- Destroy any SurfaceAppearance attached to the part
+            local surfaceAppearance = part:FindFirstChildOfClass("SurfaceAppearance")
+            if surfaceAppearance then
+                surfaceAppearance:Destroy()
+            end
+            
+            -- Check if the part already has a ForceField
+            if not part:FindFirstChildOfClass("ForceField") then
+                -- Create a new ForceField
+                local forceField = Instance.new("ForceField")
+                -- Set the parent of the ForceField to the part
+                forceField.Parent = part
+            end
+        end
+    end
+end
 
-        local FindFirstChild = game_index(game, "FindFirstChild")
 
-        local FindFirstChildWhichIsA = game_index(game, "FindFirstChildWhichIsA")
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+local grassVisible = true
+local predictionEnabled = false
+local adjustPredictionEnabled = false -- Default to enabled
+local executorname33 = "Unknown"
+local predictionFactor = { value = 0.118 } -- Adjust this value based on desired prediction (higher means more prediction)
+local aimbotEnabled = false
+local plrs = game:GetService("Players")
+local virtualInput = game:GetService("VirtualInputManager")
+print(".")
+local ammo = game.ReplicatedStorage.AmmoTypes
+local players = game:GetService("Players")
+local localPlayer = players.LocalPlayer
+local isAiming = false
+local headSizeMultiplier = 5 -- Multiplier for head size
+local transparencyValue = 0.3 -- Transparency for the head
+local targetHead = nil
+local targetPart = "Head" -- Default target part
+local isEnabled = false -- State to track if the effect is on or off
+local aimingTarget = nil
 
-        local IsA = game_index(game, "IsA") 
-
-        local camera_mt = getrawmetatable(workspace.CurrentCamera)
-
-        local camera_index = camera_mt.__index
-        
-        local WorldToViewportPoint = camera_index(workspace.CurrentCamera, "WorldToViewportPoint")
-
-        local workspace_mt = getrawmetatable(workspace)
-
-        local workspace_index = workspace_mt.__index
-        
-        local Raycast = workspace_index(workspace, "Raycast")
-    --
-
-    -- Services
-        local Players = GetService("Players")
-        local UserInputService = GetService("UserInputService")
-        local RunService = GetService("RunService")
-        local HttpService = GetService("HttpService")
-        local Workspace = GetService("Workspace")
-        local CoreGui = GetService("CoreGui")
-        local ContextActionService = GetService("ContextActionService")
-        local TeleportService = GetService("TeleportService")
-        local Lighting = GetService("Lighting")
-        local Stats = GetService("Stats")
-        local TweenService = GetService("TweenService")
-        local Debris = GetService("Debris")
-        local TextChatService = GetService("TextChatService")
-        local ReplicatedStorage = GetService("ReplicatedStorage")
-    --
-
-    -- Game
-        local Camera = Workspace.CurrentCamera
-        local LocalPlayer = Players.LocalPlayer
-        local PlaceId = game.PlaceId
-        local Mouse = LocalPlayer:GetMouse()
-        local TextChannels = FindFirstChild(TextChatService, "TextChannels")
-        local MainChannel = TextChannels and FindFirstChild(TextChannels, "RBXGeneral")
-    --
-
-    -- Position Spaces
-        local Vector2new = Vector2.new
-        local Vector3new = Vector3.new
-        local CFramenew = CFrame.new
-        local CFrameAngles = CFrame.Angles
-        local Vector2zero = Vector2.zero
-        local Vector3zero = Vector3.zero
-        local UDim2new = UDim2.new
-        local UDimnew = UDim.new
-        local UDim2offset = UDim2.fromOffset
-    --
-
-    -- Math Functions
-        local mathclamp = math.clamp
-        local mathfloor = math.floor
-        local mathcos = math.cos
-        local mathabs = math.abs
-        local mathatan2 = math.atan2
-        local mathrad = math.rad
-        local mathsin = math.sin
-        local mathmax = math.max
-        local mathmin = math.min
-        local mathpi = math.pi
-        local mathacos = math.acos
-        local mathsqrt = math.sqrt
-        local mathrandom = math.random
-        local mathdeg = math.deg
-        local halfpi = mathpi / 2
-    --
-
-    -- Color Functions
-        local Color3new = Color3.new
-        local Color3fromRGB = Color3.fromRGB
-        local Color3fromHSV = Color3.fromHSV
-        local Color3fromHex = Color3.fromHex
-    --
-
-    -- Table Functions
-        local tableremove = table.remove
-        local tableinsert = table.insert
-        local tablefind = table.find
-        local tablesort = table.sort
-        local tableclear = table.clear
-        local tableconcat = table.concat
-        local tableunpack = table.unpack
-    --
-
-    -- Extra Functions
-        local coroutinewrap = coroutine.wrap
-        local taskwait = task.wait
-        local Drawingnew = Drawing.new
-        local Instancenew = Instance.new
-        local taskspawn = task.spawn
-        local MouseMoveRel = Env.mousemoverel
-    --
-
-    local Controller = {
-        Alive = false,
-        RootPart = nil,
-        Humanoid = nil,
-        Character = nil
-    }
-
-    local Misc = {
-        ChatSpam = {
-            Nerd = {
-                "im such a skid 😜",
-                "math is hard 🧮",
-                "i speak klingon 👽",
-                "i wear socks with sandals 👣",
-                "my pocket 😎 protector brings all the nerds to the yard",
-                "phd in quantum mechanics from hogwarts 🎓",
-                "im a nerd and im proud 🤓👊",
-                "i mainframe 💻 for fun",
-                "i dream in binary 💭",
-                "im fluent in c++ 💻",
-                "my code is poetry 📝",
-            },
-            Random = {
-                "sorry i hurt your roblox ego but look -> 🤏 I DON'T CARE",
-                "i 😎 hacked my toaster",
-                "i eat ones 😋 and zeros for breakfast",
-                "i hacked nasa 🚀",
-                "im a keyboard ninja ⌨️🥋",
-                "i hacked 😈 my calculator",
-                "banlands 🔨 🗻 down 🏚️  ⏬ STOP CRASHING BANLANDS!! 🤣",
-                "password is 😡 password",
-                "i can hack anything 💻🔓",
-                "i can play doom on a pregnancy test 🎮🤰😎",
-                "i can play doom on my fridge 🎮🍕",
-                "my screen 🎨 is my canvas",
-                "i'm the king 👑 of cyber",
-                "TURN YOUR HACKS OFF!!! 🥹🥹😤😡😡😡",
-                "BROO THIS IS SO UNFAIR 😭😢 TURN OFF PATHFINDING 😡💢💢💢💢💢😒🙄",
-                "TURN TELEPORT SCANNING OFF NOWWW 😡😡💢💢💢💢💢💢😭😭😭",
-                "i surf the dark web 🕸️",
-                "votekick him!!!!!!! 😠 vk VK VK VK VOTEKICK HIM!!!!!!!!! 😠 😢 VOTE KICK !!!!! PRESS Y WHY DIDNT U PRESS Y LOL!!!!!! 😭 ",
-                "YOU VOtEkickED tHe wrong PERson!!!!!!!!!",
-                "i dream in code 💭💻",
-                "i kick kittens 🐱👟",
-                "i once 😂 kicked a soccer ball",
-                "庆崇你好我讨厌你愚蠢的母愚蠢的母庆崇",
-                "完成与草屋两个苏巴完成与草屋两个苏巴完成与草屋",
-                "诶比西迪伊艾弗吉艾尺艾杰开艾勒艾马艾娜哦屁吉吾",
-                "持有毁灭性的神经重景气游行脸红青铜色类别创意案",
-                "音频少年公民记忆欲求无尽 heywe 僵尸强迫身体哑集中排水",
-                "SETBASEWALKSPEED(999) SPEED CHEAT!!!!",
-                "i kick 🚪 doors open",
-                "i kicked a hole in space ⏰ time",
-                "i kicked my computer 💻👟",
-                "PASTE PASTE ITS PASTEEEEEDDDDDDD!!!!!!!",
-                "HAHAHAHAHAHAHA",
-                "i kicked a can down the road 🥫👟",
-                "i kickflip in my dreams 🛹💭",
-                "i kickstart my day ☕ with coffee",
-                "i kick back 🛋️ and relax",
-                "i kickstart revolutions 🔄👟",
-                "i kickflip over obstacles 🛹↗️",
-                "global🌍  warming🥵 freezing ❄️",
-                "i cooked soup 🍲 in the fridge ❄️",
-                "im a 🍦 popsicle",
-                "sweating like a ☀️ snowman in summer 😅",
-                "squirrel using 🐿️ oven mitts 🥊",
-                "cold as polar bear 🐻❄️ toenails",
-                "im hotter than the ☀️ sun 🔥",
-                "im colder than 🪐 pluto ❄️",
-                "im as cool as ice ❄️",
-                "im melting like 🧈 butter 🔥",
-                "im burning like a 🔥 furnace 💨",
-                "monkey see 🐒",
-                "monkey do 🙈",
-                "banana time 🍌",
-                "monkey business 🐵💼",
-                "monkeying around 🙊",
-                "ape escape 🦍",
-                "chimp champ 🐵🏆",
-                "gorilla warfare 🦍⚔️",
-                "jungle swing 🌴🐒",
-                "primate party 🎉🐵",
-                "ape-tastic 🦍🎉",
-            },
-        },
-        Emojis = {
-            [1] = "😊",
-            [2] = "😢",
-            [3] = "😂",
-            [4] = "❤️",
-            [5] = "👍",
-            [6] = "👎",
-            [7] = "🔥",
-            [8] = "👏",
-            [9] = "🚀",
-            [10] = "🤔",
-            [11] = "😮",
-            [12] = "😎",
-            [13] = "😍",
-            [14] = "😡",
-            [15] = "👻",
-            [16] = "👽",
-            [17] = "🤖",
-            [18] = "🦄",
-            [19] = "😺",
-            [20] = "🐶",
-            [21] = "🐠",
-            [22] = "🍕",
-            [23] = "🌮",
-            [24] = "🍰",
-            [25] = "☕",
-            [26] = "🍺",
-            [27] = "🍷",
-            [28] = "🍹",
-            [29] = "🎵",
-            [30] = "🎬",
-            [31] = "🎮",
-            [32] = "⚽",
-            [33] = "🏀",
-            [34] = "⚾",
-            [35] = "🏈",
-            [36] = "🎾",
-            [37] = "⛳",
-            [38] = "🏄",
-            [39] = "⛷️",
-            [40] = "🏂",
-            [41] = "🚴",
-            [42] = "🏊",
-            [43] = "🏃",
-            [44] = "🥾",
-        },
-        Symbols = {
-            [1] = "!",
-            [2] = "@",
-            [3] = "#",
-            [4] = "$",
-            [5] = "%",
-            [6] = "^",
-            [7] = "&",
-            [8] = "*",
-            [9] = "(",
-            [10] = ")",
-            [11] = "-",
-            [12] = "_",
-            [13] = "+",
-            [14] = "=",
-            [15] = "[",
-            [16] = "{",
-            [17] = "]",
-            [18] = "}",
-            [19] = "|",
-            [20] = [[\]],
-            [21] = ";",
-            [22] = ":",
-            [23] = '"',
-            [24] = "'",
-            [25] = "<",
-            [26] = ",",
-            [27] = ">",
-            [28] = ".",
-            [29] = "?",
-            [30] = "/",
-        },
-        Sleeping = false,
-        Gun = {
-            Shotguns = {
-                "[Double-Barrel SG]", 
-                "[TacticalShotgun]", 
-                "[Shotgun]"
-            }
-        },
-        GunConnections = {},
-        CurrentHealth = {},
-        Hitsounds = {
-            ["Skeet"] = "rbxassetid://5447626464",
-            ["Slap"] = "rbxassetid://5447626464",
-            ["Rust"] = "rbxassetid://5043539486",
-            ["Bag"] = "rbxassetid://5043539486"
-        },
-        Prediction = {
-            ["Close"] = {
-                [30] = 0.12542465767834,
-                [40] = 0.12742,
-                [60] = 0.134543,
-                [70] = 0.141,
-                [80] = 0.1413,
-                [90] = 0.1487,
-                [120] = 0.15738,
-                [140] = 0.12534,
-                [200] = 0.1652131
-            },
-            ["Mid"] = {
-                [30] = 0.12588,
-                [40] = 0.11,
-                [50] = 0.127668,
-                [60] = 0.12731,
-                [80] = 0.1365,
-                [90] = 0.138,
-                [120] = 0.157,
-                [140] = 0.13432,
-                [200] = 0.16779123
-            },
-            ["Far"] = {
-                [30] = 0.11120,
-                [40] = 0.11120,
-                [50] = 0.12542465767834,
-                [60] = 0.12921,
-                [70] = 0.1311,
-                [80] = 0.1311,
-                [90] = 0.1311,
-                [120] = 0.14325,
-                [140] = 0.138876,
-                [200] = 0.165455312399999
-            }
-        }
-    }
-
-    local Visuals = {
-        BulletTracers = {
-            ["Default"] = "rbxassetid://446111271",
-            ["Beam"] = "rbxassetid://7151777149",
-            ["Ion Beam"] = "rbxassetid://2950987173",
-            ["Lightning"] = "rbxassetid://7151778302",
-            ["Pulsing"] = "rbxassetid://11226108137",
-            ["DNA"] = "rbxassetid://6511613786",
-        },
-        Materials = {
-            ["ForceField"] = Enum.Material.ForceField,
-            -- ["Glass"] = Enum.Material.Glass,
-            -- ["Neon"] = Enum.Material.Neon,
-            -- ["Plastic"] = Enum.Material.Plastic,
-            -- ["Foil"] = Enum.Material.Foil,
-            -- ["Ice"] = Enum.Material.Ice,
-            -- ["Snow"] = Enum.Material.Snow,
-            -- ["Cobblestone"] = Enum.Material.Cobblestone,
-            -- ["Marble"] = Enum.Material.Marble,
-        },
-        Skyboxes = {
-            ["Purple Nebula"] = {
-                SkyboxBk = "rbxassetid://159454299",
-                SkyboxDn = "rbxassetid://159454296",
-                SkyboxFt = "rbxassetid://159454293",
-                SkyboxLf = "rbxassetid://159454286",
-                SkyboxRt = "rbxassetid://159454300",
-                SkyboxUp = "rbxassetid://159454288"
-            },
-            ["Night Sky"] = {
-                SkyboxBk = "rbxassetid://12064107",
-                SkyboxDn = "rbxassetid://12064152",
-                SkyboxFt = "rbxassetid://12064121",
-                SkyboxLf = "rbxassetid://12063984",
-                SkyboxRt = "rbxassetid://12064115",
-                SkyboxUp = "rbxassetid://12064131"
-            },
-            ["Pink Daylight"] = {
-                SkyboxBk = "rbxassetid://271042516",
-                SkyboxDn = "rbxassetid://271077243",
-                SkyboxFt = "rbxassetid://271042556",
-                SkyboxLf = "rbxassetid://271042310",
-                SkyboxRt = "rbxassetid://271042467",
-                SkyboxUp = "rbxassetid://271077958"
-            },
-            ["Morning Glow"] = {
-                SkyboxBk = "rbxassetid://1417494030",
-                SkyboxDn = "rbxassetid://1417494146",
-                SkyboxFt = "rbxassetid://1417494253",
-                SkyboxLf = "rbxassetid://1417494402",
-                SkyboxRt = "rbxassetid://1417494499",
-                SkyboxUp = "rbxassetid://1417494643"
-            },
-            ["Setting Sun"] = {
-                SkyboxBk = "rbxassetid://626460377",
-                SkyboxDn = "rbxassetid://626460216",
-                SkyboxFt = "rbxassetid://626460513",
-                SkyboxLf = "rbxassetid://626473032",
-                SkyboxRt = "rbxassetid://626458639",
-                SkyboxUp = "rbxassetid://626460625"
-            },
-            ["Cache"] = {
-                SkyboxBk = "rbxassetid://220513302",
-                SkyboxDn = "rbxassetid://213221473",
-                SkyboxFt = "rbxassetid://220513328",
-                SkyboxLf = "rbxassetid://220513318",
-                SkyboxRt = "rbxassetid://220513279",
-                SkyboxUp = "rbxassetid://220513345"
-            },
-            ["Fade Blue"] = {
-                SkyboxBk = "rbxassetid://153695414",
-                SkyboxDn = "rbxassetid://153695352",
-                SkyboxFt = "rbxassetid://153695452",
-                SkyboxLf = "rbxassetid://153695320",
-                SkyboxRt = "rbxassetid://153695383",
-                SkyboxUp = "rbxassetid://153695471"
-            },
-            ["Elegant Morning"] = {
-                SkyboxBk = "rbxassetid://153767241",
-                SkyboxDn = "rbxassetid://153767216",
-                SkyboxFt = "rbxassetid://153767266",
-                SkyboxLf = "rbxassetid://153767200",
-                SkyboxRt = "rbxassetid://153767231",
-                SkyboxUp = "rbxassetid://153767288"
-            },
-            ["Neptune"] = {
-                SkyboxBk = "rbxassetid://218955819",
-                SkyboxDn = "rbxassetid://218953419",
-                SkyboxFt = "rbxassetid://218954524",
-                SkyboxLf = "rbxassetid://218958493",
-                SkyboxRt = "rbxassetid://218957134",
-                SkyboxUp = "rbxassetid://218950090"
-            },
-            ["Redshift"] = {
-                SkyboxBk = "rbxassetid://401664839",
-                SkyboxDn = "rbxassetid://401664862",
-                SkyboxFt = "rbxassetid://401664960",
-                SkyboxLf = "rbxassetid://401664881",
-                SkyboxRt = "rbxassetid://401664901",
-                SkyboxUp = "rbxassetid://401664936"
-            },
-            ["Aesthetic Night"] = {
-                SkyboxBk = "rbxassetid://1045964490",
-                SkyboxDn = "rbxassetid://1045964368",
-                SkyboxFt = "rbxassetid://1045964655",
-                SkyboxLf = "rbxassetid://1045964655",
-                SkyboxRt = "rbxassetid://1045964655",
-                SkyboxUp = "rbxassetid://1045962969"
-            },
-            ["Minecraft"] = {
-                SkyboxBk = "rbxassetid://1876545003",
-                SkyboxDn = "rbxassetid://1876544331",
-                SkyboxFt = "rbxassetid://1876542941",
-                SkyboxLf = "rbxassetid://1876543392",
-                SkyboxRt = "rbxassetid://1876543764",
-                SkyboxUp = "rbxassetid://1876544642"
-            }
-        },
-        PartMaterials = {
-            Minecraft = {
-                Wood = "rbxassetid://3258599312",
-                WoodPlanks = "rbxassetid://8676581022",
-                Brick = "rbxassetid://8558400252",
-                Cobblestone = "rbxassetid://5003953441",
-                Concrete = "rbxassetid://7341687607",
-                DiamondPlate = "rbxassetid://6849247561",
-                Fabric = "rbxassetid://118776397",
-                Granite = "rbxassetid://4722586771",
-                Grass = "rbxassetid://4722588177",
-                Ice = "rbxassetid://3823766459",
-                Marble = "rbxassetid://62967586",
-                Metal = "rbxassetid://62967586",
-                Sand = "rbxassetid://152572215"
-            },
-        },
-        Hits = {}
-    }
-
-    local ESP = {
-        Players = {},
-        Items = {},
-        Image = nil,
-        EnemyImage = nil,
-        TeamImage = nil,
-        FileType = nil,
-        EnemyFileType = nil,
-        TeamFileType = nil,
-    }
-
-    local Aimbot = {
-        Targets = {},
-        Target = nil,
-        elapsedTime = 0,
-        OldTarget = nil,
-        Position = nil,
-    }
-
-    local SilentAim = {
-        Targets = {},
-        Target = nil,
-        Position = nil,
-    }
-
-    local ConvertKeys = {
-        [Enum.KeyCode.LeftShift] = "LS",
-        [Enum.KeyCode.RightShift] = "RS",
-        [Enum.KeyCode.LeftControl] = "LC",
-        [Enum.KeyCode.RightControl] = "RC",
-        [Enum.KeyCode.Insert] = "INS",
-        [Enum.KeyCode.Backspace] = "BS",
-        [Enum.KeyCode.Return] = "Ent",
-        [Enum.KeyCode.LeftAlt] = "LA",
-        [Enum.KeyCode.RightAlt] = "RA",
-        [Enum.KeyCode.CapsLock] = "CAPS",
-        [Enum.KeyCode.One] = "1",
-        [Enum.KeyCode.Two] = "2",
-        [Enum.KeyCode.Three] = "3",
-        [Enum.KeyCode.Four] = "4",
-        [Enum.KeyCode.Five] = "5",
-        [Enum.KeyCode.Six] = "6",
-        [Enum.KeyCode.Seven] = "7",
-        [Enum.KeyCode.Eight] = "8",
-        [Enum.KeyCode.Nine] = "9",
-        [Enum.KeyCode.Zero] = "0",
-        [Enum.KeyCode.KeypadOne] = "Num1",
-        [Enum.KeyCode.KeypadTwo] = "Num2",
-        [Enum.KeyCode.KeypadThree] = "Num3",
-        [Enum.KeyCode.KeypadFour] = "Num4",
-        [Enum.KeyCode.KeypadFive] = "Num5",
-        [Enum.KeyCode.KeypadSix] = "Num6",
-        [Enum.KeyCode.KeypadSeven] = "Num7",
-        [Enum.KeyCode.KeypadEight] = "Num8",
-        [Enum.KeyCode.KeypadNine] = "Num9",
-        [Enum.KeyCode.KeypadZero] = "Num0",
-        [Enum.KeyCode.Minus] = "-",
-        [Enum.KeyCode.Equals] = "=",
-        [Enum.KeyCode.Tilde] = "~",
-        [Enum.KeyCode.LeftBracket] = "[",
-        [Enum.KeyCode.RightBracket] = "]",
-        [Enum.KeyCode.RightParenthesis] = ")",
-        [Enum.KeyCode.LeftParenthesis] = "(",
-        [Enum.KeyCode.Semicolon] = ",",
-        [Enum.KeyCode.Quote] = "'",
-        [Enum.KeyCode.BackSlash] = "\\",
-        [Enum.KeyCode.Comma] = ",",
-        [Enum.KeyCode.Period] = ".",
-        [Enum.KeyCode.Slash] = "/",
-        [Enum.KeyCode.Asterisk] = "*",
-        [Enum.KeyCode.Plus] = "+",
-        [Enum.KeyCode.Period] = ".",
-        [Enum.KeyCode.Backquote] = "`",
-        [Enum.UserInputType.MouseButton1] = "MB1",
-        [Enum.UserInputType.MouseButton2] = "MB2",
-        [Enum.UserInputType.MouseButton3] = "MB3",
-        [Enum.KeyCode.Escape] = "ESC",
-        [Enum.KeyCode.Space] = "SPC",
-    }
-
-    local Library = {
-        Objects = {},
-        ThemeMap = {},
-        ThemeInstances = {},
-        Images = {
-            Saturation = "rbxassetid://13901004307",
-            Checkers = "http://www.roblox.com/asset/?id=18274452449",
-            Scroll = "rbxassetid://12776289446"
-        },
-        Theme = {
-            ["Outline"] = Color3fromRGB(0, 0, 0),
-            ["Background"] = Color3fromRGB(9, 9, 19),
-            ["Accent"] = Color3fromRGB(0, 189, 245),    
-            ["Text"] = Color3fromRGB(255, 255, 255),
-            ["Tab Enabled"] = Color3fromRGB(4, 191, 248),
-            ["Tab Disabled"] = Color3fromRGB(0, 59, 89),
-            ["Element Background"] = Color3fromRGB(1, 16, 35),
-            ["Dark Text"] = Color3fromRGB(190, 190, 190)
-        },
-        OriginalTheme = {
-            ["Outline"] = Color3fromRGB(0, 0, 0),
-            ["Background"] = Color3fromRGB(9, 9, 19),
-            ["Accent"] = Color3fromRGB(0, 189, 245),    
-            ["Text"] = Color3fromRGB(255, 255, 255),
-            ["Tab Enabled"] = Color3fromRGB(4, 191, 248),
-            ["Tab Disabled"] = Color3fromRGB(0, 59, 89),
-            ["Element Background"] = Color3fromRGB(1, 16, 35),
-            ["Dark Text"] = Color3fromRGB(190, 190, 190)
-        },
-        Folder = "Puppyware",
-        ScreenGui = nil,
-        TweenSpeed = 0.2,
-        LerpSpeed = 0.02,
-        TweenEasingStyle = Enum.EasingStyle.Quint,
-        Flags = {},
-        ConfigFlags = {},
-        CopiedColor = {
-            c = Color3fromRGB(255, 255, 255),
-            a = 1,
-        },
-        Keybinds = {},
-        Notifications = {},
-        Fps = 0
-    }
-
-    local Utility = {
-        Connections = {},
-        Objects = {},
-        Drawings = {},
-        BindToRenderSteps = {},
-        DrawingTypes = {
-            "Quad",
-            "Square",
-            "Circle",
-            "Text",
-            "Line",
-            "Triangle",
-            "Font"
-        },
-        Errors = {},
-    }
-
-    local Desync = {
-        Positions = {
-            Old = nil,
-            New = nil
-        },
-        Overwriten = nil,
-        ClonedCharacter = nil,
-        NewStatus = nil,
-    }
+-- Function to print the loading bar with percentage and hash marks
+local function printLoadingBar(percentage)
+    local totalLength = 30
+    local hashMarks = math.floor(percentage / 3.3)  -- Number of hash marks
+    local dashes = totalLength - hashMarks          -- Remaining dashes
     
-    local Puppyware = {
-        Libraries = {
-            Controller = Controller,
-            Misc = Misc,
-            Visuals = Visuals,
-            ESP = ESP,
-            Aimbot = Aimbot,
-            Library = Library,
-            Utility = Utility,
-            Desync = Desync
-        },
-        User = "developer",
-        Players = {},
-    }
+    local loadingBar = string.rep("#", hashMarks) .. string.rep("-", dashes)
+    warn(string.format("Loading Doge Hub %%%-3d %s", percentage, loadingBar))
+end
 
-    local Games = {
-        [2788229376] = {Arg = "UpdateMousePosI", Remote = "MainEvent"},
-        [16033173781] = {Arg = "UpdateMousePosI", Remote = "MainEvent"},
-        [17344804827] = {Arg = "UpdateMousePos", Remote = "MainEvent"},
-        [7213786345] = {Arg = "UpdateMousePosI", Remote = "MainEvent"},
-        [9825515356] = {Arg = "MousePosUpdate", Remote = "MainEvent"},
-        [5602055394] = {Arg = "MousePos", Remote = "Bullets"},
-        [7951883376] = {Arg = "MousePos", Remote = "Bullets"},
-        [9183932460] = {Arg = "UpdateMousePos", Remote = ".gg/untitledhood"},
-        [17403265390] = {Arg = "MOUSE", Remote = "MAINEVENT"},
-        [14412601883] = {Arg = "MOUSE", Remote = "MAINEVENT"},
-        [18111448661] = {Arg = "MOUSE", Remote = "MAINEVENT"},
-        [14487637618] = {Arg = "MOUSE", Remote = "MAINEVENT"},
-        [11143225577] = {Arg = "UpdateMousePos", Remote = "MainEvent"},
-        [14413712255] = {Arg = "MOUSE", Remote = "MAINEVENT"},
-        [17714122625] = {Arg = "UpdateMousePos", Remote = "MainEvent"},
-        [12867571492] = {Arg = "UpdateMousePos", Remote = "MainEvent"},
-        [11867820563] = {Arg = "UpdateMousePos", Remote = "MainEvent"},
-        [17109142105] = {Arg = "MoonUpdateMousePos", Remote = "MainEvent"},
-        [15186202290] = {Arg = "MOUSE", Remote = "MAINEVENT"},
-        [16469595315] = {Arg = "UpdateMousePos", Remote = "MainEvent"},
-        [17319408836] = {Arg = "UpdateMousePos", Remote = "MainEvent"},
-        [14975320521] = {Arg = "UpdateMousePos", Remote = "MainEvent"},
-        [17200018150] = {Arg = "UpdateMousePos", Remote = "MainEvent"},
-    }
+-- Function to simulate the loading process
+local function simulateLoading()
+    for percentage = 0, 100, 1 do
+        printLoadingBar(percentage)
+        wait(0.1)  -- Adjust the wait time to make the loading appear slower or faster
+    end
+end
 
-    local Gravity = Vector3new(0, workspace.Gravity, 0)
+-- Run the simulation
+simulateLoading()
 
-    Env.Puppyware = Puppyware
---
+print("Checking Executor......")
+wait(2)
 
--- Adonis Bypass
-    do -- i do this, so these variables go nowhere else, i got this bypass from J.
-        if getrenv and getrenv().debug and getrenv().debug.info and hookfunction and setthreadidentity then
-            local Hooked = {}
+local player = game.Players.LocalPlayer
 
-            local Detected, Kill
+-- Wait for the character to be added to the player
+local character = player.Character or player.CharacterAdded:Wait()
 
-            setthreadidentity(2)
+-- Wait for the humanoid to be present in the character
+local humanoid = character:WaitForChild("Humanoid")
 
-            for _,v in getgc(true) do
-                if type(v) == "table" then
-                    local DetectFunc = rawget(v, "Detected")
-                    local KillFunc = rawget(v, "Kill")
-                
-                    if type(DetectFunc) == "function" and not Detected then
-                        Detected = DetectFunc
-                        
-                        local Old; Old = hookfunction(Detected, function(Action, Info, NoCrash)
-                            return true
-                        end)
+-- Function to toggle the swimming state
+local function toggleSwimmingState()
+    -- Check the current swimming state
+    local isSwimmingEnabled = humanoid:GetStateEnabled(Enum.HumanoidStateType.Swimming)
+    
+    -- Toggle the swimming state
+    humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, not isSwimmingEnabled)
+end
 
-                        table.insert(Hooked, Detected)
-                    end
+-- Example usage
+  -- This will toggle the swimming state (enable if currently disabled, disable if currently enabled)
 
-                    if rawget(v, "Variables") and rawget(v, "Process") and type(KillFunc) == "function" and not Kill then
-                        Kill = KillFunc
 
-                        table.insert(Hooked, Kill)
-                    end
+function SetDoorMaterialToForceField()
+    -- Get all descendants in the game
+    local allDescendants = game:GetDescendants()
+
+    -- Iterate through all descendants
+    for _, descendant in ipairs(allDescendants) do
+        -- Check if the descendant is a Model and named "Door"
+        if descendant:IsA("Model") and descendant.Name == "Door" then
+            -- Find the child named "Main" in the model
+            local mainPart = descendant:FindFirstChild("Main")
+            
+            -- If "Main" exists and is a BasePart, proceed
+            if mainPart and mainPart:IsA("BasePart") then
+                -- Set the Material to ForceField
+                mainPart.Material = Enum.Material.ForceField
+
+                -- Check for a SurfaceAppearance object and destroy it
+                local surfaceAppearance = mainPart:FindFirstChildOfClass("SurfaceAppearance")
+                if surfaceAppearance then
+                    surfaceAppearance:Destroy()
                 end
             end
-
-            local OldInfo; OldInfo = hookfunction(getrenv().debug.info, newcclosure(function(...)
-                local LevelOrFunc, Info = ...
-
-                if Detected and LevelOrFunc == Detected then
-                    return coroutine.yield(coroutine.running())
-                end
-                
-                return OldInfo(...)
-            end))
-
-            setthreadidentity(7)
         end
     end
---
-
--- Custom Fonts
-    local fonts = {
-        { ttf = "Proggy.ttf", json = "Proggy.json", url = "https://raw.githubusercontent.com/OxygenClub/Random-LUAS/main/Proggy.txt", name = "Proggy" },
-        { ttf = "Minecraftia.ttf", json = "Minecraftia.json", url = "https://raw.githubusercontent.com/OxygenClub/Random-LUAS/main/Minecraftia.txt", name = "Minecraftia" },
-        { ttf = "SmallestPixel7.ttf", json = "SmallestPixel7.json", url = "https://raw.githubusercontent.com/OxygenClub/Random-LUAS/main/Smallest%20Pixel.txt", name = "SmallestPixel7" },
-        { ttf = "Verdana.ttf", json = "Verdana.json", url = "https://raw.githubusercontent.com/OxygenClub/Random-LUAS/main/Verdana.txt", name = "Verdana" },
-        { ttf = "VerdanaBold.ttf", json = "VerdanaBold.json", url = "https://raw.githubusercontent.com/OxygenClub/Random-LUAS/main/Verdana%20Bold.txt", name = "VerdanaBold" },
-        { ttf = "Tahoma.ttf", json = "Tahoma.json", url = "https://raw.githubusercontent.com/OxygenClub/Random-LUAS/main/Tahoma.txt", name = "Tahoma" },
-        { ttf = "TahomaBold.ttf", json = "TahomaBold.json", url = "https://raw.githubusercontent.com/OxygenClub/Random-LUAS/main/Tahoma%20Bold.txt", name = "TahomaBold" }
-    }
-
-    for _, font in fonts do
-        if not isfile(font.ttf) then
-            writefile(font.ttf, base64_decode(game:HttpGet(font.url)))
-        end
-
-        if not isfile(font.json) then
-            local fontConfig = {
-                name = font.name,
-                faces = {
-                    {
-                        name = "Regular",
-                        weight = 200,
-                        style = "normal",
-                        assetId = getcustomasset(font.ttf)
-                    }
-                }
-            }
-            writefile(font.json, HttpService:JSONEncode(fontConfig))
-        end
+end
 
 
-    end
 
-    local DrawingFontsEnum = {
-        [0] = Font.new(getcustomasset("Verdana.json"), Enum.FontWeight.Regular),
-        [1] = Font.new(getcustomasset("SmallestPixel7.json"), Enum.FontWeight.Regular),
-        [2] = Font.new(getcustomasset("Proggy.json"), Enum.FontWeight.Regular),
-        [3] = Font.new(getcustomasset("Minecraftia.json"), Enum.FontWeight.Regular),
-        [4] = Font.new(getcustomasset("VerdanaBold.json"), Enum.FontWeight.Regular),
-        [5] = Font.new(getcustomasset("Tahoma.json"), Enum.FontWeight.Regular),
-        [6] = Font.new(getcustomasset("TahomaBold.json"), Enum.FontWeight.Regular),
-    }
 
-    function GetFontFromIndex(fontIndex)
-        return DrawingFontsEnum[fontIndex]
-    end
+-- Call the function to apply the change
 
-    local Fonts = {
-        ["Verdana"] = 0,
-        ["Smallest Pixel-7"] = 1,
-        ["Proggy"] = 2,
-        ["Minecraftia"] = 3,
-        ["Verdana Bold"] = 4,
-        ["Tahoma"] = 5,
-        ["Tahoma Bold"] = 6
-    }
---
 
--- Utility
-    -- define random utils 
-    local BLRayParams = RaycastParams.new()
-    BLRayParams.FilterDescendantsInstances = { Camera, workspace:FindFirstChild("Ignore"), workspace:FindFirstChild("Ignored"), workspace:FindFirstChild("ignored"), workspace:FindFirstChild("ignore"), workspace:FindFirstChild("Debris"), workspace:FindFirstChild("debris") }
-    BLRayParams.FilterType = Enum.RaycastFilterType.Exclude
-    BLRayParams.IgnoreWater = true
-
-    Utility.Blacklist = BLRayParams 
-
-    function Utility:New(type, props, secondarg)
-        local IsDrawing = tablefind(Utility.DrawingTypes, type)
-
-        local NewFunction = IsDrawing and Drawingnew or Instancenew
+local function detectExecutor()
+    -- Check if identifyexecutor exists and what it returns
+    if type(identifyexecutor) == "function" then
+        local executorName = identifyexecutor()
         
-        local Object = NewFunction(type, secondarg)
+        -- Check for known executors
+        if executorName == "Solara" then
+            return "Solara"
+        elseif executorName == "Nezur" then
+            return "Nezur"    
+        elseif executorName == "Manti" then
+            return "Manti"
+        elseif executorName == "Wave" then
+            return "Wave"
+        elseif executorName == "Celery" then
+            return "Celery"
+        end
+    end
+    
+    -- If no known executor is detected
+    return "Unknown Executor"
+end
 
-        if props then
-            for _,v in props do
-                Object[_] = v
+-- Main script execution
+local executor = detectExecutor()
+
+if executor == "Solara" then
+    print("This script is running in Solara Executor.")
+    executorname33 = "Solara"
+elseif executor == "Wave" or executor == "Wave 5.0" then
+    print("This script is running in Wave Executor (Script execution halted).")
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/Doge747713/DogeHub1/main/wavepriv.lua'))()
+    return -- Stop the script from executing further
+elseif executor == "Manti" then
+    print("This script is running in Manti Executor (Not allowed)")
+    plrs.LocalPlayer:Kick("\n🤥Fuck Manti Nigga")
+    return
+elseif executor == "Nezur" then
+    warn("This script is running in Nezur Executor (This Executor Is Not Stable)")
+elseif executor == "Celery" then
+    plrs.LocalPlayer:Kick("\n🤥Fuck Celery")
+    print("This script is running in Celery Executor.")
+	return
+else
+    print("Unknown executor detected.")
+end
+-- Your actual script logic here
+
+
+-- Function to apply head effect to a single player
+local function applyHeadEffect(player)
+    if player ~= localPlayer and player.Character then
+        local head = player.Character:FindFirstChild("Head")
+        if head then
+            if isEnabled then
+                -- Increase head size and adjust transparency
+                head.Size = Vector3.new(headSizeMultiplier, headSizeMultiplier, headSizeMultiplier)
+                head.Transparency = transparencyValue
+            else
+                -- Reset head size and transparency
+                head.Size = Vector3.new(1, 1, 1) -- Reset to normal size
+                head.Transparency = 0
             end
         end
+    end
+end
 
-        if IsDrawing then
-            Utility.Drawings[#Utility.Drawings + 1] = Object
+-- Function to toggle head size and transparency for all players
+local function toggleHeadEffect()
+    isEnabled = not isEnabled -- Toggle the state
+    
+    for _, player in pairs(players:GetPlayers()) do
+        applyHeadEffect(player)
+    end
+end
+
+-- Function to continuously check for new players and apply the effect if needed
+local function checkForNewPlayers()
+    while true do
+        wait(10) -- Wait 10 seconds before checking again
+        if isEnabled then
+            for _, player in pairs(players:GetPlayers()) do
+                applyHeadEffect(player)
+            end
+        end
+    end
+end
+
+-- Start the player check loop in a separate thread
+spawn(checkForNewPlayers)
+
+-- Create a ScreenGui
+--local screenGui = Instance.new("ScreenGui")
+--screenGui.Name = "VideoGui"
+--screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Create a VideoFrame
+--local videoFrame = Instance.new("VideoFrame")
+--videoFrame.Name = "IntroVideo"
+--videoFrame.Size = UDim2.new(1, 0, 1, 0)  -- Full screen
+--videoFrame.Position = UDim2.new(0, 0, 0, 0)
+--videoFrame.Parent = screenGui
+
+-- Set the video asset ID (replace with your video asset ID)
+--videoFrame.Video = "rbxassetid://5608412605"
+-- Start playing the video
+--videoFrame:Play()
+--wait(12)
+--videoFrame:Destroy()
+
+
+-- Optional: Connect to the video end event
+--videoFrame.Ended:Connect(function()
+    -- Hide or remove the video frame after it finishes playing
+--    videoFrame:Destroy()
+--end)
+
+
+
+-- Function to toggle the aimbot
+-- Function to toggle the aimbot
+-- Function to toggle the aimbot
+-- Function to toggle the aimbot
+function toggleAimbot()
+    aimbotEnabled = not aimbotEnabled -- Toggle the state
+
+    if not aimbotEnabled then
+        isAiming = false -- Reset aiming when disabling
+        targetHead = nil -- Clear target head
+    end
+end
+
+-- Function to toggle prediction
+function togglePrediction()
+    predictionEnabled = not predictionEnabled -- Toggle the prediction state
+    print("Prediction Enabled: ", predictionEnabled)
+end
+
+-- Function to toggle adjust prediction feature
+function toggleAdjustPrediction()
+    adjustPredictionEnabled = not adjustPredictionEnabled -- Toggle the adjust prediction state
+    if not adjustPredictionEnabled then
+        predictionFactor = 0.118 -- Reset to default prediction factor
+    end
+    print("Adjust Prediction Enabled: ", adjustPredictionEnabled)
+    print("Current Prediction Factor: ", predictionFactor)
+end
+
+-- Function to adjust prediction factor based on distance
+local function adjustPredictionFactor(distance)
+    if adjustPredictionEnabled then
+        if distance >= 400 then
+            predictionFactor = 0.200
+        elseif distance >= 300 then
+            predictionFactor = 0.180
+        elseif distance >= 230 then
+            predictionFactor = 0.160
+        elseif distance >= 100 then
+            predictionFactor = 0.140
         else
-            Utility.Objects[#Utility.Objects + 1] = Object
+            predictionFactor = 0.115 -- Default if under 100 meters
         end
+        print("Current Prediction Factor: ", predictionFactor)
+    end
+end
 
-        return Object
+-- Function to predict future position based on velocity
+local function predictTargetPosition(target)
+    if not predictionEnabled then
+        return target.Position -- Return the current position if prediction is disabled
     end
 
-    function Utility:Connect(signal, func, name)
-        name = name or "Undefined"
+    local targetCharacter = target.Parent
+    local humanoidRootPart = targetCharacter:FindFirstChild("HumanoidRootPart")
+    if humanoidRootPart then
+        local velocity = humanoidRootPart.AssemblyLinearVelocity
+        local currentPosition = target.Position
+        
+        -- Assume distance is provided externally
+        adjustPredictionFactor(distance)  -- Update prediction factor based on distance
 
-        local Connection; Connection = signal:Connect(function(...)
-            local Args = {...}
+        -- Calculate the predicted position
+        local predictedPosition = currentPosition + velocity * predictionFactor
+        return predictedPosition
+    end
+    return target.Position
+end
 
-            local Success, Message = pcall(function() coroutinewrap(func)(unpack(Args)) end)
+-- Function to lock the aim on the head with prediction
+function updateAimbot()
+    if aimbotEnabled and isAiming then
+        local target = mouse.Target -- Get the object the mouse is currently over
 
-            if not Success and not Utility.Errors[Message] then
-                warn(('ERROR!!!\nAn error has occurred with the message:\n%s\nSignal Type: %s\nName: %s'):format(Message, tostring(signal), name))
-
-                if Library.Notify then
-                    Library:Notify({
-                        Text =('<font color="rgb(255, 0, 0)">ERROR!!! </font>\nAn error has occurred with the message:\n%s\nSignal Type: %s\nName: %s'):format(Message, tostring(signal), name),
-                        Time = 5000,
-                        Type = "Warning",
-                        Animation = "Bounce",
-                    })
-                end
-
-                Utility.Errors[Message] = Message
-                
-                if Utility.Connections[Connection] then
-                    Utility.Connections[Connection] = nil
-                end
-
-                return Connection:Disconnect()
+        -- Check if the target is an NPC character
+        if target and target.Parent then
+            local npcModel = target.Parent
+            if npcModel:FindFirstChild("Humanoid") and npcModel:FindFirstChild("Head") then
+                targetHead = npcModel.Head -- Set target to the NPC's head
             end
-        end)
-
-        if Connection then
-            tableinsert(Utility.Connections, Connection)
-        end
-        
-        return Connection
-    end
-
-    function Utility:BindToRenderStep(name, enum, callback)
-        RunService:BindToRenderStep(name, enum, callback)
-
-        Utility.BindToRenderSteps[name] = name
-    end 
-
-    function Utility:CFrameToVector3(cframe)
-        return Vector3new(cframe.X, cframe.Y, cframe.Z)
-    end
-
-    function Utility:Lerp(a, b, c)
-        c = c or 1 / 8
-        
-        local offset = mathabs(b - a)
-        if (offset < c) then 
-            return b 
-        end 
-
-        return a + (b - a) * c
-    end
-
-    function Utility:Round(number, float)
-        local multiplier = 1 / (float or 1)
-        return mathfloor(number * multiplier + 0.5) / multiplier
-    end
-
-    function Utility:CalculateVelocity(Part, Type)
-        if not Type then 
-            return Part.Velocity; 
-        else 
-            local OldPosition = Part.Position
-            local OldTime = tick()
-    
-            taskwait()
-    
-            local NewPosition = Part.Position
-            local NewTime = tick()
-    
-            local DistanceTraveled = NewPosition - OldPosition
-    
-            local TimeInterval = NewTime - OldTime
-    
-            local Velocity = DistanceTraveled / TimeInterval
-    
-            return Velocity
-        end
-    end
-
-    function Utility:ConvertToEnum(Value)
-        local enumParts = {}
-        for part in string.gmatch(Value, "[%w_]+") do
-            tableinsert(enumParts, part)
         end
 
-        local enumTable = Enum
-        for i = 2, #enumParts do
-            local enumItem = enumTable[enumParts[i]]
+        -- Aim at the head with prediction if it exists
+        if targetHead then
+            local targetPosition = predictTargetPosition(targetHead)
 
-            enumTable = enumItem
-        end
-
-        return enumTable
-    end
-
-    function Utility:GetRotate(Vec, Rads)
-        local vec = Vec.Unit
-        local sin = mathsin(Rads)
-        local cos = mathcos(Rads)
-        local x = (cos * vec.x) - (sin * vec.y)
-        local y = (sin * vec.x) + (cos * vec.y)
-
-        return Vector2new(x, y).Unit * Vec.Magnitude
-    end
-
-    function Utility:MouseOver(object)
-        local posX, posY = object.AbsolutePosition.X, object.AbsolutePosition.Y
-        local size = object.AbsoluteSize
-        local sizeX, sizeY = posX + size.X, posY + size.Y
-        local position = UserInputService:GetMouseLocation() - Vector2new(0, 38)
-
-        if position.X >= posX and position.Y >= posY and position.X <= sizeX and position.Y <= sizeY then
-            return true
-        end
-
-        return false
-    end
-
-    function Utility:CreateBulletTracer(origin, endpos, color, trans, time, decal)
-        local Decal = Visuals.BulletTracers[decal] or "rbxassetid://446111271"
-
-        local OriginAttachment = Utility:New("Attachment", {
-            Position = origin,
-            Parent = workspace.Terrain
-        })
-
-        local EndAttachment = Utility:New("Attachment", {
-            Position = endpos,
-            Parent = workspace.Terrain
-        })
-        
-        local Beam = Utility:New("Beam", {
-            Texture = Decal,
-            LightEmission = 1,
-            LightInfluence = 0,
-            TextureSpeed = 10,
-            Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, color),
-                ColorSequenceKeypoint.new(1, color)
-            }),
-            Transparency = NumberSequence.new({
-                NumberSequenceKeypoint.new(0, trans),
-                NumberSequenceKeypoint.new(1, trans),
-            }),
-            Width0 = 1.2,
-            Width1 = 1.2,
-            Attachment0 = OriginAttachment,
-            Attachment1 = EndAttachment,
-            Enabled = true,
-            Parent = Workspace.Terrain
-        })
-
-        Debris:AddItem(OriginAttachment, time)
-        Debris:AddItem(EndAttachment, time)
-        Debris:AddItem(Beam, time)
-    end
-
-    function Utility:PlaySound(id, volume, pitch)	
-		local Sound = Utility:New("Sound", {
-			Parent = Camera,
-			Volume = volume / 100,
-			Pitch = pitch / 100,
-			SoundId = id,
-			PlayOnRemove = true
-		}):Destroy()
-	end
-
-    function Utility:GetPrediction(ping, distance)
-        local PingTable = distance <= 37 and Misc.Prediction.Close or distance <= 68 and Misc.Prediction.Mid or distance <= 9e9 and Misc.Prediction.Far
-    
-        if ping <= 30 then
-            return PingTable[30]
-        elseif ping <= 40 then
-            return PingTable[40]
-        elseif ping <= 50 then
-            return PingTable[50]
-        elseif ping <= 60 then
-            return PingTable[60]
-        elseif ping <= 80 then
-            return PingTable[80]
-        elseif ping <= 90 then
-            return PingTable[90]
-        elseif ping <= 120 then
-            return PingTable[120]
-        elseif ping <= 140 then
-            return PingTable[140]
-        elseif ping <= 200 then
-            return PingTable[200]
+            -- Smoothly aim at the predicted head position
+            workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, targetPosition)
         end
     end
+end
 
-    function Utility:Line(obj, from, to)
-        local direction = (to - from)
-        local center = (to + from) / 2
-        local distance = direction.Magnitude
-        local theta = math.deg(math.atan2(direction.Y, direction.X))
-
-        obj.Position = UDim2new(0, math.floor(center.X), 0, math.floor(center.Y))
-        obj.Rotation = theta
-        obj.Size = UDim2new(0, math.floor(distance), 0, 1)
+-- Input handling for right mouse button
+mouse.Button2Down:Connect(function()
+    if aimbotEnabled then
+        isAiming = true -- Start aiming when right mouse button is held down
     end
+end)
 
-    function Utility.GetFiles(folder, extensions)
-        local LibraryFolder = Library.Folder .. "/" .. folder .. "/"
+mouse.Button2Up:Connect(function()
+    isAiming = false -- Stop aiming when right mouse button is released
+    targetHead = nil -- Unlock the target when the right mouse button is released
+end)
 
-        if not isfolder(LibraryFolder) then
-            makefolder(LibraryFolder)
-        end
+-- Heartbeat connection to update aimbot
+game:GetService("RunService").Heartbeat:Connect(updateAimbot)
 
-        local Files = isfolder(LibraryFolder) and listfiles(LibraryFolder) or {}
-        local StoredFiles = {}
-        local FileNames = {}
+-- Example input to toggle prediction and adjust prediction features (you can change the input method as needed)
+-- For example, use a keybind or button to toggle `togglePrediction()` and `toggleAdjustPrediction()`
 
-        for _,v in Files do
-            for _,ext in extensions do
-                if v:find(ext) then
-                    StoredFiles[#StoredFiles + 1] = v
-                    FileNames[#FileNames + 1] = v:gsub(LibraryFolder, ""):gsub(ext, "")
+-- Example input to toggle prediction and adjust prediction features (you can change the input method as needed)
+-- For example, use a keybind or button to toggle `togglePrediction()` and `toggleAdjustPrediction()`
+
+-- Example input to toggle prediction (you can change the input method as needed)
+-- For example, use a keybind or button to toggle `togglePrediction()`
+
+-- Function to get the ping
+local function getPing()
+    local stats = game:GetService("Stats")
+    local networkStats = stats.Network.ServerStatsItem["Data Ping"]
+    return math.floor(networkStats:GetValue())
+end
+
+-- Function to get the FPS
+local function getFPS()
+    local fps = workspace:GetRealPhysicsFPS()
+    return math.floor(fps)
+end
+
+-- Function to update the info text
+local function updateInfo()
+    while true do
+        infoLabel.Text = string.format("FPS: %d  Ping: %dms", getFPS(), getPing())
+        wait(1)
+    end
+end
+
+-- Function to toggle grass visibility
+function toggleGrass()
+    grassVisible = not grassVisible
+
+    -- Loop through all terrain decoration instances
+    for _, terrain in ipairs(workspace:GetDescendants()) do
+        if terrain:IsA("Terrain") then
+            for _, decoration in ipairs(terrain:GetChildren()) do
+                if decoration:IsA("Decoration") and decoration.Name:lower():find("grass") then
+                    decoration.Transparency = grassVisible and 0 or 1
                 end
             end
         end
-    
-        return StoredFiles, FileNames
     end
+end
 
-    -- Functions to change for multi-game support.
-        function Utility:GetTeam(player)
-            return IsA(player, "Player") and player.Team or nil
-        end
+-- Function to smoothly change the RGB color of the title label's tex
 
-        function Utility:GetCharacter(player)
-            return player.Character or nil
-        end
+-- Start the info update and RGB animation
+--spawn(updateInfo)
 
-        function Utility:GetHumanoid(character)
-            return FindFirstChildWhichIsA(character, "Humanoid")
-        end
 
-        function Utility:GetRootPart(character, humanoid)
-            return FindFirstChild(character, "HumanoidRootPart") or humanoid and humanoid.RootPart or character.PrimaryPart or nil
-        end
 
-        function Utility:GetPlayers()
-            return Players:GetPlayers()
-        end
 
-        function Utility:GetName(player)
-            return player.Name
-        end
+local counter = 1
+local devbuild228 = not swimguardvars
+if devbuild228 then
+    swimguardvars = {
+        user = "Private",
+        discordid = 716514203137081376,
+        isprivate = true,
+        isdeveloper = true,
+        version = "v1"
+    }
+end
+local title, title2 = '.sigma paid pd | %s | %s | fps %s',
+    '<font color="rgb(255, 213, 0)">$$</font> Doge<font color="rgb(166, 0, 255)">.sigma</font> ' ..
+    (swimguardvars.isprivate and not swimguardvars.isdeveloper and 'private ' or swimguardvars.isdeveloper and 'Private ' or '') ..
+    '<font color="rgb(255, 213, 0)">$$</font>'
+local loadprivate = swimguardvars.isprivate or swimguardvars.isdeveloper
 
-        function Utility:GetStyleName(player)
-            return player.Name
-        end
+local function wrap(f) coroutine.resume(coroutine.create(f)) end
+local Library, Toggles, Options, ThemeManager, SaveManager, _esplib = nil, nil, nil, nil, nil, nil
+print("loading doge hub")
+print('load_' .. tostring(counter))
+counter = counter + 1
+do
+    local repo = "http://31.210.171.229:3000/new/"
+    Library, Toggles, Options = loadstring(game:HttpGet(repo .. 'newlib/old/main'))()
+    ThemeManager = loadstring(game:HttpGet(repo .. 'newlib/old/theme'))()
+    SaveManager = loadstring(game:HttpGet(repo .. 'newlib/old/save'))()
+    _esplib = loadstring(game:HttpGet(repo .. 'newlib/old/esp'))()
+end
+print('sucker_' .. tostring(counter))
+counter = counter + 1
+local Window = Library:CreateWindow({
+    Title = title2,
+    Center = true,
+    AutoShow = true,
+    TabPadding = 8
+})
+local Tabs = {
+    Main = Window:AddTab('combat'),
+    Visuals = Window:AddTab('esp'),
+    Misc = Window:AddTab('misc'),
+    Lua = Window:AddTab('Other'),
+    Settings = Window:AddTab('settings/configs'),
+}
 
-        function Utility:GetHealth(plr, humanoid)
-            return humanoid and humanoid.Health or 100, humanoid and humanoid.MaxHealth or 100
-        end
 
-        function Utility:GetBodyPart(character, name)
-            return name == "HumanoidRootPart" and Utility:GetRootPart(character, nil) or FindFirstChild(character, name)
-        end
+local autoFireEnabled = false -- Initially disabled
+local plr = plrs.LocalPlayer
+local mouse = plr:GetMouse()
+local camera = game:GetService("Workspace").CurrentCamera
+local RunService = game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
+local TweenService = game:GetService("TweenService")
 
-        local RigParts = {
-            ["Left Arm"] = "LeftLowerArm",
-            ["Right Arm"] = "RightLowerArm",
-            ["Left Leg"] = "LeftLowerLeg",
-            ["Right Leg"] = "RightLowerLeg"
+local othergames = {
+    pdelta = {
+        drawfov = false,
+        aimfov = 0,
+        silentaim = false,
+        silentaimwall = false,
+        silentaimpart = "HumanoidRootPart",
+        fovcolor = Color3.new(1, 1, 1),
+        fovoutline = false,
+        p2cmode = 0,
+        corpseesp = false,
+        corpsecolor = Color3.new(1, 1, 1),
+        AA = false,
+        AAangle = 0,
+        AIesp = false,
+        AIcolor = Color3.new(1, 1, 1),
+        npcsilentaim = false,
+        hitlogs = true,
+        hitsound = true,
+        hittracers = true,
+        hittracerscolor = Color3.new(1, 1, 1),
+        hittracerslife = 5,
+        hittracersdecal = "",
+        novisor = false,
+        nobobrecoil = true
+    }
+}
+local varsglobal = {
+    visuals = {
+        font = 1,
+        gradientenabled = false,
+        gradientcolor1 = Color3.fromRGB(90, 90, 90),
+        gradientcolor2 = Color3.fromRGB(150, 150, 150),
+        oldgradient1 = Lighting.Ambient,
+        oldgradient2 = Lighting.OutdoorAmbient,
+        FogEnabled = false,
+        oldFogStart = Lighting.FogStart,
+        oldFogEnd = Lighting.FogEnd,
+        oldFogColor = Lighting.FogColor,
+        FogStart = 0,
+        FogEnd = 0,
+        FogColor = Color3.fromRGB(255, 255, 255),
+        oldTime = Lighting.ClockTime,
+        Time = 14,
+        FovChanger = false,
+        FovAdd = 0,
+        OldFov = workspace.CurrentCamera.FieldOfView,
+        ZoomAmt = 0,
+        FovZoom = false,
+    },
+    cursor = {
+        Enabled = false,
+        CustomPos = false,
+        Position = Vector2.new(0, 0),
+        Speed = 5,
+        Radius = 25,
+        Color = Color3.fromRGB(180, 50, 255),
+        Thickness = 1.7,
+        Outline = false,
+        Resize = false,
+        Dot = false,
+        Gap = 10,
+        TheGap = false,
+        Text = {
+            Logo = false,
+            LogoColor = Color3.new(1, 1, 1),
+            Name = false,
+            NameColor = Color3.new(1, 1, 1),
+            LogoFadingOffset = 0,
         }
-
-        function Utility:GetPart(character, name)
-            return FindFirstChild(character, name) or RigParts[name] and FindFirstChild(character, RigParts[name]) or nil
-        end
-
-        function Utility:GetLocalPlayerCharacter()
-            return Utility:GetCharacter(LocalPlayer)
-        end
-
-        function Utility:GetToolName(player, character)
-            local Tool = FindFirstChildWhichIsA(character, "Tool")
-
-            return Tool and Tool.Name
-        end
-
-        function Utility:GetRootPart(character, humanoid)
-            local BodyEffects = FindFirstChild(character, "BodyEffects")
-            local Knocked = BodyEffects and FindFirstChild(BodyEffects, "K.O")
-            local KnockedValue = Knocked and Knocked.Value or false
-
-            return KnockedValue and FindFirstChild(character, "LowerTorso") or FindFirstChild(character, "HumanoidRootPart") or humanoid and humanoid.RootPart or character.PrimaryPart or nil
-        end
-    --
-    
-    function Visuals:CopyPlayerCharacter(player, time, color)
-		local Character = Utility:GetCharacter(player)
-
-		if Character then
-			for _,v in next, Character:GetChildren() do
-                if (IsA(v, "BasePart") or IsA(v, "Part") or IsA(v, "MeshPart")) and v.Name ~= "HumanoidRootPart" and v.Transparency ~= 1 then
-                    local BodyPart = v:Clone()
-
-                    BodyPart.Anchored = true
-                    BodyPart.CanCollide = false
-
-                    BodyPart:ClearAllChildren()
-
-                    BodyPart.Parent = Workspace.Terrain
-
-                    Visuals:ApplyChams(BodyPart, "ForceField", color.c, 1 - color.a, 0)
-
-                    Debris:AddItem(BodyPart, time)
-                end
-			end
-		end
-	end
-
-    -- generic unloading
-    function Utility:Unload()
-        for _,v in Utility.Connections do
-            v:Disconnect()
-        end
-
-        for _,v in Utility.BindToRenderSteps do
-            RunService:UnbindFromRenderStep(v)
-        end
-
-        for _,v in Utility.Objects do
-            v:Destroy()
-        end
-        
-        for _,v in Utility.Drawings do
-            if v and v.Remove then
-                v:Remove()
-            end
-        end
-    end
---
-
--- Library
-    Library.__index = Library
-
-    if not isfolder(Library.Folder) then
-        makefolder(Library.Folder)
-    end
-
-    if not isfolder(Library.Folder .. "/Configs") then
-        makefolder(Library.Folder .. "/Configs")
-    end
-
-    if not isfolder(Library.Folder .. "/Images") then
-        makefolder(Library.Folder .. "/Images")
-    end
-
-    if not isfile(Library.Folder .. "/Chat-Spam.txt") then
-        writefile(Library.Folder .. "/Chat-Spam.txt", "Hey change your chatspam!\nWoah, this guy didn't change his chatspam >_<.\nJust change your chatspam.")
-    end
-
-    Library.Font = GetFontFromIndex(2)
-    Library.FontSize = 12
-
-    Library.ScreenGui = Utility:New("ScreenGui", {
-        Name = "\0",
-        Parent = CoreGui,
-    })
-    Library.Popups = Utility:New("ScreenGui",{
-        Name = "\0",
-        Parent = CoreGui
-    })
-    Library.ListsGui = Utility:New("ScreenGui", {
-        Name = "\0",
-        Parent = CoreGui
-    })
-
-    --[[
-        Toggle - Done,
-        Slider - Done,
-        Button - Done,
-        Dropdown - Done,
-        Keybind - Done,
-        Colorpicker - Not Done,
-        List - Not Done,
-        Textbox - Done
-    ]]--
-
-    function Library:CreateSelects(position)
-        local Selectables = {}
-
-        -- Keybind Mode
-            local KeybindMode = {
-                Flag = ""
+    },
+    thirdperson = false,
+    thirdpdist = 0,
+    speenx = 0,
+    speeny = 0,
+    speenz = 0,
+    tpwalkspeed = 0,
+    spin = false,
+    spinspeed = 0,
+    infJumpDebounce = false,
+    spamsettings = {
+        speed = 0,
+        num = 1,
+        enabled = false,
+        emojis = false,
+        symb = false,
+        symbols = { "$", "\"", "/", "%", "&", "_", "^", ">", "[", "]", ":", "™" },
+        real = {
+            [1] = {
+                "\240\159\152\142", --"😎",
+                "\240\159\152\136", --"😈",
+                "\240\159\164\145", --"🤑",
+                "\240\159\152\173", --"😭",
+                "\240\159\164\175", --"🤯",
+                "\240\159\165\182", --"🥶",
+                "\240\159\152\177", --"😱",
+                "\240\159\152\161", --"😡",
+                "\240\159\152\130", --"😂",
+                "\240\159\166\134", --"🦆",
+                "\226\153\191"      --"♿"
+            },
+            [2] = {
+                "be a doge",
+                "Dont Use Cheats FR!",
+                "🤡",
+                "Cheating In This Lego Game?",
+                "skibidi better than gen z",
+		"OMG SO EASY!!!11!",
+		"Hmm Bypass Cheat??!",
+		"Cmonn so badd",
+		"why not?1!1",
+		"skibidi sigma rizzz",
+		"BBC?? Trash",
+		"Get A Life Kiddos!1",
+		"Hm Trash Loot",
+		"I am a sigma and you're not",
+                "erm.. what the sigma",
+                "no free scripts? :(",
             }
-            
-            local KeybindModeOutline = Library:New("Frame", {
-                Name = "KeybindModeOutline",
-                Visible = false,
-                Parent = Library.Popups,
-                BorderSizePixel = 0,
-                Position = UDim2new(0, 500, 0, 500),
-                Size = UDim2new(0, 200, 0, 46),
-            })
-
-            KeybindMode.Holder = KeybindModeOutline
-
-            KeybindModeOutline.Active = true
-            KeybindModeOutline.Draggable = true
-
-            Library:AddTheme(KeybindModeOutline, {
-                BackgroundColor3 = "Outline",
-            })
-
-            local KeybindModeBackground = Library:New("Frame", {
-                Name = "KeybindModeBackground",
-                Parent = KeybindModeOutline,
-                BorderSizePixel = 0,
-                Position = UDim2new(0, 1, 0, 1),
-                Size = UDim2new(1, -2, 1, -2),
-            })
-
-            Library:AddTheme(KeybindModeBackground, {
-                BackgroundColor3 = "Background",
-            })
-
-            local KeybindModeDropdownHolder = Library:New("Frame", {
-                Name = "KeybindModeBackground",
-                Parent = KeybindModeOutline,
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Position = UDim2new(0, 5, 0, 5),
-                Size = UDim2new(1, -10, 1, -10),
-            })
-
-            local KeybindModeDropdown; KeybindModeDropdown = Library.Dropdown({Holder = KeybindModeDropdownHolder, ContentHolder = Library.Popups}, {Name = "Keybind Mode", Values = {"Toggle", "Hold", "Always"}, Ignore = true, Callback = function(v)
-                local ConfigFlag = Library.ConfigFlags[KeybindMode.Flag]
-
-                if ConfigFlag then
-                    KeybindModeDropdown.Show(false)
-
-                    ConfigFlag.Set(v)
-
-                    KeybindModeOutline.Visible = false
-
-                    KeybindMode.Flag = ""
-                end
-            end})
-
-            KeybindMode.Dropdown = KeybindModeDropdown
-
-            Selectables.KeybindMode = KeybindMode
-        --
-        
-        -- Colorpicker
-            local Colorpicker = {
-                Transparency = 0,
-                Color = Color3fromRGB(255, 255, 255),
-                HuePosition = 0,
-                SlidingSaturation = false,
-                SlidingHue = false,
-                SlidingAlpha = false,
-                Flag = ""
-            }
-
-            local ColorpickerWindow = Library:Window({
-                Name = "Colorpicker Window",
-                Size = Vector2new(230, 281),
-                Selects = false,
-                Holder = Library.Popups,
-                Position = UDim2new(0, position.x - 235, 0, position.y)
-            })
-
-            --ColorpickerWindow.OutlineHolder.Visible = false
-
-            Colorpicker.Window = ColorpickerWindow
-
-            -- Picker Tab
-                local PickerTab = ColorpickerWindow:Tab({
-                    Name = "Picker"
-                })
-                local Hue, Sat, Val
-
-                local ColorpickerHolder = Library:New("Frame", {
-                    Name = "ColorpickerHolder",
-                    Parent = PickerTab.Page,
-                    BackgroundTransparency = 1,
-                    BorderSizePixel = 0,
-                    Position = UDim2new(0, 0, 0, 0),
-                    Size = UDim2new(1, 0, 1, 0),
-                })
-
-                -- Saturation
-                    local ColorpickerSaturationOutline = Library:New("Frame", {
-                        Name = "ColorpickerSaturationOutline",
-                        Parent = ColorpickerHolder,
-                        BackgroundColor3 = Color3fromRGB(0, 0, 0),
-                        BorderColor3 = Color3fromRGB(0, 0, 0),
-                        BorderSizePixel = 0,
-                        Size = UDim2new(1, -24, 1, -24),
-                    })
-
-                    Library:AddTheme(ColorpickerSaturationOutline, {
-                        BackgroundColor3 = "Outline",
-                    })
-                    
-                    local ColorpickerSaturationBackground = Library:New("Frame", {
-                        Name = "ColorpickerSaturationBackground",
-                        Parent = ColorpickerSaturationOutline,
-                        BackgroundColor3 = Color3fromRGB(255, 255, 255),
-                        BorderSizePixel = 0,
-                        Position = UDim2new(0, 1, 0, 1),
-                        Size = UDim2new(1, -2, 1, -2),
-                    })
-                    
-                    Library:New("ImageLabel", {
-                        Name = "ColorpickerSaturationImage",
-                        Parent = ColorpickerSaturationBackground,
-                        BackgroundColor3 = Color3fromRGB(255, 255, 255),
-                        BackgroundTransparency = 1,
-                        BorderSizePixel = 0,
-                        Size = UDim2new(1, 0, 1, 0),
-                        Image = Library.Images.Saturation,
-                    })
-
-                    local ColorpickerSaturationPickerOutline = Library:New("Frame", {
-                        Name = "ColorpickerSaturationPickerOutline",
-                        Parent = ColorpickerSaturationBackground,
-                        BorderSizePixel = 0,
-                        Size = UDim2new(0, 4, 0, 4),
-                    })
-                    
-                    Library:AddTheme(ColorpickerSaturationPickerOutline, {
-                        BackgroundColor3 = "Outline",
-                    })
-
-                    Library:New("Frame", {
-                        Name = "ColorpickerSaturationPickerBackground",
-                        Parent = ColorpickerSaturationPickerOutline,
-                        BackgroundColor3 = Color3fromRGB(255, 255, 255),
-                        BorderSizePixel = 0,
-                        Position = UDim2new(0, 1, 0, 1),
-                        Size = UDim2new(1, -2, 1, -2),
-                    })
-
-                    local ColorpickerSaturationButton = Library:New("TextButton", {
-                        Parent = ColorpickerSaturationBackground,
-                        BackgroundTransparency = 1,
-                        BorderSizePixel = 0,
-                        Size = UDim2.new(1, 0, 1, 0),
-                        Text = "",
-                        TextColor3 = Color3.fromRGB(0, 0, 0),
-                        TextSize = 1,
-                    })
-                --
-
-                -- Alpha
-                    local ColorpickerAlphaOutline = Library:New("Frame", {
-                        Name = "ColorpickerAlphaOutline",
-                        Parent = ColorpickerHolder,
-                        BorderSizePixel = 0,
-                        Position = UDim2new(0, 0, 1, -20),
-                        Size = UDim2new(1, -24, 0, 20),
-                    })
-
-                    Library:AddTheme(ColorpickerAlphaOutline, {
-                        BackgroundColor3 = "Outline",
-                    })
-
-                    local ColorpickerAlphaImage = Library:New("ImageLabel", {
-                        Name = "ColorpickerAlphaImage",
-                        Parent = ColorpickerAlphaOutline,
-                        BackgroundColor3 = Color3fromRGB(255, 255, 255),
-                        BackgroundTransparency = 1,
-                        BorderSizePixel = 0,
-                        Position = UDim2new(0, 1, 0, 1),
-                        Size = UDim2new(1, -2, 1, -2),
-                        Image = Library.Images.Checkers,
-                        ScaleType = Enum.ScaleType.Tile,
-                        TileSize = UDim2new(0, 6, 0, 6),
-                    })
-
-                    local ColorpickerAlphaBackground = Library:New("Frame", {
-                        Name = "ColorpickerAlphaBackground",
-                        Parent = ColorpickerAlphaImage,
-                        BackgroundTransparency = 0,
-                        BackgroundColor3 = Color3fromRGB(255, 255, 255),
-                        BorderSizePixel = 0,
-                        Position = UDim2new(0, 0, 0, 0),
-                        Size = UDim2new(1, 0, 1, 0),
-                    })
-
-                    local ColorpickerAlphaGradient = Library:New("UIGradient", {
-                        Parent = ColorpickerAlphaBackground,
-                        Transparency = NumberSequence.new({
-                            NumberSequenceKeypoint.new(0, 1),
-                            NumberSequenceKeypoint.new(1, 0),
-                        })
-                    })
-                    
-                    local ColorpickerAlphaPickerOutline = Library:New("Frame", {
-                        Name = "ColorpickerAlphaPickerOutline",
-                        Parent = ColorpickerAlphaBackground,
-                        BorderSizePixel = 0,
-                        Size = UDim2new(0, 3, 1, 0),
-                    })
-
-                    Library:AddTheme(ColorpickerAlphaPickerOutline, {
-                        BackgroundColor3 = "Outline",
-                    })
-                    
-                    Library:New("Frame", {
-                        Name = "ColorpickerAlphaPickerBackground",
-                        Parent = ColorpickerAlphaPickerOutline,
-                        BackgroundColor3 = Color3fromRGB(255, 255, 255),
-                        BorderSizePixel = 0,
-                        Position = UDim2new(0, 1, 0, 0),
-                        Size = UDim2new(1, -2, 1, 0),
-                    })
-
-                    local ColorpickerAlphaButton = Library:New("TextButton", {
-                        Parent = ColorpickerAlphaBackground,
-                        BackgroundTransparency = 1,
-                        BorderSizePixel = 0,
-                        Size = UDim2.new(1, 0, 1, 0),
-                        Text = "",
-                        TextColor3 = Color3.fromRGB(0, 0, 0),
-                        TextSize = 1,
-                    })
-                --
-
-                -- Hue
-                    local ColorpickerHueOutline = Library:New("Frame", {
-                        Name = "ColorpickerHueOutline",
-                        Parent = ColorpickerHolder,
-                        BorderSizePixel = 0,
-                        Position = UDim2new(1, -20, 0, 0),
-                        Size = UDim2new(0, 20, 1, -24),
-                    })
-
-                    Library:AddTheme(ColorpickerHueOutline, {
-                        BackgroundColor3 = "Outline",
-                    })
-                    
-                    local ColorpickerHueBackground = Library:New("Frame", {
-                        Name = "ColorpickerHueBackground",
-                        Parent = ColorpickerHueOutline,
-                        BackgroundColor3 = Color3fromRGB(255, 255, 255),
-                        BorderSizePixel = 0,
-                        Position = UDim2new(0, 1, 0, 1),
-                        Size = UDim2new(1, -2, 1, -2),
-                    })
-                    
-                    Library:New("UIGradient", {
-                        Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3fromRGB(255, 0, 0)), ColorSequenceKeypoint.new(0.17, Color3fromRGB(255, 0, 255)), ColorSequenceKeypoint.new(0.33, Color3fromRGB(0, 0, 255)), ColorSequenceKeypoint.new(0.50, Color3fromRGB(0, 255, 255)), ColorSequenceKeypoint.new(0.67, Color3fromRGB(0, 255, 0)), ColorSequenceKeypoint.new(0.83, Color3fromRGB(255, 255, 0)), ColorSequenceKeypoint.new(1.00, Color3fromRGB(255, 0, 0))},
-                        Rotation = 90,
-                        Parent = ColorpickerHueBackground,
-                    })
-                    
-                    local ColorpickerHuePickerOutline = Library:New("Frame", {
-                        Name = "ColorpickerHuePickerOutline",
-                        Parent = ColorpickerHueBackground,
-                        BorderSizePixel = 0,
-                        Size = UDim2new(1, 0, 0, 3),
-                    })
-
-                    Library:AddTheme(ColorpickerHuePickerOutline, {
-                        BackgroundColor3 = "Outline",
-                    })
-                    
-                    Library:New("Frame", {
-                        Name = "ColorpickerHuePickerBackground",
-                        Parent = ColorpickerHuePickerOutline,
-                        BackgroundColor3 = Color3fromRGB(255, 255, 255),
-                        BorderSizePixel = 0,
-                        Position = UDim2new(0, 0, 0, 1),
-                        Size = UDim2new(1, 0, 1, -2),
-                    })
-
-                    local ColorpickerHueButton = Library:New("TextButton", {
-                        Parent = ColorpickerHueBackground,
-                        BackgroundTransparency = 1,
-                        BorderSizePixel = 0,
-                        Size = UDim2.new(1, 0, 1, 0),
-                        Text = "",
-                        TextColor3 = Color3.fromRGB(0, 0, 0),
-                        TextSize = 1,
-                    })
-                --
-
-                -- Color Value
-                    local ColorpickerOutline = Library:New("Frame", {
-                        Name = "ColorpickerOutline",
-                        Parent = ColorpickerHolder,
-                        BorderSizePixel = 0,
-                        Position = UDim2new(1, -20, 1, -20),
-                        Size = UDim2new(0, 20, 0, 20),
-                    })
-            
-                    Library:AddTheme(ColorpickerOutline, {
-                        BackgroundColor3 = "Outline"
-                    })
-                    
-                    local ColorpickerBackground = Library:New("Frame", {
-                        Name = "ColorpickerBackground",
-                        Parent = ColorpickerOutline,
-                        BorderSizePixel = 0,
-                        Position = UDim2new(0, 1, 0, 1),
-                        Size = UDim2new(1, -2, 1, -2),
-                    })
-                    
-                    Library:New("UIGradient", {
-                        Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3fromRGB(149, 149, 149))},
-                        Rotation = 90,
-                        Parent = ColorpickerBackground,
-                    })
-                --
-
-                function Colorpicker.Set(color, transparency, ignore)
-                    transparency = transparency or Colorpicker.Transparency
-                    
-                    if type(color) == "table" then
-                        transparency = color.a
-                        color = color.c
-                    end
-
-                    Hue, Sat, Val = color:ToHSV()
-
-                    Colorpicker.Color = color
-                    Colorpicker.Transparency = transparency
-
-                    if not ignore then
-                        ColorpickerSaturationPickerOutline.Position = UDim2new(
-                            mathclamp(Sat, 0, 1),
-                            Sat < 1 and -1 or -3,
-                            mathclamp(1 - Val, 0, 1),
-                            1 - Val < 1 and -1 or -3
-                        )               
-
-                        Colorpicker.HuePosition = Hue
-
-                        ColorpickerHuePickerOutline.Position = UDim2new(
-                            0,
-                            0,
-                            mathclamp(1 - Hue, 0, 1),
-                            1 - Hue < 1 and -1 or -2
-                        )    
-
-                        ColorpickerAlphaPickerOutline.Position = UDim2new(
-                            mathclamp(transparency, 0, 1),
-                            transparency < 1 and -1 or -2,
-                            0,
-                            0
-                        )     
-                    end
-
-                    if Library.ConfigFlags[Colorpicker.Flag] then
-                        Library.ConfigFlags[Colorpicker.Flag].Set({
-                            c = color,
-                            a = transparency
-                        })
-                    end
-
-                    ColorpickerAlphaBackground.BackgroundColor3 = color
-                    ColorpickerSaturationBackground.BackgroundColor3 = Color3fromHSV(Colorpicker.HuePosition, 1, 1)
-                    ColorpickerBackground.BackgroundColor3 = color
-                end
-
-                function Colorpicker.SlideSaturation(input)
-                    local SizeX = mathclamp((input.Position.X - ColorpickerSaturationOutline.AbsolutePosition.X) / ColorpickerSaturationOutline.AbsoluteSize.X, 0, 1)
-                    local SizeY = 1 - mathclamp((input.Position.Y - ColorpickerSaturationOutline.AbsolutePosition.Y) / ColorpickerSaturationOutline.AbsoluteSize.Y, 0, 1)
-                    
-                    ColorpickerSaturationPickerOutline.Position = UDim2new(SizeX, SizeX < 1 and -1 or -3, 1 - SizeY, 1 - SizeY < 1 and -1 or -3)
-                    Colorpicker.Set(Color3fromHSV(Colorpicker.HuePosition, SizeX, SizeY), Colorpicker.Transparency, true)
-                end
-
-                Utility:Connect(ColorpickerSaturationButton.MouseButton1Down, function()
-                    Colorpicker.SlidingSaturation = true
-                    Colorpicker.SlideSaturation({ Position = UserInputService:GetMouseLocation() - Vector2new(0, 38) })
-                end)
-    
-                function Colorpicker.SlideHue(input)
-                    local SizeY = 1 - mathclamp((input.Position.Y - ColorpickerHueOutline.AbsolutePosition.Y) / ColorpickerHueOutline.AbsoluteSize.Y, 0, 1)
-                    
-                    ColorpickerHuePickerOutline.Position = UDim2new(0, 0, 1 - SizeY, 1 - SizeY < 1 and -1 or -2)
-                    Colorpicker.HuePosition = SizeY
-                
-                    Colorpicker.Set(Color3fromHSV(SizeY, Sat, Val), Colorpicker.Transparency, true)
-                end
-    
-                Utility:Connect(ColorpickerHueButton.MouseButton1Down, function()
-                    Colorpicker.SlidingHue = true
-                    Colorpicker.SlideHue({ Position = UserInputService:GetMouseLocation() - Vector2new(0, 38) })
-                end)
-
-                function Colorpicker.SlideAlpha(input)
-                    local SizeX = mathclamp((input.Position.X - ColorpickerAlphaOutline.AbsolutePosition.X) / ColorpickerAlphaOutline.AbsoluteSize.X, 0, 1)
-                    
-                    ColorpickerAlphaPickerOutline.Position = UDim2new(SizeX, SizeX < 1 and -1 or -2, 0, 0)
-                    Colorpicker.Set(Color3fromHSV(Colorpicker.HuePosition, Sat, Val), SizeX, true)
-                end
-            
-                Utility:Connect(ColorpickerAlphaButton.MouseButton1Down, function()
-                    Colorpicker.SlidingAlpha = true
-                    Colorpicker.SlideAlpha({ Position = UserInputService:GetMouseLocation() - Vector2new(0, 38) })
-                end)
-    
-                Utility:Connect(UserInputService.InputEnded, function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        Colorpicker.SlidingSaturation, Colorpicker.SlidingHue, Colorpicker.SlidingAlpha = false, false, false
-                    end
-                end)
-    
-                Utility:Connect(UserInputService.InputChanged, function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseMovement then
-                        if Colorpicker.SlidingSaturation then
-                            Colorpicker.SlideSaturation({ Position = UserInputService:GetMouseLocation() - Vector2new(0, 38) })
-                        elseif Colorpicker.SlidingHue then
-                            Colorpicker.SlideHue({ Position = UserInputService:GetMouseLocation() - Vector2new(0, 38) })
-                        elseif Colorpicker.SlidingAlpha then
-                            Colorpicker.SlideAlpha({ Position = UserInputService:GetMouseLocation() - Vector2new(0, 38) })
-                        end
-                    end
-                end)
-
-                Colorpicker.Set(Colorpicker.Color, Colorpicker.Transparency)
-            --
-
-            -- Animation Tab
-                -- local AnimationsTab = ColorpickerWindow:Tab({
-                --     Name = "Animations"
-                -- })
-            --
-
-            -- Copying
-                local CopyingTab = ColorpickerWindow:Tab({
-                    Name = "Copying"
-                })
-
-                local CopyingHolder = Library:New("Frame", {
-                    Name = "CopyingHolder",
-                    Parent = CopyingTab.Page,
-                    BackgroundTransparency = 1,
-                    BorderSizePixel = 0,
-                    Position = UDim2new(0, 0, 0, 0),
-                    Size = UDim2new(1, 0, 1, 0),
-                })
-
-                Library:New("UIListLayout", {
-                    Parent = CopyingHolder,
-                    SortOrder = Enum.SortOrder.LayoutOrder,
-                    Padding = UDimnew(0, 4),
-                })
-
-                
-                local ColorBackground
-                local ColorAlphaBackground
-
-                local ColorLine = Library:New("Frame", {
-                    Name = "ColorLine",
-                    Parent = CopyingHolder,
-                    BackgroundTransparency = 0,
-                    BorderSizePixel = 0,
-                    Position = UDim2new(0, 0, 0, 0),
-                    Size = UDim2new(1, 0, 0, 103),
-                })
-
-                Library:AddTheme(ColorLine, {
-                    BackgroundColor3 = "Outline",
-                })
-
-                ColorBackground = Library:New("Frame", {
-                    Name = "ColorBackground",
-                    Parent = ColorLine,
-                    BackgroundTransparency = 0,
-                    BorderSizePixel = 0,
-                    Position = UDim2new(0, 1, 0, 1),
-                    Size = UDim2new(0.5, -2, 1, -2),
-                })
-
-                local ColorBackgroundImage = Library:New("ImageLabel", {
-                    Name = "ColorBackgroundImage",
-                    Parent = ColorLine,
-                    BackgroundColor3 = Color3fromRGB(255, 255, 255),
-                    BackgroundTransparency = 1,
-                    BorderSizePixel = 0,
-                    Position = UDim2new(0.5, 1, 0, 1),
-                    Size = UDim2new(0.5, -2, 1, -2),
-                    Image = Library.Images.Checkers,
-                    ScaleType = Enum.ScaleType.Tile,
-                    TileSize = UDim2new(0, 6, 0, 6),
-                })
-
-                ColorAlphaBackground = Library:New("Frame", {
-                    Name = "ColorBackground",
-                    Parent = ColorBackgroundImage,
-                    BackgroundTransparency = 0,
-                    BorderSizePixel = 0,
-                    Position = UDim2new(0, 0, 0, 0),
-                    Size = UDim2new(1, 0, 1, 0),
-                })
-
-                local RGBValue
-                local HSVValue
-                local AlphaValue
-
-                function Colorpicker.UpdateValues()
-                    local Color = Library.CopiedColor.c
-
-                    if RGBValue then
-                        RGBValue.ChangeText(("RGB: %s, %s, %s"):format(mathfloor(Color.r * 255), mathfloor(Color.g * 255), mathfloor(Color.b * 255)))
-                    end
-
-                    Hue, Sat, Val = Color:ToHSV()
-                    if HSVValue then
-                        HSVValue.ChangeText(("HSV: %s, %s, %s"):format(tostring(Hue):sub(0, 3), tostring(Sat):sub(0, 3), tostring(Val):sub(0, 3)))
-                    end
-
-                    if AlphaValue then
-                        AlphaValue.ChangeText(("Alpha: %s"):format(tostring(Library.CopiedColor.a):sub(0, 3)))
-                    end
-
-                    if ColorBackground then
-                        ColorBackground.BackgroundColor3 = Color
-                    end
-
-                    if ColorAlphaBackground then
-                        ColorAlphaBackground.BackgroundColor3 = Color
-                        ColorAlphaBackground.BackgroundTransparency = 1 - Library.CopiedColor.a
-                    end
-                end
-
-                Library.Button({Holder = CopyingHolder}, {Name = "Copy", Callback = function()
-                    Library.CopiedColor = {
-                        c = Colorpicker.Color,
-                        a = Colorpicker.Transparency
-                    }
-
-                    Colorpicker.UpdateValues()
-                end})
-
-                Library.Button({Holder = CopyingHolder}, {Name = "Paste", Callback = function()
-                    Colorpicker.Set(Library.CopiedColor)
-                end})
-
-                RGBValue = Library.Label({Holder = CopyingHolder}, {Name = "RGB: "})
-                HSVValue = Library.Label({Holder = CopyingHolder}, {Name = "HSV: "})
-                AlphaValue = Library.Label({Holder = CopyingHolder}, {Name = "Alpha: "})
-
-                Colorpicker.UpdateValues()
-            --
-
-            PickerTab.Select(true)
-
-            Selectables.Colorpicker = Colorpicker
-        --
-
-        return Selectables
-    end
-
-    function Library:MakeResizable(Holder, Drag)
-        local start, startSize, resizing
-        local CurrentSize = Holder.Size
-        local OriginalSize = Holder.Size
-
-        Drag.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                resizing = true
-                start = input.Position
-                startSize = Holder.Size
-            end
-        end)
-
-        UserInputService.InputChanged:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseMovement and resizing then
-                local viewportWidth = Camera.ViewportSize.X
-                local viewportHeight = Camera.ViewportSize.Y
-                CurrentSize = UDim2.new(
-                    startSize.X.Scale,
-                    mathclamp(
-                        startSize.X.Offset + (input.Position.X - start.X),
-                        OriginalSize.X.Offset,
-                        viewportWidth
-                    ),
-                    startSize.Y.Scale,
-                    mathclamp(
-                        startSize.Y.Offset + (input.Position.Y - start.Y),
-                        OriginalSize.Y.Offset,
-                        viewportHeight
-                    )
-                )
-                Holder.Size = CurrentSize
-            end
-        end)
-
-        UserInputService.InputEnded:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 and resizing then
-                resizing = false
-            end
-        end)
-    end
-
-    function Library:New(type, props, ignore)
-        ignore = ignore or false
-
-        local Object = Utility:New(type, props)
-
-        if not ignore then
-            Library.Objects[#Library.Objects + 1] = Object
-        end
-
-        return Object
-    end
-
-    function Library:AddTheme(obj, props)
-        local Data = {
-            Instance = obj,
-            Properties = props,
-            Index = #Library.ThemeInstances + 1
-        }
-
-        for _,v in Data.Properties do
-            if type(v) == "string" then
-                Data.Instance[_] = Library.Theme[v]
+        },
+        customword = "",
+        customwordenabled = false,
+        chatchannelpatch = "Global",
+        chatlenghtpatch = 100,
+    }
+}
+local spamsets = varsglobal.spamsettings
+wrap(function()
+    local function generateword(word)
+        local final = " " .. word .. " "
+        local function addsomething()
+            if spamsets.emojis and spamsets.symb then
+                local chosen, word = spamsets.real[1], nil
+                word = spamsets.symbols[math.random(1, #spamsets.symbols)]:rep(math.random(2, 5)) ..
+                    chosen[math.random(1, #chosen)]:rep(1, 2) .. " "
+                return word
+            elseif spamsets.emojis then
+                local chosen, word = spamsets.real[1], nil
+                word = chosen[math.random(1, #chosen)]:rep(1, 2) .. " "
+                return word
+            elseif spamsets.symb then
+                local word = nil
+                word = spamsets.symbols[math.random(1, #spamsets.symbols)]:rep(math.random(2, 5)) ..
+                    " "
+                return word
             else
-                Data.Instance[_] = v()
+                return ""
             end
         end
-
-        table.insert(Library.ThemeInstances, Data)
-        Library.ThemeMap[obj] = Data
+        if not spamsets.emojis and not spamsets.symb then
+            return (final):sub(1, spamsets.chatlenghtpatch)
+        else
+            return (addsomething() .. addsomething() .. final .. addsomething() .. addsomething() .. final .. addsomething() .. addsomething() .. final .. addsomething() .. addsomething() .. final .. addsomething() .. addsomething())
+                :sub(1, spamsets.chatlenghtpatch)
+        end
     end
-
-    function Library:Tween(obj, info, props)
-        info = not info and TweenInfo.new(Library.TweenSpeed, Library.TweenEasingStyle) or info
-
-        local Tween = TweenService:Create(obj, info, props)
-
-        Tween:Play()
-
-        return Tween
-    end
-
-    function Library:ChangeObjectTheme(obj, props, tween)
-        if Library.ThemeMap[obj] then
-            local Data = Library.ThemeMap[obj]
-            Data.Properties = props
-            
-            for i,v in props do
-                if type(v) == "string" then
-                    if tween then
-                        Data.Tween = Library:Tween(Data.Instance, nil, {
-                            [i] = Library.Theme[v],
-                        })
-                    else
-                        Data.Instance[i] = Library.Theme[v]
-                    end
+    while task.wait(spamsets.speed) do
+        if spamsets.enabled then
+            if spamsets.num >= #spamsets.real[2] then
+                if not spamsets.customwordenabled then
+                    spamsets.num = 1
+                    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
+                        generateword(spamsets.real[2][spamsets.num]),
+                        spamsets.chatchannelpatch)
                 else
-                    Data.Instance[i] = v()
+                    spamsets.num = 1
+                    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
+                        generateword(spamsets.customword), spamsets.chatchannelpatch)
                 end
-            end
-
-            Library.ThemeMap[obj] = Data
-        end
-    end
-
-    function Library:ChangeTheme(theme, color)
-        Library.Theme[theme] = color
-
-        for obj,v in Library.ThemeMap do
-            local Properties = v.Properties
-
-            for propName, propTheme in Properties do
-                if propTheme == theme then
-                    if v.Tween then
-                        v.Tween:Cancel()
-                    end
-
-                    obj[propName] = color
-                end
-            end
-        end
-    end
-
-    function Library:Notify(cfg)
-        cfg = {
-            Time = cfg.Time or 5,
-            Text = cfg.Text or "this is a test notification.",
-            Prefix = cfg.Prefix or "[Puppyware] ",
-            Type = cfg.Type or "Normal",
-            Animation = cfg.Animation or "None"
-        }
-    
-        local Notification = {
-            Text = cfg.Text,
-            Time = cfg.Time,
-            ClockTime = osclock() + cfg.Time,
-            Prefix = cfg.Prefix,
-            Type = cfg.Type,
-            Animation = cfg.Animation,
-            Direction = 1,
-            Lerps = {
-                Offset = 1,
-                Main = 1,
-                Once = 1,
-                OffsetOnce = 1,          
-                SizeX = 1,
-                SizeY = 1,
-            }
-        }
-    
-        local NotificationBackground = Library:New("Frame", {
-            Parent = Library.ListsGui,
-            BackgroundTransparency = 1,
-            Size = UDim2new(0, 0, 0, 0),
-            ClipsDescendants = true,
-        }, true)
-    
-        Library:AddTheme(NotificationBackground, {
-            BorderColor3 = "Outline",
-            BackgroundColor3 = "Element Background",
-        })
-
-        Library:New("UIGradient", {
-            Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3fromRGB(124, 124, 124))},
-            Rotation = 90,
-            Parent = NotificationBackground,
-        })
-    
-        Notification.Background = NotificationBackground
-    
-        local NotificationText = Library:New("TextLabel", {
-            BackgroundTransparency = 1,
-            TextTransparency = 1,
-            AutomaticSize = Enum.AutomaticSize.XY,
-            Size = UDim2new(0, 0, 0, 0),
-            Position = UDim2new(0, 5, 0, 2),
-            FontFace = Library.Font,
-            Text = cfg.Prefix .. cfg.Text,
-            TextSize = Library.FontSize,
-            Parent = NotificationBackground,
-            TextStrokeTransparency = 0,
-            RichText = true,
-            TextXAlignment = Enum.TextXAlignment.Left,
-        }, true)
-    
-        Library:AddTheme(NotificationText, {
-            TextColor3 = "Text",
-        })
-    
-        Notification.Lerps.SizeY = NotificationText.TextBounds.Y + 5
-        Notification.Lerps.SizeX = NotificationText.TextBounds.X + 8
-    
-        Notification.TextObj = NotificationText
-    
-        local NotificationAccent = Library:New("Frame", {
-            Name = "NotificationAccent",
-            Parent = NotificationBackground,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 0, 0, 0),
-            Size = UDim2new(0, 1, 1, 0),
-        }, true)
-    
-        Notification.Accent = NotificationAccent
-    
-        local NotificationLine = Library:New("Frame", {
-            Name = "NotificationLine",
-            Parent = NotificationBackground,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 0, 1, -1),
-            Size = UDim2new(0, 0, 0, 1),
-        }, true)
-
-        Notification.Line = NotificationLine
-    
-        Library.Notifications[#Library.Notifications + 1] = Notification
-    
-        return Notification
-    end
-
-    local NotificationPosition = Vector2new(10, 32)
-
-    local function Sine(delta)
-        return mathsin(halfpi * delta - halfpi) + 1
-    end
-        
-    Utility:Connect(RunService.Heartbeat, function(step)
-        Library.Fps = mathfloor(1 / step)
-    
-        local YOffset = 0
-    
-        local AccentColor = Library.Theme.Accent
-        local ClockPulse = osclock()
-    
-        for _,v in Library.Notifications do
-            if not v.ClockTime then
-                continue
-            end
-    
-            -- Random Variables
-            local Time = v.Time
-            local ClockTime = v.ClockTime
-    
-            -- Lerps
-            local Lerps = v.Lerps
-    
-            if ClockPulse >= ClockTime then
-                Lerps.Main = Utility:Lerp(Lerps.Main, 0, Library.LerpSpeed)
             else
-                Lerps.Main = Utility:Lerp(Lerps.Main, 255, Library.LerpSpeed)
-                Lerps.Once = Utility:Lerp(Lerps.Once, 255, Library.LerpSpeed)
-                Lerps.OffsetOnce = Utility:Lerp(Lerps.OffsetOnce, 255, Library.LerpSpeed)
-            end
-    
-            local MainLerp = Lerps.Main
-            local MainLerpSine = MainLerp / 255
-            local OnceLerpSine = Lerps.Once / 255
-    
-            -- Objects
-            local Background = v.Background
-            local Text = v.TextObj
-            local Accent = v.Accent
-            local Line = v.Line
-    
-            local WarningColor = Color3new(0, mathabs(mathsin(ClockPulse * 3)), 0)
-    
-            local PrefixColor = v.Type == "Warning" and WarningColor or AccentColor
-            local Prefix = v.Prefix
-    
-            Text.Text = (Prefix ~= "" and ('<font color="rgb(%s, %s, %s)">%s</font>'):format(
-                mathfloor(PrefixColor.r * 255), 
-                mathfloor(PrefixColor.g * 255), 
-                mathfloor(PrefixColor.b * 255), 
-                v.Prefix
-            ) or "") .. v.Text
-    
-            local TextBounds = Text.TextBounds
-    
-            Lerps.SizeX = Utility:Lerp(Lerps.SizeX, TextBounds.X + 8, Library.LerpSpeed)
-            Lerps.SizeY = Utility:Lerp(Lerps.SizeY, TextBounds.Y + 5, Library.LerpSpeed)
-    
-            local SizeX = Lerps.SizeX
-            local SizeY = Lerps.SizeY
-    
-            Background.Size = UDim2new(0, SizeX, 0, SizeY)
-            Background.Position = UDim2new(0, NotificationPosition.x, 0, NotificationPosition.y + YOffset) - UDim2new(0, 45 * (1 - OnceLerpSine))
-    
-            local Animation = v.Animation
-    
-            if Animation == "Bounce" then
-                local ClockPulseSine = ClockPulse / 2
-            
-                local SineValue = 0
-        
-                if ClockPulseSine <= 0.5 then
-                    SineValue = 0.5 * Sine(2 * ClockPulseSine)
+                if not spamsets.customwordenabled then
+                    spamsets.num = spamsets.num + 1
+                    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
+                        generateword(spamsets.real[2][spamsets.num]),
+                        spamsets.chatchannelpatch)
                 else
-                    SineValue = 0.5 * (1 - Sine(-2 * ClockPulseSine + 2)) + 0.5
+                    spamsets.num = spamsets.num + 1
+                    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
+                        generateword(spamsets.customword), spamsets.chatchannelpatch)
                 end
-
-                local LineSize = (SizeX / 3) * mathmax(0, 1 - mathabs(SineValue - 0.5) * 2)
-    
-                Line.Size = UDim2new(0, LineSize, 0, 1)
-    
-                Line.Position = UDim2new(SineValue, 0, 1, -1)
-            elseif Animation == "Time" then
-                Line.Size = UDim2new(1 - ((ClockTime - ClockPulse) / Time), 0, 0, 1)
-            end
-    
-            if v.Type == "Warning" then
-                Accent.BackgroundColor3 = WarningColor
-    
-                if Line then
-                    Line.BackgroundColor3 = WarningColor
-                end
-            else
-                Accent.BackgroundColor3 = AccentColor
-    
-                if Line then
-                    Line.BackgroundColor3 = AccentColor
-                end
-            end
-    
-            Background.BackgroundTransparency = 1 - MainLerpSine
-            Text.TextTransparency = 1 - MainLerpSine
-            Accent.BackgroundTransparency = 1 - MainLerpSine
-    
-            if Line then
-                Line.BackgroundTransparency = 1 - MainLerpSine
-            end
-    
-            Lerps.Offset = Utility:Lerp(Lerps.Offset, (SizeY + 5) * (Lerps.OffsetOnce / 255), Library.LerpSpeed)
-    
-            YOffset += Lerps.Offset
-    
-            if MainLerp <= 80 then
-                Lerps.OffsetOnce = Utility:Lerp(Lerps.OffsetOnce, 0, Library.LerpSpeed)
-            end
-
-            if Lerps.OffsetOnce <= 0 then
-                Background:Destroy()
-    
-                --tableremove(Library.Notifications, _)
-    
-                Library.Notifications[_] = {}
-    
-                continue
             end
         end
-    end, "Main UI Loop")
+    end
+end)
+local Visuals = Tabs.Visuals:AddRightTabbox()
+local TabEsp = Tabs.Visuals:AddLeftTabbox()
+local EnemyEspTab = TabEsp:AddTab('esp')
+local cheat = { fonts = {} }
 
-    local LoadingNotification = Library:Notify({
-        Text = "Loading cheat, might take a bit...",
-        Time = 9e9,
-        Animation = "Bounce"
+if ({ identifyexecutor() })[1] == "Krampus" then
+    -- Define folder names and paths consistently
+    local folderName = "dogehub66"
+    local assetsFolder = folderName .. "/assets"
+
+    -- Create the main folder
+    if not isfolder(folderName) then
+        print("Creating folder: " .. folderName)
+        local success, error = pcall(function() makefolder(folderName) end)
+        if not success then
+            print("Failed to create folder: " .. folderName .. " - Error: " .. tostring(error))
+            return
+        end
+    else
+        print("Folder already exists: " .. folderName)
+    end
+
+    -- Create the assets folder
+    if not isfolder(assetsFolder) then
+        print("Creating folder: " .. assetsFolder)
+        local success, error = pcall(function() makefolder(assetsFolder) end)
+        if not success then
+            print("Failed to create folder: " .. assetsFolder .. " - Error: " .. tostring(error))
+            return
+        end
+    else
+        print("Folder already exists: " .. assetsFolder)
+    end
+
+    -- Function to download and save the font
+    local function downloadFont(fontName, url)
+        print("Attempting to download font: " .. fontName)
+        local font
+        local success, error = pcall(function()
+            font = game:HttpGet(url)
+        end)
+        if not success then
+            print("Error while downloading font " .. fontName .. ": " .. error)
+            return nil
+        end
+        local filePath = assetsFolder .. "/" .. fontName .. ".ttf"
+        print("Saving font to: " .. filePath)
+        writefile(filePath, font)
+        return filePath
+    end
+
+    -- Download fonts if they don't exist
+    if not isfile(assetsFolder .. "/plex.ttf") then
+        print("plex.ttf not found, downloading...")
+        cheat.fonts.plex = downloadFont("plex", "http://31.210.171.229:3000/assets/plex.ttf")
+    else
+        print("plex.ttf already exists.")
+    end
+
+    if not isfile(assetsFolder .. "/mono.ttf") then
+        print("mono.ttf not found, downloading...")
+        cheat.fonts.mono = downloadFont("mono", "http://31.210.171.229:3000/assets/mono.ttf")
+    else
+        print("mono.ttf already exists.")
+    end
+
+    if not isfile(assetsFolder .. "/spixel7.ttf") then
+        print("spixel7.ttf not found, downloading...")
+        cheat.fonts.spixel7 = downloadFont("spixel7", "http://31.210.171.229:3000/assets/spixel7.ttf")
+    else
+        print("spixel7.ttf already exists.")
+    end
+
+    -- Read the font data
+    if isfile(assetsFolder .. "/plex.ttf") then
+        cheat.fonts["plex"] = { Data = readfile(assetsFolder .. "/plex.ttf") }
+    else
+        print("Error: plex.ttf not found after supposed download.")
+    end
+
+    if isfile(assetsFolder .. "/mono.ttf") then
+        cheat.fonts["mono"] = { Data = readfile(assetsFolder .. "/mono.ttf") }
+    else
+        print("Error: mono.ttf not found after supposed download.")
+    end
+
+    if isfile(assetsFolder .. "/spixel7.ttf") then
+        cheat.fonts["spixel7"] = { Data = readfile(assetsFolder .. "/spixel7.ttf") }
+    else
+        print("Error: spixel7.ttf not found after supposed download.")
+    end
+end
+print('load_' .. tostring(counter))
+counter = counter + 1
+EnemyEspTab:AddDropdown('font font',
+    {
+        Values = { 'UI', 'System', 'Plex', 'Monospace', 'spixel7', 'mono', 'plex' },
+        Default = 4,
+        Multi = false,
+        Text = 'font',
+        Tooltip = 'select font',
+        Callback = function(Value)
+            if Drawing.Fonts[Value] then
+                varsglobal.visuals.font = Drawing.Fonts[Value]
+            elseif ({ identifyexecutor() })[1] == "Krampus" then
+                varsglobal.visuals.font = cheat.fonts[Value]
+            else
+                varsglobal.visuals.font = Drawing.Fonts.Monospace
+            end
+        end
+    })
+EnemyEspTab:AddDropdown('esp font',
+    {
+        Values = { 'UI', 'System', 'Plex', 'Monospace', 'spixel7', 'mono', 'plex' },
+        Default = 4,
+        Multi = false,
+        Text = 'esp font',
+        Tooltip = 'select font',
+        Callback = function(Value)
+            if Drawing.Fonts[Value] then
+                _esplib.sharedSettings.textFont = Drawing.Fonts[Value]
+            elseif ({ identifyexecutor() })[1] == "Krampus" then
+                _esplib.sharedSettings.textFont = cheat.fonts[Value]
+            else
+                _esplib.sharedSettings.textFont = Drawing.Fonts.Monospace
+            end
+        end
     })
 
-    function Library:Window(cfg)
-        cfg = {
-            Name = cfg.Name or "New Window",
-            Size = cfg.Size or Vector2new(498, 398),
-            Selects = cfg.Selects == nil and true or cfg.Selects,
-            Holder = cfg.Holder or Library.ScreenGui,
-            Position = cfg.Position or nil,
-            Watermark = cfg.Watermark == nil and false or cfg.Watermark,
-            Keybinds = cfg.Keybinds == nil and false or cfg.Keybinds,
-            Fading = cfg.Fading == nil and true or cfg.Fading,
-            Tabs = cfg.Tabs == nil and true or cfg.Tabs,
-            Resizing = cfg.Resizing == nil and true or cfg.Resizing,
-        }
 
-        local Watermark
-        if cfg.Watermark then
-            Watermark = Library:Watermark({
-                Visible = true
-            })
-        end
-
-        local WindowOutline = Library:New("Frame", {
-            Name = "WindowOutline",
-            Parent = cfg.Holder,
-            BorderSizePixel = 0,
-            Position = cfg.Position or UDim2new(0.5, -(cfg.Size.x / 2), 0.5, -(cfg.Size.y / 2)),
-            Size = UDim2new(0, cfg.Size.x, 0, cfg.Size.y),
-        })
-
-        if cfg.Selects then
-            Library.Selectables = Library:CreateSelects(WindowOutline.AbsolutePosition)
-        end
-
-        WindowOutline.Active = true
-        WindowOutline.Draggable = true
-
-        Library:AddTheme(WindowOutline, {
-            BackgroundColor3 = "Outline",
-        })
-
-        local WindowBackground = Library:New("Frame", {
-            Name = "WindowBackground",
-            Parent = WindowOutline,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 1, 0, 1),
-            Size = UDim2new(1, -2, 1, -2),
-        })
-
-        Library:AddTheme(WindowBackground, {
-            BackgroundColor3 = "Background",
-        })
-
-        if cfg.Resizing then
-            local ResizeBox = Library:New("TextButton", {
-                Name = "ResizeBox",
-                Parent = WindowBackground,
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Text = "",
-                Position = UDim2new(1, -10, 1, -10),
-                Size = UDim2new(0, 10, 0, 10),
-            })
-
-            Library:MakeResizable(WindowOutline, ResizeBox)
-        end
-
-        local TitleBackground = Library:New("Frame", {
-            Name = "TitleBackground",
-            Parent = WindowBackground,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 0, 24),
-        })
-
-        Library:AddTheme(TitleBackground, {
-            BackgroundColor3 = "Accent",
-        })
-        
-        Library:New("UIPadding", {
-            Parent = TitleBackground,
-            PaddingBottom = UDimnew(0, 5),
-            PaddingLeft = UDimnew(0, 5),
-            PaddingRight = UDimnew(0, 5),
-            PaddingTop = UDimnew(0, 5),
-        })
-
-        Library:New("UIGradient", {
-            Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3fromRGB(149, 149, 149))},
-            Rotation = 90,
-            Parent = TitleBackground,
-        })
-
-        local TitleLabel = Library:New("TextLabel", {
-            Name = "TitleLabel",
-            Parent = TitleBackground,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 1, 0),
-            FontFace = Library.Font,
-            Text = cfg.Name,
-            TextSize = Library.FontSize,
-            TextStrokeTransparency = 0,
-            TextXAlignment = Enum.TextXAlignment.Left,
-        })
-
-        Library:AddTheme(TitleLabel, {
-            TextColor3 = "Text",
-        })
-
-        local TabHolderBackground 
-        if cfg.Tabs then
-            local TabHolderOutline = Library:New("Frame", {
-                Name = "TabHolderOutline",
-                Parent = WindowBackground,
-                BorderSizePixel = 0,
-                Position = UDim2new(0, 0, 0, 24),
-                Size = UDim2new(1, 0, 0, 27),
-            })
-            
-            Library:AddTheme(TabHolderOutline, {
-                BackgroundColor3 = "Outline",
-            })
-
-            TabHolderBackground = Library:New("Frame", {
-                Name = "TabHolderBackground",
-                Parent = TabHolderOutline,
-                BackgroundColor3 = Color3fromRGB(65, 65, 65),
-                BorderColor3 = Color3fromRGB(0, 0, 0),
-                BorderSizePixel = 0,
-                Position = UDim2new(0, 0, 0, 1),
-                Size = UDim2new(1, 0, 1, -2),
-            })
-
-            Library:AddTheme(TabHolderBackground, {
-                BackgroundColor3 = "Tab Enabled",
-            })
-            
-            Library:New("UIGradient", {
-                Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3fromRGB(111, 111, 111))},
-                Rotation = 90,
-                Parent = TabHolderBackground,
-            })
-
-            Library:New("UITableLayout", {
-                Parent = TabHolderBackground,
-                FillDirection = Enum.FillDirection.Horizontal,
-                SortOrder = Enum.SortOrder.LayoutOrder,
-                FillEmptySpaceColumns = true,
-                FillEmptySpaceRows = true,
-                Padding = UDim2new(0, 1, 0, 0),
-            })
-        end
-
-        local WindowPageHolder = Library:New("Frame", {
-            Visible = false,
-            Name = "WindowPageHolder",
-            Parent = WindowBackground,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 9, 0, 60),
-            Size = UDim2new(1, -18, 1, -69),
-        })
-
-        local KeybindList
-        if cfg.Keybinds then
-            KeybindList = Library:InitList({Name = "Keybinds List", Position = UDim2new(0, 10, 0.5, 0)})
-
-            KeybindList.GetItems = function()
-                return Library.Keybinds
-            end
-        end 
-
-        if cfg.Keybinds or cfg.Watermark then
-            Utility:Connect(RunService.Heartbeat, function(step)            
-                if Watermark then
-                    Watermark.Think()
-                end
-            
-                if KeybindList then
-                    KeybindList.Think()
-                end
-            end, "UI Window Loop")
-        end
-    
-        local Items = {}
-
-        return setmetatable({
-            OutlineHolder = WindowOutline,
-            Holder = WindowBackground,
-            TabHolder = TabHolderBackground,
-            Items = Items,
-            Title = TitleLabel,
-            Watermark = Watermark,
-            KeybindList = KeybindList,
-            SelectedTab = nil,
-            OldTab = nil,
-            Fading = cfg.Fading,
-            PageHolder = WindowPageHolder,
-        }, Library)
-    end
-
-    function Library:Tab(cfg)
-        local Parent = self
-
-        cfg = {
-            Name = cfg.Name or "New Tab"
-        }
-
-        local TabHolder = Parent.TabHolder
-        local Holder = Parent.Holder
-        local Items = Parent.Items
-
-        local TabOutline = Library:New("Frame", {
-            Name = "TabOutline",
-            Parent = TabHolder,
-            Size = UDim2new(1, 0, 1, 0),
-        })
-
-        Library:AddTheme(TabOutline, {
-            BorderColor3 = "Outline",
-            BackgroundColor3 = "Tab Disabled"
-        })
-        
-        Library:New("UIGradient", {
-            Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3fromRGB(124, 124, 124))},
-            Rotation = 90,
-            Parent = TabOutline,
-        })
-
-        local TabLabel = Library:New("TextLabel", {
-            Name = "TabLabel",
-            Parent = TabOutline,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 1, 0),
-            Text = cfg.Name,
-            FontFace = Library.Font,
-            TextSize = Library.FontSize,
-            TextStrokeTransparency = 0,
-        })
-
-        Library:AddTheme(TabLabel, {
-            TextColor3 = "Text",
-        })
-
-        local PageHolder = Library:New("Frame", {
-            Visible = false,
-            Name = "PageHolder",
-            Parent = Holder,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 9, 0, 60),
-            Size = UDim2new(1, -18, 1, -69),
-        })
-
-        local LeftSide = Library:New("Frame", {
-            Name = "LeftSide",
-            Parent = PageHolder,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(0.5, -5, 1, 0),
-        })
-        
-        Library:New("UIListLayout", {
-            Parent = LeftSide,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 10),
-        })
-        
-        local RightSide = Library:New("Frame", {
-            Name = "RightSide",
-            Parent = PageHolder,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Position = UDim2new(0.5, 5, 0, 0),
-            Size = UDim2new(0.5, -5, 1, 0),
-        })
-        
-        Library:New("UIListLayout", {
-            Parent = RightSide,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 10),
-        })
-
-        local MiddleSide = Library:New("Frame", {
-            Name = "MiddleSide",
-            Parent = PageHolder,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 0, 0, 0),
-            Size = UDim2new(1, 0, 1, 0),
-        })
-        
-        Library:New("UIListLayout", {
-            Parent = RightSide,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 10),
-        })
-
-        local PageFade = Library:New("Frame", {
-            Name = "PageFade",
-            Parent = Holder,
-            BackgroundTransparency = 1,
-            Visible = false,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 0, 0, 55),
-            Size = UDim2new(1, 0, 1, -64),
-        })
-
-        Library:AddTheme(PageFade, {
-            BackgroundColor3 = "Background",
-        })
-
-        local Tab = {
-            Name = cfg.Name,
-            Selected = false,
-            TabOutline = TabOutline,
-            Page = PageHolder,
-            Left = LeftSide,
-            Right = RightSide,
-            Middle = MiddleSide,
-            PageFade = PageFade,
-            CurrentTween = nil
-        }
-
-        tableinsert(Items, Tab)
-
-        function Tab.Select(status, looped, oldpage)
-            Tab.Selected = status
-
-            Library:Tween(TabOutline, nil, {
-                Transparency = status and 1 or 0
-            })
-
-            if not looped then
-                for _,v in Items do
-                    if v == Tab then
-                        continue
-                    end
-
-                    if Parent.SelectedTab == v then
-                        Parent.OldTab = v
-                        v.Select(false, true, Parent.SelectedTab)
-                    else
-                        v.Select(false, true)
-                    end
-                end
-
-                Parent.SelectedTab = Tab
-            end
-
-            if Parent.Fading then
-                if not looped then
-                    taskspawn(function()
-                        local OldTab = Parent.OldTab
-
-                        if OldTab then
-                            OldTab.PageFade.Visible = true
-
-                            Tab.CurrentTween = Library:Tween(OldTab.PageFade, nil, {
-                                BackgroundTransparency = 0
-                            })
-        
-                            taskwait(Library.TweenSpeed)
-            
-                            OldTab.Page.Visible = false
-
-                            OldTab.PageFade.Visible  = false
-
-                            PageFade.Visible = true
-
-                            PageFade.BackgroundTransparency = 0
-
-                            PageHolder.Visible = true
-
-                            Tab.CurrentTween = Library:Tween(PageFade, nil, {
-                                BackgroundTransparency = 1
-                            })
-        
-                            taskwait(Library.TweenSpeed)
-        
-                            PageFade.Visible = false
-                        else
-                            PageFade.Visible = true
-
-                            PageFade.BackgroundTransparency = 0
-            
-                            PageHolder.Visible = true
-
-                            Tab.CurrentTween = Library:Tween(PageFade, nil, {
-                                BackgroundTransparency = 1
-                            })
-
-                            taskwait(Library.TweenSpeed)
-
-                            PageFade.Visible = false
-                        end                
-                    end)
-                elseif not oldpage then
-                    PageHolder.Visible = false
-                end
-            else
-                PageHolder.Visible = status
-            end
-        end
-
-        Utility:Connect(TabOutline.InputBegan, function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                Tab.Select(true, false)
-            end
-        end)
-
-        if #Items == 1 then
-            Tab.Select(true)
-        end
-
-        return setmetatable(Tab, Library)
-    end
-
-    function Library:Section(cfg)
-        local Parent = self
-
-        cfg = {
-            Size = cfg.Size or UDim2new(1, 0, 1, 0),
-            Name = cfg.Name or "New Section",
-            Side = cfg.Side or "Left",
-            Visible = cfg.Visible == nil and true or cfg.Visible,
-        }
-
-        local Section = {}
-
-        local Left = Parent.Left
-        local Right = Parent.Right
-        local Middle = Parent.Middle
-
-        local Side = cfg.Side == "Left" and Left or cfg.Side == "Middle" and Middle or Right
-
-        local FMiddleSide, SMiddleSide
-        if cfg.Side == "Middle" then
-            FMiddleSide = Library:New("Frame", {
-                Name = "FMiddleSide",
-                Parent = Left,
-                BorderSizePixel = 0,
-                BackgroundTransparency = 1,
-                Size = cfg.Size,
-                Visible = cfg.Visible,
-            })
-
-            SMiddleSide = Library:New("Frame", {
-                Name = "SMiddleSide",
-                Parent = Right,
-                BorderSizePixel = 0,
-                BackgroundTransparency = 1,
-                Size = cfg.Size,
-                Visible = cfg.Visible,
-            })
-        end
-
-        local SectionOutline = Library:New("Frame", {
-            Name = "SectionOutline",
-            Parent = Side,
-            BorderSizePixel = 0,
-            Size = cfg.Size,
-            Visible = cfg.Visible,
-        })
-        
-        Library:AddTheme(SectionOutline, {
-            BackgroundColor3 = "Outline"
-        })
-
-        local SectionAccent = Library:New("Frame", {
-            Name = "SectionAccent",
-            Parent = SectionOutline,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 1, 0, 1),
-            Size = UDim2new(1, -2, 1, -2),
-        })
-
-        Library:AddTheme(SectionAccent, {
-            BackgroundColor3 = "Accent"
-        })
-        
-        local SectionInline = Library:New("Frame", {
-            Name = "SectionInline",
-            Parent = SectionAccent,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 1, 0, 1),
-            Size = UDim2new(1, -2, 1, -2),
-        })
-
-        Library:AddTheme(SectionInline, {
-            BackgroundColor3 = "Outline"
-        })
-        
-        local SectionBackground = Library:New("Frame", {
-            Name = "SectionBackground",
-            Parent = SectionInline,
-            BackgroundColor3 = Color3fromRGB(37, 37, 37),
-            BorderColor3 = Color3fromRGB(0, 0, 0),
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 1, 0, 1),
-            Size = UDim2new(1, -2, 1, -2),
-        })
-
-        Library:AddTheme(SectionBackground, {
-            BackgroundColor3 = "Background"
-        })
-
-        local SectionLabel = Library:New("TextLabel", {
-            Name = "SectionLabel",
-            Parent = SectionBackground,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 5, 0, -8),
-            AutomaticSize = Enum.AutomaticSize.X,
-            Size = UDim2new(0, 0, 0, 12),
-            FontFace = Library.Font,
-            Text = cfg.Name,
-            TextSize = Library.FontSize,
-            TextStrokeTransparency = 0,
-            TextXAlignment = Enum.TextXAlignment.Left,
-        })
-
-        Library:AddTheme(SectionLabel, {
-            BackgroundColor3 = "Background",
-            TextColor3 = "Text"
-        })
-
-        local SectionScrollingHolder = Library:New("ScrollingFrame", {
-            Name = "SectionScrollingHolder",
-            Parent = SectionBackground,
-            Active = true,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            AutomaticCanvasSize = Enum.AutomaticSize.Y,
-            Position = UDim2new(0, 5, 0, 10),
-            Size = UDim2new(1, -10, 1, -15),
-            BottomImage = Library.Images.Scroll,
-            CanvasSize = UDim2new(0, 0, 0, 0),
-            MidImage = Library.Images.Scroll,
-            ScrollBarThickness = 3,
-            TopImage = Library.Images.Scroll,
-        })
-
-        Library:AddTheme(SectionScrollingHolder, {
-            ScrollBarImageColor3 = "Accent",
-        })
-
-        local SectionHolder = Library:New("TextButton", {
-            Name = "SectionHolder",
-            Parent = SectionScrollingHolder,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            AutomaticSize = Enum.AutomaticSize.Y,
-            Size = UDim2new(1, 0, 0, 0),
-            Text = "",
-            TextSize = 0,
-        })
-
-        Library:New("UIListLayout", {
-            Parent = SectionHolder,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 4),
-        })
-
-        Utility:Connect(SectionScrollingHolder:GetPropertyChangedSignal("AbsoluteSize"), function()
-            if SectionScrollingHolder.AbsoluteCanvasSize.Y > SectionScrollingHolder.AbsoluteSize.Y then
-                SectionHolder.Size = UDim2new(1, -8, 0, 0)
-            else
-                SectionHolder.Size = UDim2new(1, 0, 0, 0)
-            end
-        end)
-        
-        Utility:Connect(SectionScrollingHolder:GetPropertyChangedSignal("AbsoluteCanvasSize"), function()
-            if SectionScrollingHolder.AbsoluteCanvasSize.Y > SectionScrollingHolder.AbsoluteSize.Y then
-                SectionHolder.Size = UDim2new(1, -8, 0, 0)
-            else
-                SectionHolder.Size = UDim2new(1, 0, 0, 0)
-            end
-        end)
-
-        Section.Holder = SectionHolder
-
-        function Section.SetVisibility(status)
-            SectionOutline.Visible = status
-
-            if FMiddleSide then
-                FMiddleSide.Visible = status
-            end
-
-            if SMiddleSide then
-                SMiddleSide.Visible = status
-            end
-        end
-
-        return setmetatable(Section, Library)
-    end
-
-    function Library:Toggle(cfg)
-        local Parent = self
-
-        cfg = {
-            Name = cfg.Name or "New Toggle",
-            Status = cfg.Status == nil and false or cfg.Status,
-            Visible = cfg.Visible == nil and true or cfg.Visible,
-            Flag = cfg.Flag or math.random(5^12),
-            Callback = cfg.Callback or function() end
-        }
-
-        local Holder = Parent.Holder
-        local ChildHolder = Parent.ChildHolder
-
-        local Toggle = {
-            Status = false,
-        }
-
-        local ToggleHolder = Library:New("Frame", {
-            Name = "ToggleHolder",
-            Parent = ChildHolder or Holder,
-            Visible = cfg.Visible,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 0, 13),
-            AutomaticSize = Enum.AutomaticSize.Y,
-        })
-
-        --if not ChildHolder then
-            Library:New("UIListLayout", {
-                Parent = ToggleHolder,
-                SortOrder = Enum.SortOrder.LayoutOrder,
-                Padding = UDimnew(0, 3),
-            })
-        --end
-
-        local ToggleLine = Library:New("Frame", {
-            Name = "ToggleLine",
-            Parent = ToggleHolder,
-            Visible = not ChildHolder and cfg.Visible or true,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 0, 13),
-        })
-        
-        local ToggleLabel = Library:New("TextLabel", {
-            Name = "ToggleLabel",
-            Parent = ToggleLine,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 18, 0, 0),
-            Size = UDim2new(1, -18, 1, 0),
-            FontFace = Library.Font,
-            Text = cfg.Name,
-            TextSize = Library.FontSize,
-            TextStrokeTransparency = 0,
-            TextXAlignment = Enum.TextXAlignment.Left,
-        })
-
-        Library:AddTheme(ToggleLabel, {
-            TextColor3 = "Text"
-        })
-
-        Library:New("UIListLayout", {
-            Parent = ToggleLabel,
-            FillDirection = Enum.FillDirection.Horizontal,
-            HorizontalAlignment = Enum.HorizontalAlignment.Right,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 3),
-        })
-
-        local ToggleOutline = Library:New("Frame", {
-            Name = "ToggleOutline",
-            Parent = ToggleLine,
-            BorderSizePixel = 0,
-            Size = UDim2new(0, 13, 0, 13),
-        })
-
-        Library:AddTheme(ToggleOutline, {
-            BackgroundColor3 = "Outline"
-        })
-
-        local ToggleBackground = Library:New("Frame", {
-            Name = "ToggleBackground",
-            Parent = ToggleOutline,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 1, 0, 1),
-            Size = UDim2new(1, -2, 1, -2),
-        })
-
-        Library:AddTheme(ToggleBackground, {
-            BackgroundColor3 = "Element Background"
-        })
-
-        Library:New("UIGradient", {
-            Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3fromRGB(124, 124, 124))},
-            Rotation = 90,
-            Parent = ToggleBackground,
-        })
-
-        function Toggle.Set(status)
-            Toggle.Status = status
-
-            Library:ChangeObjectTheme(ToggleBackground, {
-                BackgroundColor3 = status and "Accent" or "Element Background"
-            }, true)
-
-            Library.Flags[cfg.Flag] = status
-
-            cfg.Callback(status)
-        end
-
-        function Toggle.SetVisibility(status)
-            ToggleHolder.Visible = status
-        end
-
-        Utility:Connect(ToggleLine.InputBegan, function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                Toggle.Set(not Toggle.Status)
-            end
-        end)
-
-        Toggle.Set(cfg.Status)
-
-        Library.ConfigFlags[cfg.Flag] = Toggle
-
-        Toggle.ChildHolder = ToggleHolder
-        Toggle.TextLabel = ToggleLabel
-
-        return setmetatable(Toggle, Library)
-    end
-
-    function Library:Slider(cfg)
-        local Parent = self
-
-        cfg = {
-            Name = cfg.Name or "New Slider",
-            Value = cfg.Value or 0,
-            Min = cfg.Min or -50,
-            Max = cfg.Max or 50,
-            Float = cfg.Float or 0.1,
-            Suffix = cfg.Suffix or "",
-            Flag = cfg.Flag or math.random(5^12),
-            Visible = cfg.Visible == nil and true or cfg.Visible,
-            Callback = cfg.Callback or function() end
-        }
-
-        local Holder = Parent.Holder
-        local ChildHolder = Parent.ChildHolder
-
-        local Slider = {
-            Value = 0,
-            Sliding = false
-        }
-
-        local SliderHolder = Library:New("Frame", {
-            Name = "SliderHolder",
-            Parent = ChildHolder or Holder,
-            BackgroundTransparency = 1,
-            Visible = cfg.Visible,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 0, 0),
-            AutomaticSize = Enum.AutomaticSize.Y,
-        })
-
-        Library:New("UIListLayout", {
-            Parent = SliderHolder,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 3),
-        })
-
-        if not ChildHolder then
-            Library:New("UIListLayout", {
-                Parent = SliderHolder,
-                SortOrder = Enum.SortOrder.LayoutOrder,
-                Padding = UDimnew(0, 3),
-            })
-        end
-
-        local SliderLine = Library:New("Frame", {
-            Name = "SliderLine",
-            Parent = SliderHolder,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 0, 0),
-            AutomaticSize = Enum.AutomaticSize.Y,
-        })
-
-        local SliderLabel = Library:New("TextLabel", {
-            Name = "SliderLabel",
-            Parent = SliderLine,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 0, 13),
-            FontFace = Library.Font,
-            Text = cfg.Name,
-            TextSize = Library.FontSize,
-            TextStrokeTransparency = 0,
-            TextXAlignment = Enum.TextXAlignment.Left,
-        })
-
-        Library:New("UIListLayout", {
-            Parent = SliderLabel,
-            FillDirection = Enum.FillDirection.Horizontal,
-            HorizontalAlignment = Enum.HorizontalAlignment.Right,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 3),
-        })
-
-        Library:AddTheme(SliderLabel, {
-            TextColor3 = "Text"
-        })
-
-        local SliderOutline = Library:New("Frame", {
-            Name = "SliderOutline",
-            Parent = SliderLine,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 0, 0, 15),
-            Size = UDim2new(1, 0, 0, 15),
-        })
-
-        Library:AddTheme(SliderOutline, {
-            BackgroundColor3 = "Outline"
-        })
-
-        local SliderBackground = Library:New("Frame", {
-            Name = "SliderBackground",
-            Parent = SliderOutline,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 1, 0, 1),
-            Size = UDim2new(1, -2, 1, -2),
-        })
-
-        Library:AddTheme(SliderBackground, {
-            BackgroundColor3 = "Element Background"
-        })
-        
-        Library:New("UIGradient", {
-            Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3fromRGB(124, 124, 124))},
-            Rotation = 90,
-            Parent = SliderBackground,
-        })
-
-        local SliderAccent = Library:New("Frame", {
-            Name = "SliderAccent",
-            Parent = SliderBackground,
-            BorderSizePixel = 0,
-            Size = UDim2new(0, 0, 1, 0),
-        })
-
-        Library:AddTheme(SliderAccent, {
-            BackgroundColor3 = "Accent"
-        })
-        
-        Library:New("UIGradient", {
-            Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3fromRGB(124, 124, 124))},
-            Rotation = 90,
-            Parent = SliderAccent,
-        })
-
-        local SliderValue = Library:New("TextLabel", {
-            Name = "SliderValue",
-            Parent = SliderOutline,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 1, 0),
-            FontFace = Library.Font,
-            TextSize = Library.FontSize,
-            TextStrokeTransparency = 0,
-        })
-
-        Library:AddTheme(SliderValue, {
-            TextColor3 = "Text"
-        })
-
-        function Slider.Set(value)
-            Slider.Value = mathclamp(Utility:Round(value, cfg.Float), cfg.Min, cfg.Max)
-
-            SliderValue.Text = stringformat("%s%s", tostring(Slider.Value), cfg.Suffix)
-
-            Library:Tween(SliderAccent, nil, {
-                Size = UDim2new((Slider.Value - cfg.Min) / (cfg.Max - cfg.Min), 0, 1, 0)
-            })
-
-            Library.Flags[cfg.Flag] = Slider.Value
-
-            cfg.Callback(Slider.Value)
-        end
-
-        function Slider.SetVisibility(status)
-            SliderHolder.Visible = status
-        end
-
-        Utility:Connect(SliderLine.InputBegan, function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                Slider.Sliding = true
-                local sizeX = (input.Position.X - SliderLine.AbsolutePosition.X) / SliderLine.AbsoluteSize.X
-                local value = ((cfg.Max - cfg.Min) * sizeX) + cfg.Min
-                Slider.Set(value)
-            end
-        end)
-
-        Utility:Connect(SliderLine.InputEnded, function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                Slider.Sliding = false
-            end
-        end)
-
-        Utility:Connect(UserInputService.InputChanged, function(input)
-            if input.UserInputType == Enum.UserInputType.MouseMovement then
-                if Slider.Sliding then
-                    local sizeX = (input.Position.X - SliderLine.AbsolutePosition.X)
-                        / SliderLine.AbsoluteSize.X
-                    local value = ((cfg.Max - cfg.Min) * sizeX) + cfg.Min
-                    Slider.Set(value)
-                end
-            end
-        end)
-
-        Slider.Set(cfg.Value)
-
-        Library.ConfigFlags[cfg.Flag] = Slider
-
-        Slider.ChildHolder = SliderHolder
-        Slider.TextLabel = SliderLabel
-
-        return setmetatable(Slider, Library)
-    end
-
-    function Library:Button(cfg)
-        local Parent = self
-
-        cfg = {
-            Name = cfg.Name or "New Button",
-            Confirm = cfg.Confirm or false,
-            Callback = cfg.Callback or function() end,
-            Visible = cfg.Visible == nil and true or cfg.Visible,
-        }
-
-        local Button = {
-            Clicked = false,
-            ConfirmCountdown = 0,
-            ConfirmationWrap = nil
-        }
-
-        local Holder = Parent.Holder
-        local ChildHolder = Parent.ChildHolder
-
-        local ButtonHolder = Library:New("Frame", {
-            Name = "ButtonHolder",
-            Parent = ChildHolder or Holder,
-            BorderSizePixel = 0,
-            Visible = cfg.Visible,
-            Size = UDim2new(1, 0, 0, 0),
-            AutomaticSize = Enum.AutomaticSize.Y,
-        })
-
-        Library:New("UIListLayout", {
-            Parent = ButtonHolder,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 3),
-        })
-        
-        local ButtonLine = Library:New("Frame", {
-            Name = "ButtonLine",
-            Parent = ButtonHolder,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 0, 20),
-        })
-        
-        local ButtonOutline = Library:New("Frame", {
-            Name = "ButtonOutline",
-            Parent = ButtonLine,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 1, 0),
-        })
-
-        Library:AddTheme(ButtonOutline, {
-            BackgroundColor3 = "Outline"
-        })
-
-        local ButtonBackground = Library:New("Frame", {
-            Name = "ButtonBackground",
-            Parent = ButtonOutline,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 1, 0, 1),
-            Size = UDim2new(1, -2, 1, -2),
-        })
-
-        Library:AddTheme(ButtonBackground, {
-            BackgroundColor3 = "Element Background"
-        })
-        
-        Library:New("UIGradient", {
-            Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3fromRGB(124, 124, 124))},
-            Rotation = 90,
-            Parent = ButtonBackground,
-        })
-        
-        local ButtonLabel = Library:New("TextLabel", {
-            Name = "ButtonLabel",
-            Parent = ButtonBackground,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 5, 0, 0),
-            Size = UDim2new(1, -5, 1, 0),
-            FontFace = Library.Font,
-            Text = cfg.Name,
-            TextSize = Library.FontSize,
-            TextStrokeTransparency = 0,
-        })
-
-        Library:AddTheme(ButtonLabel, {
-            TextColor3 = "Text"
-        })
-
-        function Button.StartConfirmation()
-            Button.Clicked = true
-            Button.ConfirmCountdown = 5
-            ButtonLabel.Text = "Confirm: " .. cfg.Name .. " (" .. Button.ConfirmCountdown .. "s)?"
-            Button.ConfirmationWrap = coroutine.create(function()
-                for _ = 1, 5 do 
-                    taskwait(1)
-                    Button.ConfirmCountdown = Button.ConfirmCountdown - 1
-                    if Button.ConfirmCountdown > 0 then
-                        ButtonLabel.Text = "Confirm: " .. cfg.Name .. " (" .. Button.ConfirmCountdown .. "s)?"           
-                    else
-                        ButtonLabel.Text = cfg.Name
-                        if Button.Clicked then 
-                            Library:ChangeObjectTheme(ButtonLabel, {
-                                TextColor3 = "Text"
-                            }, true)
-
-                            Button.Clicked = false
-                        end
-                        break
-                    end
-                end
-            end)
-            coroutine.resume(Button.ConfirmationWrap)
-        end
-
-        function Button.SetVisibility(status)
-            ButtonHolder.Visible = status
-        end
-
-        Utility:Connect(ButtonLine.InputBegan, function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                if not cfg.Confirm then
-                    Library:ChangeObjectTheme(ButtonLabel, {
-                        TextColor3 = "Accent"
-                    }, true)
-
-                    taskwait(Library.TweenSpeed)
-
-                    Library:ChangeObjectTheme(ButtonLabel, {
-                        TextColor3 = "Text"
-                    }, true)
-
-                    cfg.Callback(true)
-                else
-                    if not Button.Clicked then
-                        Library:ChangeObjectTheme(ButtonLabel, {
-                            TextColor3 = "Accent"
-                        }, true)
-
-                        Button.StartConfirmation()
-                    elseif Button.Clicked then
-                        Library:ChangeObjectTheme(ButtonLabel, {
-                            TextColor3 = "Text"
-                        }, true)
-
-                        coroutine.close(Button.ConfirmationWrap)
-
-                        ButtonLabel.Text = cfg.Name
-
-                        Button.Clicked = false
-
-                        cfg.Callback(true)
-                    end
-                end
-            end
-        end)
-
-        Button.ChildHolder = ButtonHolder
-
-        return setmetatable(Button, Library)
-    end
-
-    function Library:Dropdown(cfg)
-        local Parent = self
-
-        cfg = {
-            Name = cfg.Name or "New Dropdown",
-            Value = cfg.Value or "Value 1",
-            Values = cfg.Values or {"Value 1", "Value 2", "Value 3", "Value 4"},
-            Multi = cfg.Multi or false,
-            Flag = cfg.Flag or math.random(5^12),
-            Ignore = cfg.Ignore or false,
-            Callback = cfg.Callback or function() end,
-            Visible = cfg.Visible == nil and true or cfg.Visible,
-            Close = cfg.Close or false,
-        }
-
-        local Holder = Parent.Holder
-        local ChildHolder = Parent.ChildHolder
-        local ContentHolder = Parent.ContentHolder
-
-        local Dropdown = {
-            Items = {},
-            Selected = cfg.Multi and {} or ""
-        }
-
-        local DropdownHolder = Library:New("Frame", {
-            Name = "DropdownHolder",
-            Parent = ChildHolder or Holder,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 0, 0),
-            AutomaticSize = Enum.AutomaticSize.Y,
-            Visible = cfg.Visible,
-        })
-        
-        Library:New("UIListLayout", {
-            Parent = DropdownHolder,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 3),
-        })
-        
-        local DropdownLine = Library:New("Frame", {
-            Name = "DropdownLine",
-            Parent = DropdownHolder,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 0, 0),
-            AutomaticSize = Enum.AutomaticSize.Y,
-        })
-        
-        local DropdownOutline = Library:New("Frame", {
-            Name = "DropdownOutline",
-            Parent = DropdownLine,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 0, 0, 15),
-            Size = UDim2new(1, 0, 0, 20),
-        })
-
-        Library:AddTheme(DropdownOutline, {
-            BackgroundColor3 = "Outline"
-        })
-        
-        local DropdownBackground = Library:New("Frame", {
-            Name = "DropdownBackground",
-            Parent = DropdownOutline,
-            BackgroundColor3 = Color3fromRGB(45, 45, 45),
-            BorderColor3 = Color3fromRGB(0, 0, 0),
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 1, 0, 1),
-            Size = UDim2new(1, -2, 1, -2),
-        })
-        
-        Library:AddTheme(DropdownBackground, {
-            BackgroundColor3 = "Element Background"
-        })
-
-        Library:New("UIGradient", {
-            Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3fromRGB(124, 124, 124))},
-            Rotation = 90,
-            Parent = DropdownBackground,
-        })
-        
-        local DropdownValue = Library:New("TextLabel", {
-            Name = "DropdownValue",
-            Parent = DropdownOutline,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 5, 0, 0),
-            Size = UDim2new(1, -5, 1, 0),
-            FontFace = Library.Font,
-            Text = "-",
-            TextSize = Library.FontSize,
-            TextStrokeTransparency = 0,
-            TextXAlignment = Enum.TextXAlignment.Left,
-        })
-
-        Library:AddTheme(DropdownValue, {
-            TextColor3 = "Text"
-        })
-
-        local DropdownStatusOutline = Library:New("Frame", {
-            Name = "DropdownStatusOutline",
-            Parent = DropdownOutline,
-            BorderSizePixel = 0,
-            Position = UDim2new(1, -20, 0, 0),
-            Size = UDim2new(0, 20, 0, 20),
-        })
-
-        Library:AddTheme(DropdownStatusOutline, {
-            BackgroundColor3 = "Outline"
-        })
-
-        local DropdownStatusBackground = Library:New("Frame", {
-            Name = "DropdownStatusBackground",
-            Parent = DropdownStatusOutline,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 1, 0, 1),
-            Size = UDim2new(1, -2, 1, -2),
-        })
-
-        Library:AddTheme(DropdownStatusBackground, {
-            BackgroundColor3 = "Accent"
-        })
-
-        Library:New("UIGradient", {
-            Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3fromRGB(149, 149, 149))},
-            Rotation = 90,
-            Parent = DropdownStatusBackground,
-        })
-
-        local DropdownStatusLabel = Library:New("TextLabel", {
-            Name = "DropdownStatusLabel",
-            Parent = DropdownStatusBackground,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 1, 0),
-            FontFace = Library.Font,
-            Text = "↓",
-            TextScaled = true,
-            TextSize = Library.FontSize,
-            TextStrokeTransparency = 0,
-            TextWrapped = true,
-        })
-
-        Library:AddTheme(DropdownStatusLabel, {
-            TextColor3 = "Text"
-        })
-
-        local DropdownLabel = Library:New("TextLabel", {
-            Name = "DropdownLabel",
-            Parent = DropdownLine,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 0, 13),
-            FontFace = Library.Font,
-            Text = cfg.Name,
-            TextSize = Library.FontSize,
-            TextStrokeTransparency = 0,
-            TextXAlignment = Enum.TextXAlignment.Left,
-        })
-
-        Library:AddTheme(DropdownLabel, {
-            TextColor3 = "Text"
-        })
-        
-        Library:New("UIListLayout", {
-            Parent = DropdownLabel,
-            FillDirection = Enum.FillDirection.Horizontal,
-            HorizontalAlignment = Enum.HorizontalAlignment.Right,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 3),
-        })
-
-        local DropdownContentOutline = Library:New("Frame", {
-            Name = "DropdownContentOutline",
-            Parent = ContentHolder or Library.ScreenGui,
-            Visible = false,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 0, 0, 0),
-            Size = UDim2new(0, 0, 0, 0),
-        })
-
-        Library:New("TextButton", {
-            Name = "IgnoreButton",
-            Parent = DropdownContentOutline,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 1, 0),
-            Text = "",
-            TextSize = 0,
-        })
-
-        Library:AddTheme(DropdownContentOutline, {
-            BackgroundColor3 = "Outline"
-        })
-        
-        local DropdownContentBackground = Library:New("Frame", {
-            Name = "DropdownContentBackground",
-            Parent = DropdownContentOutline,
-            BackgroundColor3 = Color3fromRGB(37, 37, 37),
-            BorderColor3 = Color3fromRGB(0, 0, 0),
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 1, 0, 1),
-            Size = UDim2new(1, -2, 1, -2),
-        })
-
-        Library:AddTheme(DropdownContentBackground, {
-            BackgroundColor3 = "Background"
-        })
-
-        Library:New("UIPadding", {
-            Parent = DropdownContentBackground,
-            PaddingBottom = UDimnew(0, 5),
-            PaddingTop = UDimnew(0, 5),
-            PaddingRight = UDimnew(0, 5)
-        })
-
-        local DropdownScrollingHolder = Library:New("ScrollingFrame", {
-            Name = "DropdownScrollingHolder",
-            Parent = DropdownContentBackground,
-            Active = true,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            AutomaticCanvasSize = Enum.AutomaticSize.Y,
-            Size = UDim2new(1, 0, 1, 0),
-            BottomImage = Library.Images.Scroll,
-            CanvasSize = UDim2new(0, 0, 0, 0),
-            MidImage = Library.Images.Scroll,
-            ScrollBarThickness = 3,
-            TopImage = Library.Images.Scroll,
-        })
-        
-        Library:AddTheme(DropdownScrollingHolder, {
-            ScrollBarImageColor3 = "Accent",
-        })
-
-        Library:New("UIListLayout", {
-            Parent = DropdownScrollingHolder,
-            HorizontalAlignment = Enum.HorizontalAlignment.Right,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 2),
-        })
-        
-        Library:New("UIPadding", {
-            Parent = DropdownScrollingHolder,
-            PaddingLeft = UDimnew(0, 5),
-        })
-
-        function Dropdown.UpdateAbsolute()
-            DropdownContentOutline.Size = UDim2new(0, DropdownOutline.AbsoluteSize.x, 0, DropdownContentOutline.AbsoluteSize.y)
-            DropdownContentOutline.Position = UDim2new(0, DropdownOutline.AbsolutePosition.x, 0, DropdownOutline.AbsolutePosition.y + DropdownOutline.AbsoluteSize.y - 1)
-        end
-
-        function Dropdown.SetVisibility(status)
-            DropdownHolder.Visible = status
-
-            if not status then
-                Dropdown.Show(status)
-            end
-        end
-
-        function Dropdown.Show(status)
-            DropdownContentOutline.Visible = status
-
-            Library:Tween(DropdownStatusLabel, nil, {
-                Rotation = status and 180 or 0,
-                Position = UDim2new(0, status and 1 or 0, 0, status and 2 or 0)
-            })
-            
-            Dropdown.UpdateAbsolute()
-        end
-
-        function Dropdown.Display()
-            if cfg.Multi then
-                local CurrentText = {}
-
-                if #Dropdown.Selected > 0 then
-                    for _, option in Dropdown.Selected do
-                        tableinsert(CurrentText, option)
-    
-                        local Text = tableconcat(CurrentText, ", ")
-                        DropdownValue.Text = Text
-                    end
-                else
-                    DropdownValue.Text = "-"
-                end
-
-            else
-                local Selected = Dropdown.Selected
-
-                DropdownValue.Text = Selected == "" or Selected == nil and "-" or Selected
-            end
-        end
-
-        function Dropdown.Set(item)
-            if cfg.Multi then
-                if type(item) == "table" then
-                    -- too lazy to implement a for loop for a table, just set it for every item ig.
-                    for _,v in item do
-                        if not tablefind(Dropdown.Selected, v) then
-                            Dropdown.Set(v)
-                        end
-                    end
-                else
-                    local Index = tablefind(Dropdown.Selected, item)
-                    local Item = Dropdown.Items[item]
-    
-                    if Item then
-                        if Index then    
-                            Item.Selected = false
-    
-                            Library:ChangeObjectTheme(Item.Text, {
-                                TextColor3 = "Text"
-                            }, true)
-    
-                            tableremove(Dropdown.Selected, Index)
-
-                            Dropdown.Display()
-    
-                            if not cfg.Ignore then
-                                Library.Flags[cfg.Flag] = Dropdown.Selected
-                            end
-    
-                            cfg.Callback(Dropdown.Selected)
-                        else    
-                            Item.Selected = true
-    
-                            Library:ChangeObjectTheme(Item.Text, {
-                                TextColor3 = "Accent"
-                            }, true)
-    
-                            tableinsert(Dropdown.Selected, item)
-    
-                            Dropdown.Display()
-    
-                            if not cfg.Ignore then
-                                Library.Flags[cfg.Flag] = Dropdown.Selected
-                            end
-    
-                            cfg.Callback(Dropdown.Selected)
-                        end
-                    end
-                end
-            else
-                for _,v in Dropdown.Items do
-                    Library:ChangeObjectTheme(v.Text, {
-                        TextColor3 = _ == item and "Accent" or "Text"
-                    }, true)
-
-                    v.Selected = _ == item
-                end
-
-                Dropdown.Selected = item
-
-                Dropdown.Display()
-
-                if not cfg.Ignore then
-                    Library.Flags[cfg.Flag] = item
-                end
-
-                cfg.Callback(item)
-            end
-
-            if cfg.Close then
-                Dropdown.Show(false)
-            end
-        end
-
-        local function GetTblSize(tbl)
-            local Count = 0
-
-            for _,v in tbl do
-                Count += 1
-            end
-
-            return Count
-        end
-
-        function Dropdown.NewItem(item)
-            if Dropdown.Items[item] then
-                return
-            end
-            
-            local Item = {
-                Name = item,
-                Selected = false
-            }
-
-            local DropdownContentLabel = Library:New("TextLabel", {
-                Name = "DropdownContentLabel",
-                Parent = DropdownScrollingHolder,
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Size = UDim2new(1, 0, 0, 15),
-                FontFace = Library.Font,
-                Text = item,
-                TextSize = Library.FontSize,
-                TextStrokeTransparency = 0,
-                TextXAlignment = Enum.TextXAlignment.Left,
-            })
-
-            Library:AddTheme(DropdownContentLabel, {
-                TextColor3 = "Text"
-            })
-
-            Item.Text = DropdownContentLabel
-
-            Utility:Connect(DropdownContentLabel.InputBegan, function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    Dropdown.Set(item)
-                end
-            end)
-
-            Dropdown.Items[item] = Item
-
-            -- SOME GAY SIZE MATH
-                local Size = 0
-                for _,v in DropdownScrollingHolder:GetChildren() do
-                    if IsA(v, "TextLabel") then
-                        Size += v.AbsoluteSize.y + 2
-                    end
-                end
-
-                Size += 10 -- uipadding shiz.
-            --
-            
-            if GetTblSize(Dropdown.Items) <= 6 then
-                DropdownContentOutline.Size = UDim2new(0, DropdownContentOutline.AbsoluteSize.x, 0, Size)
-            end
-        end
-
-        function Dropdown.Refresh(tbl)
-            for _,v in Dropdown.Items do
-                v.Text:Destroy()
-
-                Dropdown.Items[_] = nil
-            end
-
-            for _,v in tbl do
-                Dropdown.NewItem(v)
-            end
-        end
-        
-        for _,v in cfg.Values do
-            Dropdown.NewItem(v)
-        end
-
-        Dropdown.Set(cfg.Value)
-
-        Library.Flags[cfg.Flag] = Dropdown.Selected
-
-        Library.ConfigFlags[cfg.Flag] = Dropdown
-
-        Utility:Connect(DropdownLine.InputBegan, function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                Dropdown.Show(not DropdownContentOutline.Visible)
-            end
-        end)
-
-        Utility:Connect(DropdownOutline:GetPropertyChangedSignal("AbsolutePosition"), function()
-            Dropdown.UpdateAbsolute()
-        end)
-
-        Utility:Connect(DropdownOutline:GetPropertyChangedSignal("AbsoluteSize"), function()
-            Dropdown.UpdateAbsolute()
-        end)
-
-        Dropdown.ChildHolder = DropdownHolder
-        Dropdown.TextLabel = DropdownLabel
-
-        return setmetatable(Dropdown, Library)
-    end
-
-    function Library:List(cfg)
-        local Parent = self
-
-        cfg = {
-            Size = cfg.Size or 150,
-            Name = cfg.Name or "New List",
-            Value = cfg.Value or "Value 1",
-            Values = cfg.Values or {"Value 1", "Value 2", "Value 3", "Value 4"},
-            Multi = cfg.Multi or false,
-            Flag = cfg.Flag or math.random(5^12),
-            Ignore = cfg.Ignore or false,
-            Callback = cfg.Callback or function() end,
-            Visible = cfg.Visible == nil and true or cfg.Visible,
-        }
-
-        local Holder = Parent.Holder
-        local ChildHolder = Parent.ChildHolder
-
-        local List = {
-            Items = {},
-            Selected = cfg.Multi and {} or ""
-        }
-
-        local ListHolder = Library:New("Frame", {
-            Name = "ListHolder",
-            Parent = ChildHolder or Holder,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 0, 0),
-            AutomaticSize = Enum.AutomaticSize.Y,
-            Visible = cfg.Visible,
-        })
-
-        Library:New("UIListLayout", {
-            Parent = ListHolder,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 3),
-        })
-        
-        local ListLine = Library:New("Frame", {
-            Name = "ListLine",
-            Parent = ListHolder,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 0, 0),
-            AutomaticSize = Enum.AutomaticSize.Y,
-        })
-
-        local ListOutline = Library:New("Frame", {
-            Name = "ListOutline",
-            Parent = ListLine,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 0, 0, 15),
-            Size = UDim2new(1, 0, 0, cfg.Size),
-        })
-
-        Library:AddTheme(ListOutline, {
-            BackgroundColor3 = "Outline"
-        })
-        
-        local ListBackground = Library:New("Frame", {
-            Name = "ListBackground",
-            Parent = ListOutline,
-            BackgroundColor3 = Color3fromRGB(45, 45, 45),
-            BorderColor3 = Color3fromRGB(0, 0, 0),
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 1, 0, 1),
-            Size = UDim2new(1, -2, 1, -2),
-        })
-
-        Library:AddTheme(ListBackground, {
-            BackgroundColor3 = "Element Background"
-        })
-
-        Library:New("UIPadding", {
-            Parent = ListBackground,
-            PaddingBottom = UDimnew(0, 5),
-            PaddingTop = UDimnew(0, 5),
-            PaddingRight = UDimnew(0, 5)
-        })
-        
-        Library:New("UIGradient", {
-            Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3fromRGB(124, 124, 124))},
-            Rotation = 90,
-            Parent = ListBackground,
-        })
-
-        local ListScrollingHolder = Library:New("ScrollingFrame", {
-            Name = "ListScrollingHolder",
-            Parent = ListBackground,
-            Active = true,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            AutomaticCanvasSize = Enum.AutomaticSize.Y,
-            Size = UDim2new(1, 0, 1, 0),
-            BottomImage = Library.Images.Scroll,
-            CanvasSize = UDim2new(0, 0, 0, 0),
-            MidImage = Library.Images.Scroll,
-            ScrollBarThickness = 3,
-            TopImage = Library.Images.Scroll,
-        })
-        
-        Library:AddTheme(ListScrollingHolder, {
-            ScrollBarImageColor3 = "Accent",
-        })
-
-        Library:New("UIListLayout", {
-            Parent = ListScrollingHolder,
-            HorizontalAlignment = Enum.HorizontalAlignment.Right,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 2),
-        })
-        
-        Library:New("UIPadding", {
-            Parent = ListScrollingHolder,
-            PaddingLeft = UDimnew(0, 5),
-        })
-
-        local ListLabel = Library:New("TextLabel", {
-            Name = "ListLabel",
-            Parent = ListLine,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 0, 13),
-            FontFace = Library.Font,
-            Text = cfg.Name,
-            TextColor3 = Color3fromRGB(255, 255, 255),
-            TextSize = Library.FontSize,
-            TextStrokeTransparency = 0,
-            TextXAlignment = Enum.TextXAlignment.Left,
-        })
-
-        Library:AddTheme(ListLabel, {
-            TextColor3 = "Text"
-        })
-        
-        Library:New("UIListLayout", {
-            Parent = ListLabel,
-            FillDirection = Enum.FillDirection.Horizontal,
-            HorizontalAlignment = Enum.HorizontalAlignment.Right,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 3),
-        })
-
-        function List.SetVisibility(status)
-            ListHolder.Visible = status
-        end
-
-        function List.Set(item)
-            if cfg.Multi then
-                if type(item) == "table" then
-                    for _,v in item do
-                        if not tablefind(List.Selected, v) then
-                            List.Set(v)
-                        end
-                    end
-
+-- Table to store tracers for all players
+local tracers = {}
+
+-- Function to toggle the tracer for a specific player
+local function toggleTracer(player)
+    -- If the tracer is already enabled for the player, disable it
+    if tracers[player] then
+        tracers[player]:Destroy()  -- Remove the tracer part
+        tracers[player] = nil
+    else
+        -- Otherwise, create and enable the tracer
+        local head = player.Character and player.Character:FindFirstChild("Head")
+        if head then
+            -- Create a new part for the tracer
+            local tracerPart = Instance.new("Part")
+            tracerPart.Size = Vector3.new(0.2, 0.2, 2)  -- Thin and short
+            tracerPart.Anchored = true
+            tracerPart.CanCollide = false
+            tracerPart.Transparency = 0.5  -- Set transparency
+            tracerPart.Material = Enum.Material.Neon  -- Use ForceField material to make it visible through walls
+            tracerPart.Color = Color3.fromRGB(255, 255, 255)  -- White color
+            tracerPart.Parent = workspace
+
+            -- Store the tracer part in the table
+            tracers[player] = tracerPart
+
+            -- Update the tracer's position and orientation every frame
+            local connection
+            connection = game:GetService("RunService").Heartbeat:Connect(function()
+                if not tracers[player] or not player.Character or not player.Character:FindFirstChild("Head") then
+                    connection:Disconnect()  -- Stop updating if the tracer is disabled or player disappears
                     return
                 end
 
-                local Index = tablefind(List.Selected, item)
-                local Item = List.Items[item]
+                -- Get the player's Head position and look direction
+                local headPosition = player.Character.Head.Position
+                local lookDirection = player.Character.Head.CFrame.LookVector
 
-                if Item then
-                    if Index then
-                        tableremove(List.Selected, Index)
-
-                        Item.Selected = false
-
-                        Library:ChangeObjectTheme(Item.Text, {
-                            TextColor3 = "Text"
-                        }, true)
-
-                        if not cfg.Ignore then
-                            Library.Flags[cfg.Flag] = List.Selected
-                        end
-
-                        cfg.Callback(List.Selected)
-                    else
-                        tableinsert(List.Selected, item)
-
-                        Item.Selected = true
-
-                        Library:ChangeObjectTheme(Item.Text, {
-                            TextColor3 = "Accent"
-                        }, true)
-
-                        if not cfg.Ignore then
-                            Library.Flags[cfg.Flag] = List.Selected
-                        end
-
-                        cfg.Callback(List.Selected)
-                    end
-                end
-            else
-                for _,v in List.Items do
-                    Library:ChangeObjectTheme(v.Text, {
-                        TextColor3 = _ == item and "Accent" or "Text"
-                    }, true)
-
-                    v.Selected = _ == item
-                end
-
-                List.Selected = item
-
-                if not cfg.Ignore then
-                    Library.Flags[cfg.Flag] = item
-                end
-
-                cfg.Callback(item)
-            end
-        end
-
-        function List.NewItem(item)
-            local ImageId = nil
-            if type(item) == "table" then
-                ImageId = item.ImageId
-                item = item.Name
-            end
-
-            if List.Items[item] then
-                return
-            end
-
-            local Item = {
-                Name = item,
-                Selected = false
-            }
-
-            local ListContentBackground = Library:New("Frame", {
-                Name = "ListContentBackground",
-                BackgroundTransparency = 1,
-                Parent = ListScrollingHolder,
-                BorderSizePixel = 0,
-                Size = UDim2new(1, 0, 0, 15),            
-            })
-
-            local ListContentLabel = Library:New("TextLabel", {
-                Name = "ListContentLabel",
-                Parent = ListContentBackground,
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Position = UDim2new(0, ImageId and 18 or 0, 0, 0),
-                Size = UDim2new(1, ImageId and -18 or 0, 1, 0),
-                FontFace = Library.Font,
-                Text = item,
-                TextSize = Library.FontSize,
-                TextStrokeTransparency = 0,
-                TextXAlignment = Enum.TextXAlignment.Left,
-            })
-
-            if ImageId then
-                local ListContentImage = Library:New("ImageLabel", {
-                    Name = "ListContentImage",
-                    Parent = ListContentBackground,
-                    BackgroundColor3 = Color3fromRGB(255, 255, 255),
-                    BackgroundTransparency = 1,
-                    BorderSizePixel = 0,
-                    Position = UDim2new(0, 0, 0, 0),
-                    Size = UDim2new(0, 15, 0, 15),
-                    Image = ImageId,
-                })
-            end
-            
-            Library:AddTheme(ListContentLabel, {
-                TextColor3 = "Text"
-            })
-
-            Item.Holder = ListContentBackground
-            Item.Text = ListContentLabel
-
-            Utility:Connect(ListContentBackground.InputBegan, function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    List.Set(item)
-                end
+                -- Set the position and orientation of the tracer part
+                tracers[player].CFrame = CFrame.new(headPosition, headPosition + lookDirection) * CFrame.new(0, 0, -1)
             end)
-
-            List.Items[item] = Item
-        end
-
-        function List.Refresh(tbl)
-            for _,v in List.Items do
-                v.Holder:Destroy()
-
-                List.Items[_] = nil
-            end
-
-            for _,v in tbl do
-                List.NewItem(v)
-            end
-        end
-        
-        for _,v in cfg.Values do
-            List.NewItem(v)
-        end
-
-        List.Set(cfg.Value)
-
-        Library.Flags[cfg.Flag] = List.Selected
-
-        Library.ConfigFlags[cfg.Flag] = List
-
-        List.ChildHolder = ListHolder
-        List.TextLabel = ListLabel
-
-        return setmetatable(List, Library)
-    end
-
-    function Library:Keybind(cfg)
-        local Parent = self
-
-        cfg = {
-            Name = cfg.Name or "New Keybind",
-            Key = cfg.Key or "-",
-            Mode = cfg.Mode or "Toggle",
-            Modes = cfg.Modes or true,
-            Value = cfg.Value or false,
-            Flag = cfg.Flag or math.random(5^12),
-            Ignore = cfg.Ignore or false,
-            Callback = cfg.Callback or function() end,
-            Child = cfg.Child == nil and true or cfg.Child,
-            Visible = cfg.Visible == nil and true or cfg.Visible,
-        }
-
-        local Holder = Parent.Holder
-        local ChildHolder = Parent.ChildHolder
-        local TextLabelHolder = Parent.TextLabel
-
-        local Keybind = {
-            Listening = false,
-            Key = "",
-            Value = cfg.Value,
-            Mode = ""
-        }
-
-        local KeybindMode = Library.Selectables.KeybindMode
-
-        local KeybindHolder = cfg.Child and TextLabelHolder or Library:New("Frame", {
-            Name = "KeybindHolder",
-            Parent = ChildHolder or Holder,
-            BackgroundTransparency = 1,
-            Visible = not TextLabelHolder and cfg.Visible or true,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 0, 13),
-            AutomaticSize = Enum.AutomaticSize.Y,
-        })
-        
-        local KeybindLabel
-        if not (TextLabelHolder and cfg.Child) then
-            local KeybindLine = Library:New("Frame", {
-                Name = "KeybindLine",
-                Parent = KeybindHolder,
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Size = UDim2new(1, 0, 0, 13),
-            })    
-
-            KeybindLabel = Library:New("TextLabel", {
-                Name = "KeybindLabel",
-                Parent = KeybindLine,
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Size = UDim2new(1, 0, 1, 0),
-                FontFace = Library.Font,
-                Text = cfg.Name,
-                TextSize = Library.FontSize,
-                TextStrokeTransparency = 0,
-                TextXAlignment = Enum.TextXAlignment.Left,
-            })
-
-            Library:AddTheme(KeybindLabel, {
-                TextColor3 = "Text"
-            })
-            
-            Library:New("UIListLayout", {
-                Parent = KeybindLabel,
-                FillDirection = Enum.FillDirection.Horizontal,
-                HorizontalAlignment = Enum.HorizontalAlignment.Right,
-                SortOrder = Enum.SortOrder.LayoutOrder,
-                Padding = UDimnew(0, 3),
-            })
-        end
-
-        local KeybindValue = Library:New("TextButton", {
-            Name = "KeybindHolder",
-            Parent = cfg.Child and TextLabelHolder or KeybindLabel,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Visible = TextLabelHolder and cfg.Visible or true,
-            AutomaticSize = Enum.AutomaticSize.X,
-            Size = UDim2new(0, 0, 1, 0),
-            FontFace = Library.Font,
-            Text = "[E]",
-            TextSize = Library.FontSize,
-            TextStrokeTransparency = 0,
-        })
-
-        Library:AddTheme(KeybindValue, {
-            TextColor3 = "Text"
-        })
-
-        function Keybind.ChangeMode(mode)
-            Keybind.Mode = mode 
-            if mode == "Always" then
-                Keybind.Set(true)
-            elseif mode == "Hold" then
-                Keybind.Set(false)
-            end
-        end
-
-        function Keybind.Set(input)
-            if type(input) == "boolean" then
-                local Value = input
-
-                if Keybind.Mode == "Always" then
-                    Value = true
-                end
-
-                Keybind.Value = Value
-
-                cfg.Callback(Keybind.Value or false)
-            elseif tostring(input):find("Enum") then 
-                input = input.Name == "Escape" and "-" or input
-
-                Keybind.Key = input or "-"
-
-                local Text = (ConvertKeys[Keybind.Key] or tostring(Keybind.Key):gsub("Enum.", ""))
-                local Text2 = (tostring(Text):gsub("KeyCode.", ""):gsub("UserInputType.", "")) or "-"
-                KeybindValue.Text = "[" .. Text2 .. "]"
-
-                cfg.Callback(Keybind.Value or false)
-            elseif tablefind({"Toggle", "Hold", "Always"}, input) then 
-                Keybind.ChangeMode(input)
-
-                cfg.Callback(Keybind.Value or false)
-            elseif type(input) == "table" then
-                input.Key = type(input.Key) == "string" and input.Key ~= "-" and Utility:ConvertToEnum(input.Key) or input.Key
-
-                input.Key = input.Key == Enum.KeyCode.Escape and "-" or input.Key
-
-                Keybind.Key = input.Key or "-"
-
-                Keybind.Mode = input.Mode or "Toggle"
-
-                if input.Value then
-                    Keybind.Value = input.Value
-                end
-
-                local Text = tostring(Keybind.Key) ~= "Enums" and (ConvertKeys[Keybind.Key] or tostring(Keybind.Key):gsub("Enum.", "")) or nil
-                local Text2 = Text and (tostring(Text):gsub("KeyCode.", ""):gsub("UserInputType.", ""))
-                KeybindValue.Text = "[" .. Text2 .. "]" or "[-]"
-
-                cfg.Callback(Keybind.Value or false)
-            end
-
-            if not cfg.Ignore then
-                Library.Keybinds[cfg.Flag] = {
-                    Flag = cfg.Flag,
-                    Status = Keybind.Value,
-                    Text = ("[%s]: %s"):format(tostring(Keybind.Key):gsub("Enum.KeyCode.", ""):gsub("Enum.UserInputType.", ""), cfg.Name)
-                }
-            end
-
-            Library.Flags[cfg.Flag] = Keybind.Value
-
-            Library.Flags[cfg.Flag .. "_data"] = {
-                Key = Keybind.Key,
-                Mode = Keybind.Mode,
-                Value = Keybind.Value,
-            }
-        end
-
-        function Keybind.SetVisibility(status)
-            if not TextLabelHolder then
-                KeybindHolder.Visible = status
-            end
-
-            if TextLabelHolder then
-                KeybindValue.Visible = status
-            end
-        end
-
-        Utility:Connect(KeybindValue.InputBegan, function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 and not Keybind.Listening then
-                Library:ChangeObjectTheme(KeybindValue, {
-                    TextColor3 = "Accent"
-                }, true)
-
-                taskwait()
-
-                Keybind.Listening = true
-            end
-
-            if input.UserInputType == Enum.UserInputType.MouseButton2 then
-                KeybindMode.Holder.Position = UDim2new(0, KeybindValue.AbsolutePosition.x, 0, KeybindValue.AbsolutePosition.y + KeybindValue.AbsoluteSize.y + 2)
-
-                if KeybindMode.Flag ~= cfg.Flag then
-                    KeybindMode.Holder.Visible = true
-
-                    KeybindMode.Dropdown.Set(Keybind.Mode ~= "" and Keybind.Mode or "Toggle")
-
-                    KeybindMode.Flag = cfg.Flag
-                else
-                    KeybindMode.Holder.Visible = false
-
-                    KeybindMode.Flag = ""
-                end
-            end
-        end)
-
-        Utility:Connect(UserInputService.InputBegan, function(input)
-            if Keybind.Listening then
-                Keybind.Set(input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode or input.UserInputType)
-                Keybind.Listening = false
-
-                Library:ChangeObjectTheme(KeybindValue, {
-                    TextColor3 = "Text"
-                }, true)
-            elseif input.KeyCode == Keybind.Key or input.UserInputType == Keybind.Key then
-                Keybind.Set(not Keybind.Value)
-            end
-        end)
-
-        Utility:Connect(UserInputService.InputEnded, function(input)
-            if Keybind.Mode == "Hold" and (input.KeyCode == Keybind.Key or input.UserInputType == Keybind.Key) and not Keybind.Listening then
-                Keybind.Set(false)
-            end
-        end)
-
-        Keybind.Set({
-            Key = cfg.Key,
-            Mode = cfg.Mode
-        })
-
-        Library.ConfigFlags[cfg.Flag] = Keybind
-
-        Library.ConfigFlags[cfg.Flag .. "_data"] = Keybind
-
-        Keybind.ChildHolder = KeybindHolder
-        Keybind.TextLabel = cfg.Child and TextLabelHolder or KeybindLabel
-
-        return setmetatable(Keybind, Library)
-    end
-
-    function Library:Textbox(cfg)
-        local Parent = self
-
-        cfg = {
-            Name = cfg.Name or "New Textbox",
-            Value = cfg.Value or "",
-            Flag = cfg.Flag or  math.random(5^12),
-            Callback = cfg.Callback or function() end,
-            Visible = cfg.Visible == nil and true or cfg.Visible,
-        }
-
-        local Textbox = {}
-
-        local Holder = Parent.Holder
-        local ChildHolder = Parent.ChildHolder
-
-        local TextboxHolder = Library:New("Frame", {
-            Name = "TextboxHolder",
-            Parent = ChildHolder or Holder,
-            BorderSizePixel = 0,
-            Visible = cfg.Visible,
-            Size = UDim2new(1, 0, 0, 0),
-            AutomaticSize = Enum.AutomaticSize.Y,
-        })
-
-        Library:New("UIListLayout", {
-            Parent = TextboxHolder,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 3),
-        })
-        
-        local TextboxLine = Library:New("Frame", {
-            Name = "TextboxLine",
-            Parent = TextboxHolder,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 0, 20),
-        })
-        
-        local TextboxOutline = Library:New("Frame", {
-            Name = "TextboxOutline",
-            Parent = TextboxLine,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 1, 0),
-        })
-
-        Library:AddTheme(TextboxOutline, {
-            BackgroundColor3 = "Outline"
-        })
-
-        local TextboxBackground = Library:New("Frame", {
-            Name = "TextboxBackground",
-            Parent = TextboxOutline,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 1, 0, 1),
-            Size = UDim2new(1, -2, 1, -2),
-        })
-
-        Library:AddTheme(TextboxBackground, {
-            BackgroundColor3 = "Element Background"
-        })
-        
-        -- Library:New("UIGradient", {
-        --     Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3fromRGB(124, 124, 124))},
-        --     Rotation = 90,
-        --     Parent = TextboxBackground,
-        -- })
-        
-        local TextboxLabel = Library:New("TextBox", {
-            Name = "TextboxLabel",
-            Parent = TextboxBackground,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 5, 0, 0),
-            Size = UDim2new(1, -5, 1, 0),
-            FontFace = Library.Font,
-            Text = cfg.Value,
-            PlaceholderText = cfg.Name,
-            TextSize = Library.FontSize,
-            ClearTextOnFocus = false,
-            TextStrokeTransparency = 0,
-        })
-
-        Library:AddTheme(TextboxLabel, {
-            TextColor3 = "Text",
-            PlaceholderColor3 = "Dark Text"
-        })
-
-        function Textbox.SetVisibility(status)
-            TextboxHolder.Visible = status
-        end
-
-        function Textbox.Set(value)
-            TextboxLabel.Text = value
-
-            Library.Flags[cfg.Flag] = value
-
-            cfg.Callback(value)
-        end
-
-        Utility:Connect(TextboxLabel.FocusLost, function()
-            Textbox.Set(TextboxLabel.Text)
-        end)
-
-        Utility:Connect(TextboxLabel:GetPropertyChangedSignal("Text"), function()
-            Textbox.Set(TextboxLabel.Text)
-        end)
-
-        Textbox.ChildHolder = TextboxHolder
-
-        Library.ConfigFlags[cfg.Flag] = Textbox
-
-        return setmetatable(Textbox, Library)
-    end
-
-    function Library:Label(cfg)
-        local Parent = self
-
-        cfg = {
-            Name = cfg.Name or "New Label",
-        }
-
-        local Label = {}
-
-        local Holder = Parent.Holder
-        local ChildHolder = Parent.ChildHolder
-
-        local LabelHolder = Library:New("Frame", {
-            Name = "LabelHolder",
-            Parent = ChildHolder or Holder,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Visible = cfg.Visible,
-            Size = UDim2new(1, 0, 0, 0),
-            AutomaticSize = Enum.AutomaticSize.Y,
-        })
-
-        Library:New("UIListLayout", {
-            Parent = LabelHolder,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 3),
-        })
-        
-        local LabelLine = Library:New("Frame", {
-            Name = "LabelLine",
-            Parent = LabelHolder,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 0, 13),
-        })
-
-        local LabelLabel = Library:New("TextLabel", {
-            Name = "LabelLabel",
-            Parent = LabelLine,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 0, 0, 0),
-            Size = UDim2new(1, 0, 1, 0),
-            FontFace = Library.Font,
-            Text = cfg.Name,
-            TextSize = Library.FontSize,
-            TextStrokeTransparency = 0,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            RichText = true,
-        })
-
-        Library:AddTheme(LabelLabel, {
-            TextColor3 = "Text"
-        })
-
-        Library:New("UIListLayout", {
-            Parent = LabelLabel,
-            FillDirection = Enum.FillDirection.Horizontal,
-            HorizontalAlignment = Enum.HorizontalAlignment.Right,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 3),
-        })
-
-        function Label.SetVisibility(status)
-            LabelHolder.Visible = status
-        end
-
-        function Label.ChangeText(text)
-            LabelLabel.Text = text
-        end
-
-        Label.ChildHolder = LabelHolder
-        Label.TextLabel = LabelLabel
-
-        return setmetatable(Label, Library)
-    end
-
-    function Library:Colorpicker(cfg)
-        local Parent = self
-
-        cfg = {
-            Name = cfg.Name or "New Colorpicker",
-            Color = cfg.Color or Color3fromRGB(255, 255, 255),
-            Transparency = cfg.Transparency or 1,
-            Flag = cfg.Flag or math.random(5^12),
-            Callback = cfg.Callback or function() end,
-            Child = cfg.Child == nil and true or cfg.Child,
-            Visible = cfg.Visible == nil and true or cfg.Visible,
-        }
-
-        local Holder = Parent.Holder
-        local ChildHolder = Parent.ChildHolder
-        local TextLabelHolder = Parent.TextLabel
-
-        local Colorpicker = {
-            Color = cfg.Color,
-            Transparency = cfg.Transparency
-        }
-
-        local ColorpickerHolder = cfg.Child and TextLabelHolder or Library:New("Frame", {
-            Name = "ColorpickerHolder",
-            Parent = ChildHolder or Holder,
-            BackgroundTransparency = 1,
-            Visible = not TextLabelHolder and cfg.Visible or true,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 0, 13),
-            AutomaticSize = Enum.AutomaticSize.Y,
-        })
-
-        local ColorpickerLabel
-        if not (TextLabelHolder and cfg.Child) then
-            local ColorpickerLine = Library:New("Frame", {
-                Name = "ColorpickerLine",
-                Parent = ColorpickerHolder,
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Size = UDim2new(1, 0, 0, 13),
-            })
-            
-            ColorpickerLabel = Library:New("TextLabel", {
-                Name = "ColorpickerLabel",
-                Parent = ColorpickerLine,
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Size = UDim2new(1, 0, 1, 0),
-                FontFace = Library.Font,
-                Text = cfg.Name,
-                TextSize = Library.FontSize,
-                TextStrokeTransparency = 0,
-                TextXAlignment = Enum.TextXAlignment.Left,
-            })
-
-            Library:AddTheme(ColorpickerLabel, {
-                TextColor3 = "Text"
-            })
-
-            Library:New("UIListLayout", {
-                Parent = ColorpickerLabel,
-                FillDirection = Enum.FillDirection.Horizontal,
-                HorizontalAlignment = Enum.HorizontalAlignment.Right,
-                SortOrder = Enum.SortOrder.LayoutOrder,
-                Padding = UDimnew(0, 3),
-            })
-        end
-        
-        local ColorpickerOutline = Library:New("Frame", {
-            Name = "ColorpickerOutline",
-            Parent = cfg.Child and TextLabelHolder or ColorpickerLabel,
-            Visible = TextLabelHolder and cfg.Visible == nil and true or cfg.Visible,
-            BorderSizePixel = 0,
-            Size = UDim2new(0, 27, 1, 0),
-        })
-
-        Library:AddTheme(ColorpickerOutline, {
-            BackgroundColor3 = "Outline"
-        })
-        
-        local ColorpickerImage = Library:New("ImageLabel", {
-            Name = "ColorpickerImage",
-            Parent = ColorpickerOutline,
-            BackgroundColor3 = Color3fromRGB(255, 255, 255),
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 1, 0, 1),
-            Size = UDim2new(1, -2, 1, -2),
-            Image = Library.Images.Checkers,
-            ScaleType = Enum.ScaleType.Tile,
-            TileSize = UDim2new(0, 6, 0, 6),
-        })
-
-        local ColorpickerBackground = Library:New("Frame", {
-            Name = "ColorpickerBackground",
-            Parent = ColorpickerImage,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 1, 0),
-        })
-        
-        Library:New("UIGradient", {
-            Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3fromRGB(149, 149, 149))},
-            Rotation = 90,
-            Parent = ColorpickerBackground,
-        })
-
-        local ColorpickerButton = Library:New("TextButton", {
-            Name = "ColorpickerButton",
-            BackgroundTransparency = 1,
-            Parent = ColorpickerBackground,
-            BorderSizePixel = 0,
-            Text = "",
-            Size = UDim2new(1, 0, 1, 0),
-            ZIndex = 10,
-        })
-
-        function Colorpicker.Set(color, transparency)
-            transparency = transparency or Colorpicker.Transparency
-
-            if type(color) == "table" then
-                transparency = color.a
-                color = color.c
-            end
-
-            Colorpicker.Color = color
-            Colorpicker.Transparency = transparency
-
-            ColorpickerBackground.BackgroundColor3 = color
-            ColorpickerBackground.BackgroundTransparency = 1 - transparency
-
-            Library.Flags[cfg.Flag] = {
-                a = transparency,
-                c = color
-            }
-
-            cfg.Callback({
-                a = transparency,
-                c = color
-            })
-        end
-
-        function Colorpicker.SetVisibility(status)
-            if not TextLabelHolder then
-                ColorpickerHolder.Visible = status
-            end
-
-            if TextLabelHolder then
-                ColorpickerOutline.Visible = status
-            end
-        end
-
-        Colorpicker.Set({
-            c = Colorpicker.Color,
-            a = Colorpicker.Transparency
-        })
-
-        Utility:Connect(ColorpickerButton.MouseButton1Down, function()
-            local ColorpickerSelect = Library.Selectables.Colorpicker
-
-            ColorpickerSelect.Window.Title.Text = cfg.Name
-
-            -- if ColorpickerSelect.Window.OutlineHolder.Visible then
-            --     ColorpickerSelect.Flag = ""
-
-            --     --ColorpickerSelect.Window.OutlineHolder.Visible = false
-            -- else
-                ColorpickerSelect.Flag = cfg.Flag
-
-                ColorpickerSelect.Set({
-                    c = Colorpicker.Color,
-                    a = Colorpicker.Transparency
-                })
-
-                --ColorpickerSelect.Window.OutlineHolder.Visible = true
-            -- end
-        end)
-
-        Library.ConfigFlags[cfg.Flag] = Colorpicker
-
-        Colorpicker.ChildHolder = ColorpickerHolder
-        Colorpicker.TextLabel = cfg.Child and TextLabelHolder or ColorpickerLabel
-
-        return setmetatable(Colorpicker, Library)
-    end
-
-    function Library:Show(value)
-        Library.ScreenGui.Enabled = value
-        Library.Popups.Enabled = value
-    end
-
-    function Library:GetConfig()
-        local Config = {}
-
-        for _,v in Library.ConfigFlags do
-            local Value = Library.Flags[_]
-
-            if type(Value) == "table" and Value["Key"] then
-                Config[_] = {Value = Value.Value, Mode = Value.Mode, Key = tostring(Value.Key)}
-            elseif type(Value) == "table" and Value["a"] and Value["c"] then
-                Config[_] = {a = Value.a, c = Value.c:ToHex()}
-            else
-                Config[_] = Value
-            end
-        end
-
-        return HttpService:JSONEncode(Config)
-    end
-
-    function Library:LoadConfig(config)
-        local Config = HttpService:JSONDecode(config)
-
-        for _,v in Config do
-            local ConfigTable = Library.ConfigFlags[_]
-
-            if ConfigTable then
-                local Func = ConfigTable.Set
-                if Func then
-                    if type(v) == "table" and v["a"] and v["c"] then
-                        Func({
-                            a = v.a,
-                            c = type(v.c) == "string" and Color3fromHex(v.c) or v.c
-                        })
-                    else
-                        Func(v)
-                    end
-                end
-            end
         end
     end
-
-    function Library:InitList(cfg)
-        cfg = {
-            Name = cfg.Name or "New List",
-            Position = cfg.Position or UDim2new(0, 300, 0, 300)
-        }
-
-        local WindowOutline = Library:New("Frame", {
-            Name = "WindowOutline",
-            Parent = Library.ListsGui,
-            BorderSizePixel = 0,
-            Position = cfg.Position,
-            Size = UDim2new(0, 100, 0, 0),
-            --AutomaticSize = Enum.AutomaticSize.Y,
-        }, true)
-
-        WindowOutline.Active = true
-        WindowOutline.Draggable = true
-
-        Library:AddTheme(WindowOutline, {
-            BackgroundColor3 = "Outline",
-        })
-
-        local WindowBackground = Library:New("Frame", {
-            Name = "WindowBackground",
-            Parent = WindowOutline,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 1, 0, 1),
-            Size = UDim2new(1, -2, 1, -2),
-        }, true)
-
-        Library:AddTheme(WindowBackground, {
-            BackgroundColor3 = "Background",
-        })
-
-        local ItemsHolder = Library:New("Frame", {
-            Name = "WindowBackground",
-            Parent = WindowBackground,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 0, 0, 0),
-            Size = UDim2new(1, 0, 0, 0),
-        }, true)
-
-        Library:New("UIPadding", {
-            Parent = ItemsHolder,
-            PaddingLeft = UDimnew(0, 5),
-            PaddingRight = UDimnew(0, 5),
-        }, true)
-
-        local TitleBackground = Library:New("Frame", {
-            Name = "TitleBackground",
-            Parent = WindowBackground,
-            BorderSizePixel = 0,
-            Size = UDim2new(1, 0, 0, 24),
-        }, true)
-
-        Library:AddTheme(TitleBackground, {
-            BackgroundColor3 = "Accent",
-        })
-        
-        Library:New("UIPadding", {
-            Parent = TitleBackground,
-            PaddingBottom = UDimnew(0, 5),
-            PaddingLeft = UDimnew(0, 5),
-            PaddingRight = UDimnew(0, 5),
-            PaddingTop = UDimnew(0, 5),
-        }, true)
-
-        Library:New("UIGradient", {
-            Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3fromRGB(149, 149, 149))},
-            Rotation = 90,
-            Parent = TitleBackground,
-        }, true)
-
-        local TitleLabel = Library:New("TextLabel", {
-            Name = "TitleLabel",
-            Parent = TitleBackground,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            AutomaticSize = Enum.AutomaticSize.X,
-            Size = UDim2new(0, 0, 1, 0),
-            FontFace = Library.Font,
-            Text = cfg.Name,
-            TextSize = Library.FontSize,
-            TextStrokeTransparency = 0,
-            TextXAlignment = Enum.TextXAlignment.Left,
-        }, true)
-
-        Library:AddTheme(TitleLabel, {
-            TextColor3 = "Text",
-        })
-
-        local TitleOutline = Library:New("Frame", {
-            Name = "TitleOutline",
-            Parent = WindowBackground,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 0, 0, 24),
-            Size = UDim2new(1, 0, 0, 1),
-        }, true)
-
-        Library:AddTheme(TitleOutline, {
-            BackgroundColor3 = "Outline",
-        })
-
-        local List = {
-            Items = {},
-        }
-
-        local YOffset = 0
-        local BiggestX = TitleLabel.TextBounds.X
-        local LerpedSize = TitleLabel.TextBounds.X
-
-        function List.RenderItem(flag, text, status)
-            if not List.Items[flag] then
-                List.Items[flag] = {
-                    Object = Library:New("TextLabel", {
-                        Name = "ItemLabel",
-                        Parent = ItemsHolder,
-                        BackgroundTransparency = 1,
-                        TextTransparency = 1,
-                        Position = UDim2new(0, 0, 0, 0),
-                        AutomaticSize = Enum.AutomaticSize.XY,
-                        Size = UDim2new(0, 0, 0, 0),
-                        FontFace = Library.Font,
-                        Text = text,
-                        TextSize = Library.FontSize,
-                        TextStrokeTransparency = 0,
-                    }, true),
-                    Text = text,
-                    Status = status,
-                    Fade = 2,
-                }
-
-                Library:AddTheme(List.Items[flag].Object, {
-                    TextColor3 = "Text"
-                })        
-
-                return
-            end
-
-            local Item = List.Items[flag]
-            local Object = Item.Object
-
-            Item.Fade = Utility:Lerp(Item.Fade, status and 255 or 0, Library.LerpSpeed)
-
-            Item.Text = text
-            Item.Status = status
-            
-            Object.Text = Item.Text
-            Object.Position = UDim2new(0, -(Object.TextBounds.X - (Object.TextBounds.X * (Item.Fade / 255))), 0, 30 + YOffset)
-            Object.TextTransparency = 1 - (1 * (Item.Fade / 255))
-
-            if status and BiggestX < Object.TextBounds.X then
-                BiggestX = mathmax(BiggestX, Object.TextBounds.X)
-            end
-
-            YOffset += (Object.TextBounds.Y + 3) * (Item.Fade / 255)
-        end
-
-        function List.GetItems()
-            return {
-                {
-                    Text = "Test22222222",
-                    Flag = "flag1",
-                    Status = true,
-                },
-                {
-                    Text = "Test2",
-                    Flag = "flag2",
-                    Status = true,
-                },
-                {
-                    Text = "Test3",
-                    Flag = "flag3",
-                    Status = true,
-                },
-                {
-                    Text = "Test4",
-                    Flag = "flag4",
-                    Status = true,
-                },
-                {
-                    Text = "Test5",
-                    Flag = "flag5",
-                    Status = true,
-                },
-            }
-        end
-
-        function List.SetVisibility(status)
-            WindowOutline.Visible = status
-        end
-
-        function List.Think()
-            if not WindowOutline.Visible then
-                return
-            end
-
-            YOffset = 0
-            BiggestX = TitleLabel.TextBounds.X
-
-            for _,v in List.GetItems() do
-                List.RenderItem(v.Flag, v.Text, v.Status)
-            end
-
-            LerpedSize = Utility:Lerp(LerpedSize, BiggestX + 15, Library.LerpSpeed)
-
-            WindowOutline.Size = UDim2new(0, LerpedSize, 0, 35 + YOffset)
-        end
-
-        return List
-    end
-
-    function Library:TextTriggers(text)
-        local AccentTheme = Library.Theme.Accent
-
-        local Triggers = {
-            ['{user}'] = Puppyware.User,
-            ['{name}'] = ('<font color="rgb(%s, %s, %s)">Puppyware</font>'):format(mathfloor(AccentTheme.r * 255), mathfloor(AccentTheme.g * 255), mathfloor(AccentTheme.b * 255)),
-            ['{hour}'] = os.date("%H"),
-            ['{minute}'] = os.date("%M"),
-            ['{second}'] = os.date("%S"),
-            ['{ap}'] = os.date("%p"),
-            ['{month}'] = os.date("%b"),
-            ['{day}'] = os.date("%d"),
-            ['{year}'] = os.date("%Y"),
-            ['{fps}'] = Library.Fps,
-            ['{ping}'] = mathfloor(Stats.PerformanceStats.Ping:GetValue() or 0),
-            ['{time}'] = os.date("%H:%M:%S"),
-            ['{date}'] = os.date("%b. %d, %Y")
-        }
-
-        for _,v in Triggers do
-            text = string.gsub(text, _, v)
-        end
-
-        return text
-    end
-
-    function Library:Watermark(cfg)
-        cfg = {
-            Text = cfg.Text or "{name} | {user} | rtt: {ping}ms | {time}",
-            Visible = cfg.Visible or true,
-            TickRate = cfg.TickRate or 0.2
-        }
-
-        local Watermark = {
-            Visible = cfg.Visible,
-            Text = cfg.Text,
-            TickRate = cfg.TickRate,
-            Time = osclock() - 1000
-        }
-
-        local WatermarkBackground = Library:New("Frame", {
-            Name = "WatermarkBackground",
-            Parent = Library.ListsGui,
-            AutomaticSize = Enum.AutomaticSize.XY,
-            Position = UDim2new(0, 10, 0, 5),
-            Size = UDim2new(0, 0, 0, 0),
-            Visible = cfg.Visible,
-        }, true)
-
-        local WatermarkLabel = Library:New("TextLabel", {
-            Name = "WatermarkLabel",
-            Parent = WatermarkBackground,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            AutomaticSize = Enum.AutomaticSize.XY,
-            Position = UDim2new(0, 0, 0, 0),
-            FontFace = Library.Font,
-            TextSize = Library.FontSize,
-            TextTransparency = 0,
-            TextStrokeTransparency = 0,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            RichText = true,
-        }, true)
-
-        local WatermarkAccent = Library:New("Frame", {
-            Name = "WatermarkAccent",
-            Parent = WatermarkBackground,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, -3, 0, -5),
-            Size = UDim2new(1, 6, 0, 1),
-        }, true)
-
-        -- Utility:New("UIGradient", {
-        --     Enabled = true,
-        --     Rotation = 0,
-        --     Parent = WatermarkBackground,
-        --     Transparency = NumberSequence.new({
-        --         NumberSequenceKeypoint.new(0, 0),
-        --         NumberSequenceKeypoint.new(1, 1),
-        --     })
-        -- })
-
-        Library:New("UIPadding", {
-            Parent = WatermarkBackground,
-            PaddingBottom = UDimnew(0, 3),
-            PaddingLeft = UDimnew(0, 3),
-            PaddingRight = UDimnew(0, 3),
-            PaddingTop = UDimnew(0, 5),
-        })
-
-        Library:AddTheme(WatermarkAccent, {
-            BackgroundColor3 = "Accent",
-        })
-
-        Library:AddTheme(WatermarkBackground, {
-            BorderColor3 = "Outline",
-            BackgroundColor3 = "Element Background",
-        })
-
-        -- Library:AddTheme(ToggleBackground, {
-        --     BackgroundColor3 = "Element Background"
-        -- })
-
-        Library:New("UIGradient", {
-            Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3fromRGB(124, 124, 124))},
-            Rotation = 90,
-            Parent = WatermarkBackground,
-        })
-
-        Library:AddTheme(WatermarkLabel, {
-            TextColor3 = "Text",
-        })
-
-        function Watermark.Think()
-            local ClockPulse = osclock()
-
-            if ClockPulse - Watermark.Time < Watermark.TickRate then
-                return
-            end
-
-            Watermark.Time = ClockPulse
-
-            if WatermarkBackground.Visible ~= Watermark.Visible then
-                WatermarkBackground.Visible = Watermark.Visible
-            end
-
-            if Watermark.Visible then
-                local Text = Library:TextTriggers(Watermark.Text)
-
-                WatermarkLabel.Text = Text
-            end
-        end
-
-        function Watermark.SetText(text)
-            Watermark.Text = text
-        end
-
-        function Watermark.SetTickRate(rate)
-            Watermark.TickRate = rate
-        end
-
-        function Watermark.SetVisibility(status)
-            Watermark.Visible = status
-        end
-
-        return Watermark
-    end 
-
-    local Flags = Library.Flags
--- 
-
--- Controller
-    Controller.Alive = false
-    Controller.RootPart = nil
-    Controller.Humanoid = nil
-    Controller.Character = nil
-
-    function Controller.Spawning(Character, Humanoid, RootPart)
-        Controller.Character = Character
-        Controller.Humanoid = Humanoid
-        Controller.RootPart = RootPart
-        Controller.Alive = true 
-
-        if not (Controller.Character and Controller.Humanoid and Controller.RootPart) then 
-            return Controller.Despawning()
-        end 
-    end 
-
-    function Controller.Despawning(Value)
-        if Value then return end 
-        Controller.Alive = false
-        Controller.Character = nil
-        Controller.RootPart = nil
-        Controller.Humanoid = nil
-    end     
-
-    Utility:Connect(RunService.Heartbeat, function()
-        local Character = Utility:GetLocalPlayerCharacter()
-
-        if not Character then
-            if Controller.Alive then
-                Controller.Despawning(false)
-            end
-            return
-        end
-
-        local Humanoid = Utility:GetHumanoid(Character)
-
-        local RootPart = Utility:GetRootPart(Character, Humanoid)
-
-        if not RootPart then
-            if Controller.Alive then
-                Controller.Despawning(false)
-            end
-            return
-        end
-
-        Controller.Spawning(Character, Humanoid, RootPart)
-    end, "Controller Heartbeat")
---
-
--- Aimbot
-    function Aimbot:SelectTarget()
-        Aimbot.Targets = {}
-        Aimbot.Target = nil
-    
-        local LocalRoot = Controller.RootPart
-        
-        if not Aimbot.Position then
-            Aimbot.Position = Flags["aimbot_position"] == "Screen" and Camera.ViewportSize / 2 or MouseLocation
-        end
-
-        local CameraPosition = Camera.CFrame.p
-
-        for _,v in Utility:GetPlayers() do
-            if v == LocalPlayer then
-                continue
-            end
-
-            local PlayerTbl = Puppyware.Players[v.Name]
-            local Status = PlayerTbl and PlayerTbl.Status or "None"
-            if Flags["ignore_friends"] and Status and Status == "Friend" then
-                continue
-            end
-
-            if Flags["priority_only"] and Status and Status ~= "Priority" then
-                continue
-            end
-
-            local Character = Utility:GetCharacter(v)
-    
-            if not Character then
-                continue
-            end
-
-            if tablefind(Flags["aimbot_checks"], "Force-Field") and typeof(Character) == "Instance" and FindFirstChildWhichIsA(Character, "ForceField") then
-                continue
-            end
-    
-            local Humanoid = Utility:GetHumanoid(Character)
-            local Health = Utility:GetHealth(v, Humanoid)
-    
-            if tablefind(Flags["aimbot_checks"], "Health") and Health and Health <= 0 then
-                continue
-            end
-
-            local Hitbox = Utility:GetBodyPart(Character, Flags["aimbot_hitbox"])
-    
-            if not Hitbox then
-                continue
-            end
-            
-            local Distance = ((LocalRoot and LocalRoot.Position or Camera.CFrame.p) - Hitbox.Position).Magnitude
-    
-            if Flags["aimbot_limit_distance"] and Distance > Flags["aimbot_limit_distance_amount"] then
-                continue
-            end
-
-            local Position, OnScreen = WorldToViewportPoint(Camera, Hitbox.Position)
-    
-            if Flags["aimbot_use_fov"] and not OnScreen or not Position then
-                continue
-            end
-
-            --local Result = Raycast(Workspace, CameraPosition, (Hitbox.Position - CameraPosition).Unit * 1000, Utility.Blacklist)
-    
-            local AimbotMagnitude = (Vector2.new(Position.x, Position.y) - Aimbot.Position).Magnitude
-    
-            if Flags["aimbot_use_fov"] and Flags["aimbot_fov_amount"] < AimbotMagnitude then
-                continue
-            end
-    
-            table.insert(Aimbot.Targets, {
-                Player = v,
-                Hitbox = Hitbox,
-                ScreenHitbox = Position,
-                Magnitude = AimbotMagnitude,
-                Character = Character,
-            })
-        end
-    
-        tablesort(Aimbot.Targets, function(a, b) 
-            return a.Magnitude < b.Magnitude
-        end)
-
-        return Aimbot.Targets[1]
-    end
-
-    function Aimbot:Think(dt)
-        local LocalRoot = Controller.RootPart
-
-        if not (Flags["aimbot"] and Flags["aimbot_key"]) then
-            Aimbot.Target = nil
-
-            return
-        end
-
-        local MouseLocation = UserInputService:GetMouseLocation()
-
-        Aimbot.Position = Flags["aimbot_position"] == "Screen" and Camera.ViewportSize / 2 or MouseLocation
-
-        if Flags["aimbot_sticky_aim"] and not Aimbot.Target then
-            Aimbot.Target = Aimbot:SelectTarget()
-        end
-
-        if not Flags["aimbot_sticky_aim"] then
-            Aimbot.Target = Aimbot:SelectTarget()
-        end
-
-        if not Aimbot.Target then
-            return
-        end
-
-        local SelectedTarget = Aimbot.Target
-
-        if SelectedTarget then
-            local Hitbox = SelectedTarget.Hitbox
-            
-            local Distance = (Hitbox.Position - (LocalRoot and LocalRoot.Position or Vector3.zero)).Magnitude
-
-            if Hitbox then
-                local PartVelocity = Utility:CalculateVelocity(Hitbox)
-
-                local Velocity = Flags["aimbot_velocity"] and PartVelocity * (Flags["aimbot_pred"] and Stats.PerformanceStats.Ping:GetValue() / (Flags["aimbot_pred_amount"] * 10) or tonumber(Flags["aimbot_pred_box"])) or Vector3.zero
-
-                local Position = Hitbox.Position + Velocity
-                
-                if Flags["aimbot_mouse"] then
-                    local ScreenPosition = WorldToViewportPoint(Camera, Position)
-
-                    mousemoverel(
-                        (ScreenPosition.x - MouseLocation.x) / Flags["aimbot_smoothing"],
-                        (ScreenPosition.y - MouseLocation.y) / Flags["aimbot_smoothing"]
-                    )
-                else
-                    local EndPoint = CFramenew(Camera.CFrame.p, Position)
-                    Camera.CFrame = Camera.CFrame:Lerp(EndPoint, (100 - Flags["aimbot_smoothing"]) / 100)
-                end
-            end
+end
+
+-- Example: Toggling the tracer for all players except the local player
+local function toggleTracersForAllPlayersExceptLocal(localPlayer)
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= localPlayer then
+            toggleTracer(player)
         end
     end
---
-
--- Silent Aim
-    function SilentAim:SelectTarget()
-        SilentAim.Targets = {}
-
-        local LocalRoot = Controller.RootPart
-
-        for _,v in Utility:GetPlayers() do
-            if v == LocalPlayer then
-                continue
-            end
-
-            local PlayerTbl = Puppyware.Players[v.Name]
-            local Status = PlayerTbl and PlayerTbl.Status or "None"
-            if Flags["ignore_friends"] and Status and Status == "Friend" then
-                continue
-            end
-
-            if Flags["priority_only"] and Status and Status ~= "Priority" then
-                continue
-            end
-
-            local Character = Utility:GetCharacter(v)
-
-            if not Character then
-                continue
-            end
-
-            if tablefind(Flags["silent_checks"], "Force-Field") and typeof(Character) == "Instance" and FindFirstChildWhichIsA(Character, "ForceField") then
-                continue
-            end
-
-            local Humanoid = Utility:GetHumanoid(Character)
-            local Health = Utility:GetHealth(v, Humanoid)
-
-            if tablefind(Flags["silent_checks"], "Health") and Health and Health <= 0 then
-                continue
-            end
-
-            local Root = Utility:GetRootPart(Character, Humanoid)
-
-            if not Root then
-                continue
-            end
-            
-            local Distance = ((LocalRoot and LocalRoot.Position or Camera.CFrame.p) - Root.Position).Magnitude
-
-            if Flags["silent_limit_distance"] and Distance > Flags["silent_limit_distance_amount"] then
-                continue
-            end
-
-            local Hitbox = Utility:GetBodyPart(Character, Flags["silent_hitbox"])
-
-            if not Hitbox then
-                continue
-            end
-
-            local Position, OnScreen = WorldToViewportPoint(Camera, Hitbox.Position)
-
-            if Flags["silent_use_fov"] and not OnScreen or not Position then
-                continue
-            end
-
-            local SilentAimMagnitude = (Vector2.new(Position.x, Position.y) - SilentAim.Position).Magnitude
-
-            if Flags["silent_use_fov"] and Flags["silent_fov_amount"] < SilentAimMagnitude then
-                continue
-            end
-
-            table.insert(SilentAim.Targets, {
-                Player = v,
-                Hitbox = Hitbox,
-                ScreenHitbox = Position,
-                Magnitude = SilentAimMagnitude,
-                Character = Character
-            })
-        end
-
-        tablesort(SilentAim.Targets, function(a, b) 
-            return a.Magnitude < b.Magnitude
-        end)
-
-        return SilentAim.Targets[1]
-    end
-
-    function SilentAim:Think(dt)
-        SilentAim.Targets = {}
-
-        if not (Flags["silent"] and Flags["silent_key"]) then
-            SilentAim.Target = nil
-
-            return
-        end
-
-        local MouseLocation = UserInputService:GetMouseLocation()
-
-        SilentAim.Position = Flags["aimbot_position"] == "Screen" and Camera.ViewportSize / 2 or MouseLocation
-
-        if Flags["silent_sticky_aim"] and not SilentAim.Target then
-            SilentAim.Target = SilentAim:SelectTarget()
-        end
-
-        if not Flags["silent_sticky_aim"] then
-            SilentAim.Target = SilentAim:SelectTarget()
-        end
-
-        if not SilentAim.Target then
-            return
-        end
-
-        local SelectedTarget = SilentAim.Target
-        
-        if SelectedTarget then
-            local Hitbox = SelectedTarget.Hitbox
-            
-            --local _, NewDesyncPos = Desync:GetPositions()
-
-            local Origin = NewDesyncPos and NewDesyncPos.p or LocalRoot and LocalRoot.Position or Vector3.zero
-
-            local Distance = (Hitbox.Position - Origin).Magnitude
-
-            if Hitbox then
-                local PredNum = Flags["silent_pred_table"] and Utility:GetPrediction(Stats.PerformanceStats.Ping:GetValue(), Distance) or Stats.PerformanceStats.Ping:GetValue() / (Flags["silent_pred_amount"] * 10)
-                
-                local PartVelocity = Utility:CalculateVelocity(Hitbox)
-
-                local Velocity = Flags["silent_velocity"] and PartVelocity * (Flags["silent_pred"] and PredNum or tonumber(Flags["silent_pred_box"])) or Vector3.zero
-            
-                local Position = Hitbox.Position + Velocity
-
-                if Flags["silent_air_prediction"] then 
-                    local Humanoid = Utility:GetHumanoid(SelectedTarget.Player)
-
-                    if Humanoid then 
-                        local Status = Humanoid:GetState() 
-
-                        if Status == Enum.HumanoidStateType.Freefall then 
-                            Position = SelectedTarget.Player.Character[Flags["silent_air_hitbox"]].Position + (Velocity * Vector3new(0, Flags["silent_jump_offset"], 0))
-                        end 
-                    end 
-                end 
-
-                SilentAim.Target = {
-                    Player = SelectedTarget.Player,
-                    Position = Position,
-                    Hitbox = Hitbox,
-                    Size = Hitbox.Size,
-                    Character = SelectedTarget.Character
-                }
-            end
-        end
-    end
-
-    function SilentAim:AutoShoot()
-        if not (Flags["silent_auto_shoot"] and SilentAim.Target) then
-            return
-        end
-
-        local Character = Controller.Character
-
-        if not Character then
-            return
-        end
-
-        local Tool = FindFirstChildWhichIsA(Character, "Tool")
-
-        if not Tool then
-            return
-        end
-
-        Tool:Activate()
-    end
-    
-    Utility:Connect(RunService.RenderStepped, function(dt)
-        SilentAim:Think()
-
-        SilentAim:AutoShoot()
-    end, "Silent Aim Heartbeat")
---
-
--- ESP
-    local SkeletonLayout = {
-        "Head",
-        "Left Arm",
-        "Right Arm",
-        "Left Leg",
-        "Right Leg"
-    }
-    local Huge = math.huge
-    local extents = { Vector3new(1, 1, 1), Vector3new(1, 1, -1), Vector3new(1, -1, 1), Vector3new(1, -1, -1),
-        Vector3new(-1, 1, 1), Vector3new(-1, 1, -1), Vector3new(-1, -1, 1), Vector3new(-1, -1, -1) }
-
-    function ESP.GetBoundingBox(object)
-        local cf, size = object:GetBoundingBox()
-        
-        local minX, minY, maxX, maxY = Huge, Huge, -Huge, -Huge
-        
-        local newsize = size * 0.5
-        
-        for exindx = 1, 6 do
-            local extent = extents[exindx]
-            local corner = cf * (newsize * extent)
-            local screenPoint, isOnScreen = WorldToViewportPoint(Camera, corner)
-            if isOnScreen then
-                minX = mathmin(minX, screenPoint.X)
-                minY = mathmin(minY, screenPoint.Y)
-                maxX = mathmax(maxX, screenPoint.X)
-                maxY = mathmax(maxY, screenPoint.Y)
-            end
-        end
-                
-        local BoxPosition = Vector2new(minX, minY)
-        local BoxSize = Vector2new(maxX - minX, maxY - minY)
-
-        return BoxPosition, BoxSize
-    end
-
-    function ESP.GetRootBounding(root)
-        local upVector = Camera.CFrame.UpVector
-
-        local topPosition = root.Position + root.CFrame:VectorToWorldSpace(Vector3new(0, 1.8, 0)) + upVector
-        local bottomPosition = root.Position + root.CFrame:VectorToWorldSpace(Vector3new(0, -2.5, 0)) - upVector
-
-        local topViewport, _ = WorldToViewportPoint(Camera, topPosition)
-        local bottomViewport, _ = WorldToViewportPoint(Camera, bottomPosition)
-        
-        local width = mathmax(mathabs(topViewport.X - bottomViewport.X), 3)
-        local height = mathmax(mathabs(bottomViewport.Y - topViewport.Y), width / 2, 3)
-
-        local boxSize = Vector2new(mathfloor(height / 1.5), mathfloor(height))
-        local boxPos = Vector2new(
-            mathfloor((topViewport.X + bottomViewport.X) / 2 - boxSize.X / 2),
-            mathfloor(math.min(topViewport.Y, bottomViewport.Y))
-        )
-        
-        return boxPos, boxSize
-    end
-
-    function ESP.GetCase(text, casetype)
-        casetype = casetype or Flags["esp_text_case"]
-
-        if casetype == "UPPERCASE" then
-            return text:upper()
-        elseif casetype == "lowercase" then
-            return text:lower()
-        else
-            return text
-        end
-    end
-
-    function ESP.GetOverwritenColor(player)
-        local PlayerTbl = Puppyware.Players[player.Name]
-        local Status = PlayerTbl and PlayerTbl.Status or "None"
-
-        local SilentTarget = SilentAim.Target
-        local SilentPlayer = SilentTarget and SilentTarget.Player
-        
-        local AimbotTarget = Aimbot.Target 
-        local AimbotPlayer = AimbotTarget and AimbotTarget.Player
-
-        return 
-            Flags["esp_highlight_targets"] and (AimbotPlayer and AimbotPlayer == player or SilentTarget and SilentTarget == player) and Flags["esp_highlight_targets_color"].c 
-                or 
-            Flags["esp_highlight_friends"] and Status == "Friend" and Flags["esp_highlight_friends_color"].c 
-                or 
-            Flags["esp_highlight_priority"] and Status == "Priority" and Flags["esp_highlight_priority_color"].c 
-                or 
-            nil
-    end
-
-    ESP.Holder = Utility:New("ScreenGui", {
-        Name = "\0",
-        Parent = CoreGui,
-        DisplayOrder = -1,
-        IgnoreGuiInset = true,
-    })
-
-    function ESP:AddPlayer(player)
-        if ESP.Players[player] then 
-            return
-        end
-        
-        local PlayerTable = {
-            Connects = {},
-            Drawings = {},
-            Health = 0,
-            Offsets = {},
-            StaticOffsets = {
-                Right = 0,
-                Bottom = 0
-            },
-            Sides = {
-                Right = Vector2zero,
-                Bottom = Vector2zero
-            },
-        }
-
-        PlayerTable.Drawings = {}
-
-        local Holder = Utility:New("ScreenGui", {
-            Name = "\0",
-            Parent = ESP.Holder,
-            DisplayOrder = -1,
-            IgnoreGuiInset = true,
-        })
-
-        local Drawings = PlayerTable.Drawings
-        local StaticOffsets = PlayerTable.StaticOffsets
-        local Sides = PlayerTable.Sides
-        local Offsets = PlayerTable.Offsets
-
-        function PlayerTable:CreateDrawings()
-            Drawings.Box = Utility:New("Frame", {
-                Parent = Holder,
-                Visible = false,
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-            })
-            Drawings.BoxFill = Utility:New("Frame", {
-                Parent = Drawings.Box,
-                Visible = true,
-                BackgroundTransparency = 1,
-                Position = UDim2new(0, -1, 0, -1),
-                Size = UDim2new(1, 2, 1, 2),
-                BorderSizePixel = 0,
-            })
-            Drawings.BoxOutline = Utility:New("UIStroke", {
-                Parent = Drawings.Box,
-                ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-                LineJoinMode = Enum.LineJoinMode.Miter,
-                Thickness = 3,
-                Color = Color3fromRGB()   
-            })
-            Drawings.BoxInline = Utility:New("UIStroke", {
-                Parent = Drawings.BoxFill,
-                ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-                LineJoinMode = Enum.LineJoinMode.Miter,
-                Thickness = 1,  
-            })
-            Drawings.BoxGradient = Utility:New("UIGradient", {
-                Enabled = false,
-                Rotation = 270,
-                Parent = Drawings.BoxInline
-            })
-            Drawings.BoxFillGradient = Utility:New("UIGradient", {
-                Enabled = false,
-                Rotation = 270,
-                Parent = Drawings.BoxFill
-            })
-            Drawings.Name = Utility:New("TextLabel", {
-                Parent = Holder,
-                Visible = false,
-                AutomaticSize = Enum.AutomaticSize.XY,
-                Size = UDim2new(0, 0, 0, 0),
-                Position = UDim2new(0, 0, 0, 0),
-                TextYAlignment = Enum.TextYAlignment.Top,
-                TextStrokeTransparency = 0,
-                BackgroundTransparency = 1,
-                ZIndex = 2,
-                RichText = true,
-            })
-            Drawings.HealthBarOutline = Utility:New("Frame", {
-                Visible = false,
-                BorderSizePixel = 0,
-                Parent = Holder,
-            })
-            Drawings.HealthBar = Utility:New("Frame", {
-                Visible = true,
-                BorderSizePixel = 0,
-                Parent = Drawings.HealthBarOutline,
-            })
-            Drawings.HealthBarGradient = Utility:New("UIGradient", {
-                Enabled = false,
-                Rotation = 270,
-                Parent = Drawings.HealthBar
-            })
-            Drawings.HealthNumber = Utility:New("TextLabel", {
-                Parent = Holder,
-                Visible = false,
-                AutomaticSize = Enum.AutomaticSize.XY,
-                Size = UDim2new(0, 0, 0, 0),
-                Position = UDim2new(0, 0, 0, 0),
-                TextYAlignment = Enum.TextYAlignment.Top,
-                TextStrokeTransparency = 0,
-                BackgroundTransparency = 1,
-                ZIndex = 2,
-            })
-            Drawings.ImageLabel = Utility:New("ImageLabel", {
-                Parent = Holder,
-                Visible = true,
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                ZIndex = 2,
-            })
-
-            -- for _,v in SkeletonLayout do
-            --     Drawings[v] = Utility:New("Frame", {
-            --         Visible = false,
-            --         BorderSizePixel = 0,
-            --         Parent = Holder,
-            --         ZIndex = 1,
-            --         AnchorPoint = (Vector2.one * 0.5),
-            --     })
-            -- end
-        end
-
-        function PlayerTable:ClearDrawings()
-            Holder:Destroy()
-
-            PlayerTable.Drawings = {}
-        end
-
-        function PlayerTable.CreateFlag(flag, text, colortbl, font, size, status, side, overwrite)
-            local Position = Sides[side]
-
-            local object = Drawings[flag]
-
-            if not object then
-                Drawings[flag] = Utility:New("TextLabel", {
-                    Parent = Holder,
-                    Visible = false,
-                    AutomaticSize = Enum.AutomaticSize.XY,
-                    Size = UDim2new(0, 0, 0, 0),
-                    Position = UDim2new(0, 0, 0, 0),
-                    TextYAlignment = Enum.TextYAlignment.Top,
-                    TextStrokeTransparency = 0,
-                    BackgroundTransparency = 1,
-                    ZIndex = 2,
-                })
-
-                object = Drawings[flag]
-            end
-
-            local OffsetFlag = flag .. side
-
-            if not Offsets[OffsetFlag] then
-                Offsets[OffsetFlag] = 1
-            end
-
-            local EndVal = status and 255 or 0
-
-            if Offsets[OffsetFlag] ~= EndVal then
-                Offsets[OffsetFlag] = Utility:Lerp(Offsets[OffsetFlag], EndVal, 0.1)
-            end
-
-            if Offsets[OffsetFlag] == 0 then
-                object.Visible = false
-
-                return
-            end
-
-            object.Visible = true
-
-            object.Text = text
-
-            local LerpVal = Offsets[OffsetFlag] / 255
-
-            object.TextTransparency = 1 - (colortbl.a * LerpVal)
-            object.TextColor3 = overwrite or colortbl.c
-            object.FontFace = GetFontFromIndex(Fonts[font])
-            object.TextSize = size
-            object.Position = side == "Right" and UDim2new(0, Position.x, 0, Position.y + StaticOffsets[side]) or UDim2new(0, Position.x - object.TextBounds.x / 2, 0, Position.y + StaticOffsets[side])
-
-            StaticOffsets[side] += (object.TextBounds.y + 2) * LerpVal
-        end
-        
-        PlayerTable:CreateDrawings()
-
-        tableinsert(PlayerTable.Connects, Utility:Connect(RunService.Heartbeat, function(DT)          
-            if Holder.Enabled then Holder.Enabled = false end
-       
-            local Team = Utility:GetTeam(player)
-            local LocalTeam = Utility:GetTeam(LocalPlayer)
-
-            local TeamFlag = "_enemy"
-
-            if player == LocalPlayer then
-                TeamFlag = "_local"
-            end
-
-            if not Flags["esp_players_enabled" .. TeamFlag] then
-                return
-            end 
-
-            local Character = Utility:GetCharacter(player)
-
-            if not Character then
-                PlayerTable.Health = 0
-
-                return
-            end
-
-            local Humanoid = Utility:GetHumanoid(Character)
-
-            local Root = Utility:GetRootPart(Character, Humanoid)
-
-            if not Root then
-                PlayerTable.Health = 0
-
-                return
-            end
-
-            local Distance = ((Controller.Alive and Controller.RootPart.CFrame.p or Camera.CFrame.p) - Root.Position).Magnitude
-
-            if Flags["esp_players_limit"] and Distance > Flags["esp_players_limit_amount"] then
-                return
-            end
-
-            local Position, OnScreen = WorldToViewportPoint(Camera, Root.Position)
-
-            if not (Position and OnScreen) then
-                return
-            end
-
-            Holder.Enabled = true
-
-            local Health, MaxHealth = Utility:GetHealth(player, Humanoid)
-
-            if MaxHealth == math.huge then
-                MaxHealth = 100
-            end
-
-            if Health > MaxHealth then
-                MaxHealth = Health -- ????
-            end
-
-            Health = mathclamp(Health, 0, MaxHealth)
-
-            if PlayerTable.Health ~= Health then
-                PlayerTable.Health = Utility:Lerp(PlayerTable.Health, Health, Flags["esp_health_fade_speed"] / 1000)
-            end
-
-            local HealthScale = PlayerTable.Health / MaxHealth
-
-            local AutoSizing = (Flags["esp_auto_sizing"] ~= "Simple" and IsA(Character, "Model"))
-
-            local SizeFunction = AutoSizing and ESP.GetBoundingBox or ESP.GetRootBounding
-
-            local BoxPosition, BoxSize = SizeFunction(AutoSizing and Character or Root)
-
-            StaticOffsets = {
-                Right = 0,
-                Bottom = 0
-            }
-
-            Sides = {
-                Right = BoxPosition + Vector2new(BoxSize.x + 4, -4),
-                Bottom = BoxPosition + Vector2new(BoxSize.x / 2, BoxSize.y + 4)
-            }
-
-            local OverwritenColor = ESP.GetOverwritenColor(player)
-
-            local Box = Drawings.Box
-            local BoxOutline = Drawings.BoxOutline
-            local BoxInline = Drawings.BoxInline
-            local BoxGradient = Drawings.BoxGradient
-
-            local BoxStatus = Flags["esp_players_box" .. TeamFlag]
-
-            Box.Visible = BoxStatus
-            if BoxStatus then
-                Box.Size = UDim2offset(BoxSize.X - 2, BoxSize.Y - 2)
-                Box.Position = UDim2offset(BoxPosition.X + 1, BoxPosition.Y + 1)
-
-                BoxOutline.Transparency = 1 - Flags["esp_players_box_outline" .. TeamFlag].a
-                BoxOutline.Color = Flags["esp_players_box_outline" .. TeamFlag].c
-
-                local BoxGradientStatus = Flags["esp_players_box_gradient" .. TeamFlag]
-
-                BoxGradient.Enabled = BoxGradientStatus
-
-                if BoxGradientStatus then 
-                    BoxInline.Color = Color3fromRGB(255, 255, 255)
-                    BoxInline.Transparency = 0
-                    local Color = ColorSequence.new({
-                        ColorSequenceKeypoint.new(0, Flags["esp_players_box_gradient_from_color" .. TeamFlag].c), 
-                        ColorSequenceKeypoint.new(1, Flags["esp_players_box_gradient_to_color" .. TeamFlag].c)
-                    })
-
-                    local Transparency = NumberSequence.new({
-                        NumberSequenceKeypoint.new(0, 1 - Flags["esp_players_box_gradient_from_color" .. TeamFlag].a),
-                        NumberSequenceKeypoint.new(1, 1 - Flags["esp_players_box_gradient_to_color" .. TeamFlag].a),
-                    })
-
-                    if Flags["esp_players_box_gradient_rainbow" .. TeamFlag] then 
-                        local Time = tick()
-                        local HueStart = (Time / 5) % 1
-                        local HueEnd = (HueStart + (Flags["esp_players_box_gradient_rainbow_speed" .. TeamFlag] / 100)) % 1 
-                    
-                        local ColorStart = Color3fromHSV(HueStart, 1, 1)
-                        local ColorEnd = Color3fromHSV(HueEnd, 1, 1)
-                    
-                        Color = ColorSequence.new({
-                            ColorSequenceKeypoint.new(0, ColorStart),
-                            ColorSequenceKeypoint.new(1, ColorEnd)
-                        })
-                    end
-
-                    BoxGradient.Color = Color 
-                    BoxGradient.Transparency = Transparency 
-                else
-                    BoxInline.Color = OverwritenColor or Flags["esp_players_box_color" .. TeamFlag].c
-                    BoxInline.Transparency = 1 - Flags["esp_players_box_color" .. TeamFlag].a
-                end
-            end
-
-            local BoxFill = Drawings.BoxFill
-            local BoxFillGradient = Drawings.BoxFillGradient
-
-            local BoxFillStatus = Flags["esp_players_box_fill" .. TeamFlag]
-
-            BoxFill.Visible = BoxFillStatus
-            if BoxFillStatus then
-                local BoxFillGradientStatus = Flags["esp_players_box_fill_gradient" .. TeamFlag]
-
-                BoxFillGradient.Enabled = BoxFillGradientStatus
-
-                if BoxFillGradientStatus then 
-                    BoxFill.BackgroundColor3 = Color3fromRGB(255, 255, 255)
-                    BoxFill.BackgroundTransparency = 0
-
-                    local Color = ColorSequence.new({
-                        ColorSequenceKeypoint.new(0, Flags["esp_players_box_fill_gradient_from_color" .. TeamFlag].c), 
-                        ColorSequenceKeypoint.new(1, Flags["esp_players_box_fill_gradient_to_color" .. TeamFlag].c)
-                    })
-
-                    local Transparency = NumberSequence.new({
-                        NumberSequenceKeypoint.new(0, 1 - Flags["esp_players_box_fill_gradient_from_color" .. TeamFlag].a),
-                        NumberSequenceKeypoint.new(1, 1 - Flags["esp_players_box_fill_gradient_to_color" .. TeamFlag].a),
-                    })
-
-                    if Flags["esp_players_box_fill_gradient_rainbow" .. TeamFlag] then 
-                        local Time = tick()
-                        local HueStart = (Time / 5) % 1
-                        local HueEnd = (HueStart + (Flags["esp_players_box_fill_gradient_rainbow_speed" .. TeamFlag] / 100)) % 1 
-                    
-                        local ColorStart = Color3fromHSV(HueStart, 1, 1)
-                        local ColorEnd = Color3fromHSV(HueEnd, 1, 1)
-                    
-                        Color = ColorSequence.new({
-                            ColorSequenceKeypoint.new(0, ColorStart),
-                            ColorSequenceKeypoint.new(1, ColorEnd)
-                        })
-                    end
-
-                    BoxFillGradient.Color = Color 
-                    BoxFillGradient.Transparency = Transparency 
-                else
-                    BoxFill.BackgroundColor3 = OverwritenColor or Flags["esp_players_box_fill_color" .. TeamFlag].c
-                    BoxFill.BackgroundTransparency = 1 - Flags["esp_players_box_fill_color" .. TeamFlag].a
-                end 
-            end
-
-            local ImageLabel = Drawings.ImageLabel
-
-            local ImageId = TeamFlag == "_enemy" and ESP.EnemyImage or TeamFlag == "_team" and ESP.TeamImage or ESP.Image
-            local FileType = TeamFlag == "_enemy" and ESP.EnemyFileType or TeamFlag == "_team" and ESP.TeamFileType or ESP.FileType
-            local ImageStatus = Flags["esp_players_image" .. TeamFlag] and ImageId
-
-            ImageLabel.Visible = ImageStatus and FileType
-
-            if ImageStatus then
-                ImageLabel.Size = UDim2offset(BoxSize.x, BoxSize.y)
-                ImageLabel.Position = UDim2offset(BoxPosition.x, BoxPosition.y)
-
-                if ImageLabel.Image ~= ImageId then
-                    ImageLabel.Image = ImageId
-                end
-            end
-
-            local Name = Drawings.Name
-            
-            local NameStatus = Flags["esp_players_name" .. TeamFlag]
-
-            Name.Visible = NameStatus
-            if NameStatus then
-                Name.Position = UDim2offset(BoxPosition.x + BoxSize.x / 2 - Name.TextBounds.x / 2, BoxPosition.y - Name.TextBounds.y - 4)
-                Name.TextColor3 = OverwritenColor or Flags["esp_players_name_color" .. TeamFlag].c
-                Name.TextTransparency = 1 - Flags["esp_players_name_color" .. TeamFlag].a
-                Name.Text = ESP.GetCase(Utility:GetStyleName(player):sub(0, Flags["esp_players_name_max" .. TeamFlag]), Flags["esp_players_name_case" .. TeamFlag])
-                Name.FontFace = GetFontFromIndex(Fonts[Flags["esp_players_name_font" .. TeamFlag]])
-                Name.TextSize = Flags["esp_players_name_size" .. TeamFlag]
-            end
-
-            local FoundTool = Utility:GetToolName(player, Character)
-
-            local ToolStatus = Flags["esp_players_tool" .. TeamFlag] and FoundTool
-
-            PlayerTable.CreateFlag(
-                "Tool", 
-                ESP.GetCase(FoundTool or "", Flags["esp_players_tool_case" .. TeamFlag]):sub(0, Flags["esp_players_tool_max" .. TeamFlag]), 
-                Flags["esp_players_tool_color" .. TeamFlag], 
-                Flags["esp_players_tool_font" .. TeamFlag], 
-                Flags["esp_players_tool_size" .. TeamFlag], 
-                ToolStatus, 
-                "Bottom",
-                OverwritenColor
-            )
-
-            local DistanceStatus = Flags["esp_players_distance" .. TeamFlag]
-
-            PlayerTable.CreateFlag(
-                "Distance", 
-                ESP.GetCase(tostring(mathfloor(Distance)) .. " ST", Flags["esp_players_distance_case" .. TeamFlag]), 
-                Flags["esp_players_distance_color" .. TeamFlag], 
-                Flags["esp_players_distance_font" .. TeamFlag], 
-                Flags["esp_players_distance_size" .. TeamFlag], 
-                DistanceStatus, 
-                "Bottom",
-                OverwritenColor
-            )
-
-            local HealthNumber = Drawings.HealthNumber
-            local HealthBarOutline = Drawings.HealthBarOutline
-            local HealthBar = Drawings.HealthBar
-            local HealthBarGradient = Drawings.HealthBarGradient
-
-            local HealthBarStatus = Flags["esp_players_health_bar" .. TeamFlag]
-            local HealthBarSize = Flags["esp_players_health_bar_size" .. TeamFlag] + 2
-
-            HealthBarOutline.Visible = HealthBarStatus
-
-            if HealthBarStatus then
-                HealthBarOutline.Size = UDim2offset(HealthBarSize, BoxSize.y + 4)
-                HealthBarOutline.Position = UDim2offset(BoxPosition.x - 4 - HealthBarSize, BoxPosition.y - 2)
-                HealthBarOutline.BackgroundColor3 = Flags["esp_players_health_bar_outline" .. TeamFlag].c
-                HealthBarOutline.BackgroundTransparency = 1 - Flags["esp_players_health_bar_outline" .. TeamFlag].a
-
-                local HealthScaleSize = (HealthBarOutline.AbsoluteSize.y - 2) * HealthScale
-
-                HealthBar.Size = UDim2new(1, -2, 0, HealthScaleSize)
-                HealthBar.Position = UDim2new(0, 1, 1, -(HealthScaleSize + 1))
-
-                local HealthBarGradientStatus = Flags["esp_players_health_bar_gradient" .. TeamFlag]
-
-                HealthBarGradient.Enabled = HealthBarGradientStatus
-
-                if HealthBarGradientStatus then 
-                    HealthBar.BackgroundColor3 = Color3fromRGB(255, 255, 255)
-                    HealthBar.BackgroundTransparency = 0
-
-                    local Color = ColorSequence.new({
-                        ColorSequenceKeypoint.new(0, Flags["esp_players_health_bar_gradient_from_color" .. TeamFlag].c), 
-                        ColorSequenceKeypoint.new(1, Flags["esp_players_health_bar_gradient_to_color" .. TeamFlag].c)
-                    })
-
-                    local Transparency = NumberSequence.new({
-                        NumberSequenceKeypoint.new(0, 1 - Flags["esp_players_health_bar_gradient_from_color" .. TeamFlag].a),
-                        NumberSequenceKeypoint.new(1, 1 - Flags["esp_players_health_bar_gradient_to_color" .. TeamFlag].a),
-                    })
-
-                    if Flags["esp_players_health_bar_gradient_rainbow" .. TeamFlag] then 
-                        local Time = tick()
-                        local HueStart = (Time / 5) % 1
-                        local HueEnd = (HueStart + (Flags["esp_players_health_bar_gradient_rainbow_speed" .. TeamFlag] / 100)) % 1 
-                    
-                        local ColorStart = Color3fromHSV(HueStart, 1, 1)
-                        local ColorEnd = Color3fromHSV(HueEnd, 1, 1)
-                    
-                        Color = ColorSequence.new({
-                            ColorSequenceKeypoint.new(0, ColorStart),
-                            ColorSequenceKeypoint.new(1, ColorEnd)
-                        })
-                    end
-
-                    HealthBarGradient.Color = Color 
-                    HealthBarGradient.Transparency = Transparency 
-                else
-                    HealthBar.BackgroundColor3 = OverwritenColor or Flags["esp_players_health_bar_color" .. TeamFlag].c
-                    HealthBar.BackgroundTransparency = 1 - Flags["esp_players_health_bar_color" .. TeamFlag].a
-                end 
-            end
-
-            local HealthNumberStatus = Flags["esp_players_health_number" .. TeamFlag] and PlayerTable.Health <= MaxHealth - 10
-
-            HealthNumber.Visible = HealthNumberStatus
-
-            if HealthNumberStatus then
-                local HealthScaleSize = (HealthBarOutline.AbsoluteSize.y - 2) * HealthScale
-
-                local FollowHealthBar = Flags["esp_players_health_number_follow" .. TeamFlag]
-
-                local HealthPosition = UDim2offset(BoxPosition.x - (HealthBarStatus and not FollowHealthBar and HealthBarOutline.Size.X.Offset + 4 or 4) - HealthNumber.TextBounds.x, BoxPosition.y - 6)
-
-                if FollowHealthBar and HealthBarStatus then
-                    HealthPosition = UDim2offset(BoxPosition.x - 4 - HealthBarSize / 2 - HealthNumber.TextBounds.x / 2, (BoxPosition.y + BoxSize.y) - HealthScaleSize - HealthNumber.TextBounds.y / 2)
-                end
-
-                HealthNumber.Position = HealthPosition
-                HealthNumber.TextColor3 = OverwritenColor or Flags["esp_players_health_number_color" .. TeamFlag].c
-                HealthNumber.TextTransparency = 1 - Flags["esp_players_health_number_color" .. TeamFlag].a
-                HealthNumber.Text = tostring(mathfloor(PlayerTable.Health))
-                HealthNumber.FontFace = GetFontFromIndex(Fonts[Flags["esp_players_health_number_font" .. TeamFlag]])
-                HealthNumber.TextSize = Flags["esp_players_health_number_size" .. TeamFlag]
-            end
-
-            local ForceFieldStatus = Flags["esp_players_force" .. TeamFlag] and typeof(Character) == "Instance" and FindFirstChildWhichIsA(Character, "ForceField")
-
-            PlayerTable.CreateFlag(
-                "Force Field", 
-                ESP.GetCase("Force-Field", Flags["esp_players_force_case" .. TeamFlag]), 
-                Flags["esp_players_force_color" .. TeamFlag], 
-                Flags["esp_players_force_font" .. TeamFlag], 
-                Flags["esp_players_force_size" .. TeamFlag], 
-                ForceFieldStatus, 
-                "Right",
-                OverwritenColor
-            )
-
-            local TargetStatus = Flags["esp_players_target" .. TeamFlag] and (SilentAim.Target and SilentAim.Target.Player and SilentAim.Target.Player == player or Aimbot.Target and Aimbot.Target.Player and Aimbot.Target.Player == player)
-
-            PlayerTable.CreateFlag(
-                "Target", 
-                ESP.GetCase("Target", Flags["esp_players_target_case" .. TeamFlag]), 
-                Flags["esp_players_target_color" .. TeamFlag], 
-                Flags["esp_players_target_font" .. TeamFlag], 
-                Flags["esp_players_target_size" .. TeamFlag], 
-                TargetStatus, 
-                "Right",
-                OverwritenColor
-            )
-
-            -- local BonesStatus = Flags["esp_players_bones" .. TeamFlag]
-
-            -- for _,v in SkeletonLayout do
-            --     local Object = Drawings[v]
-                
-            --     if Object then
-            --         Object.Visible = BonesStatus
-            --     end
-            -- end
-
-            -- if BonesStatus then
-            --     for _,v in SkeletonLayout do
-            --         local Part = Utility:GetPart(Character, v)
-                    
-            --         local Object = Drawings[v]
-
-            --         if not Part then
-            --             if Object then
-            --                 Object.Visible = false
-            --             end
-
-            --             continue
-            --         end
-
-            --         local BonePosition, BoneOnScreen = WorldToViewportPoint(Camera, Part.Position)
-
-            --         if not (BonePosition and BoneOnScreen) then
-            --             if Object then
-            --                 Object.Visible = false
-            --             end
-
-            --             continue
-            --         end
-
-            --         if not Object then
-            --             continue
-            --         end
-
-            --         local From = Vector2new(Position.x, Position.y)
-            --         local To = Vector2new(BonePosition.x, BonePosition.y)
-            --         local Direction = (To - From)
-            --         local Center = (To + From) / 2
-            --         local Distance = Direction.Magnitude
-            --         local Theta = mathdeg(mathatan2(Direction.Y, Direction.X))
-
-            --         Object.Visible = true
-            --         Object.Position = UDim2offset(Center.X, Center.Y)
-            --         Object.Rotation = Theta
-            --         Object.Size = UDim2offset(Distance, 1)
-            --         Object.BackgroundColor3 = OverwritenColor or Flags["esp_players_bones_color" .. TeamFlag].c
-            --         Object.BackgroundTransparency = 1 - Flags["esp_players_bones_color" .. TeamFlag].a
-            --     end                
-            -- end
-        end, "ESP Player Heartbeat"))
-
-        ESP.Players[player] = PlayerTable
-    end
-
-    function ESP:RemovePlayer(player)
-        if not ESP.Players[player] then
-            return
-        end
-
-        local Player = ESP.Players[player]
-
-        Player:ClearDrawings()
-
-        for _,v in Player.Connects do
-            v:Disconnect()
-        end
-
-        ESP.Players[player] = nil
-    end
-
-    Utility:Connect(Players.PlayerRemoving, function(player)
-        ESP:RemovePlayer(player)
-    end, "ESP Player Removing")
-
-    Utility:Connect(RunService.Heartbeat, function()
-        for _,v in Utility:GetPlayers() do
-            if not ESP.Players[v] then 
-                ESP:AddPlayer(v)
-            end
-        end
-    end, "ESP Extra Heartbeat") 
---
-
--- Visuals
-    local Sky = FindFirstChildWhichIsA(Lighting, "Sky")
-    if not Sky then
-        Sky = Utility:New("Sky", {
-            Parent = Lighting
-        })
-    end
-
-    function Visuals:UpdateWorldVisuals()
-        -- Clock Time
-            if Flags["world_clock_time"] then
-                Lighting.ClockTime = Flags["world_clock_time_amount"]
-            end
-        --
-
-        -- Ambience Changer
-            if Flags["world_ambience"] then
-                Lighting.OutdoorAmbient = Flags["world_ambience_outside"].c
-                Lighting.Ambient = Flags["world_ambience_inside"].c
-            end
-        --
-
-        -- Brightness Changer
-            if Flags["world_brightness"] then
-                Lighting.Brightness = Flags["world_brightness_amount"] / 100
-            end
-        --
-
-        -- Fog Changer
-            if Flags["world_fog"] then
-                Lighting.FogColor = Flags["world_fog_color"].c
-                Lighting.FogStart = Flags["world_fog_start"]
-                Lighting.FogEnd = Flags["world_fog_end"]
-            end
-        --
-
-        -- Skybox Changer
-            local SkyboxType = Flags["world_skybox_changer"]
-            local Skyboxes = Visuals.Skyboxes
-            local Sky = FindFirstChildWhichIsA(Lighting, "Sky")
-
-            if Sky and Flags["world_stars_count"] then
-                Sky.StarCount = Flags["world_stars_count_amount"]
-            end
-
-            if SkyboxType ~= "Off" and Skyboxes and Skyboxes[SkyboxType] then
-                if Sky then
-                    for _,v in Skyboxes[SkyboxType] do
-                        if Sky[_] ~= v then
-                            Sky[_] = v
-                        end
-                    end
-                else
-                    Utility:New("Sky", {
-                        Parent = Lighting
-                    })
-                end                
-            end
-        --
-    end
-
-    local Faces = {"Front", "Back", "Bottom", "Top", "Right", "Left"}
-    local Cache = {}
-    function Visuals:CreateTexture(part, id)
-        local Objects = {}
-
-        for _,v in Faces do
-            Objects[v] = Utility:New("Texture", {
-                ZIndex = 9e9,
-                Name = "\0",
-                Face = Enum.NormalId[v],
-                Color3 = part.Color,
-                Transparency = part.Transparency,
-                Texture = id
-            })
-        end
-
-        return Objects
-    end
-
-    function Visuals:TextureChange()
-        for _,v in workspace:GetDescendants() do
-            if IsA(v, "BasePart") or IsA(v, "Part") or IsA(v, "MeshPart") then
-                local PartMaterial = v.Material.Name
-                local FoundId = Visuals.PartMaterials.Minecraft[PartMaterial]
-                
-                if FoundId then
-                    Cache[v] = PartMaterial 
-
-                    Visuals:CreateTexture(v, FoundId)
-
-                    v.Material = "SmoothPlastic"
-                end
-            end
-        end
-    end
-
-    function Visuals:LinePosition(index, position, size, gap)
-        local FromVector2, ToVector2 = Vector2zero, Vector2zero
-        if index == 1 then
-            FromVector2 = Vector2new(position.x - size - gap, position.y - size - gap)
-            ToVector2 = Vector2new(position.x - gap, position.y - gap)
-        elseif index == 2 then
-            FromVector2 = Vector2new(position.x - size - gap, position.y + size + gap)
-            ToVector2 = Vector2new(position.x - gap, position.y + gap)
-        elseif index == 3 then
-            FromVector2 = Vector2new(position.x + size + gap, position.y + size + gap)
-            ToVector2 = Vector2new(position.x + gap, position.y + gap)
-        elseif index == 4 then
-            FromVector2 = Vector2new(position.x + size + gap, position.y - size - gap)
-            ToVector2 = Vector2new(position.x + gap, position.y - gap)
-        end
-    
-        return FromVector2, ToVector2
-    end
-
-    function Visuals:NewHitmarker(Cfg)
-        Cfg = {
-            Position = Cfg.Position or Vector3new(1, 1, 1),
-            Time = Cfg.Time or 3,
-        }
-    
-        local Hitmarker = {
-            ["Objects"] = {},
-            ["StartTick"] = osclock(),
-        }
-    
-        for i = 1, 4 do
-            Hitmarker.Objects[#Hitmarker.Objects + 1] = Utility:New("Frame", {
-                Visible = false,
-                BorderSizePixel = 1,
-                Parent = ESP.Holder,
-                ZIndex = 1,
-                AnchorPoint = (Vector2.one * 0.5),
-            })
-    
-        end
-    
-        local Objects = Hitmarker.Objects
-    
-        local Connection = Utility:Connect(RunService.Heartbeat, function()
-            local Position, OnScreen = Camera:WorldToViewportPoint(Cfg.Position)
-            local Vector2Position = Vector2new(Position.x, Position.y)
-    
-            local HitmarkerSize = Flags["hitmarker_size"]
-            local HitmarkerGap = Flags["hitmarker_gap"]
-            local HitmarkerColor = Flags["hitmarker_color"]
-            local HitmarkerOutlineColor = Flags["hitmarker_outline"]
-
-            for idx, Object in Objects do
-                Object.Visible = Position and OnScreen
-
-                if Object.Visible then
-                    local FromPosition, ToPosition = Visuals:LinePosition(idx, Position, HitmarkerSize, HitmarkerGap)
-    
-                    Object.BackgroundColor3 = HitmarkerColor.c
-                    Object.BorderColor3 = HitmarkerOutlineColor.c
-                    Object.BackgroundTransparency = 1 - HitmarkerColor.a
-
-                    Utility:Line(Object, FromPosition, ToPosition)
-                end
-            end
-    
-            if osclock() - Hitmarker.StartTick > Cfg.Time then
-                Hitmarker:Remove()
-                table.remove(Visuals.Hits, _)
-            end
-        end)
-
-        Hitmarker.Connection = Connection
-    
-        function Hitmarker:Remove()
-            for _,v in next, Hitmarker.Objects do
-                v:Destroy()
-            end
-    
-            Hitmarker.Connection:Disconnect()
-        end
-    
-        Visuals.Hits[#Visuals.Hits + 1] = Hitmarker
-    end
-
-    local FovAmount = 0
-    function Visuals:UpdateCameraVisuals()
-        -- Third Person
-            -- if Flags["camera_tp"] and Flags["camera_tp_key"] then
-            --     Camera.CFrame *= CFramenew(Vector3new(Flags["camera_tp_x"], Flags["camera_tp_y"], Flags["camera_tp_z"]))
-            -- end
-        --
-
-        -- Camera FOV Changer
-            if Flags["camera_fov_zoom"] and Flags["camera_fov_zoom_key"] or Flags["camera_fov"] then
-                FovAmount = Utility:Lerp(FovAmount, Flags["camera_fov_zoom"] and Flags["camera_fov_zoom_key"] and Flags["camera_fov_zoom_amount"] or Flags["camera_fov_amount"])
-
-                Camera.FieldOfView = FovAmount
-            end
-        --
-
-        -- Aspect Ratio
-            if Flags["camera_as"] then
-                local X, Y, Z, R00, R01, R02, R10, R11, R12, R20, R21, R22 = Camera.CFrame:GetComponents()
-                Camera.CFrame = CFramenew(X, Y, Z, R00 * Library.Flags["camera_as_hor"] / 100, R01 * Library.Flags["camera_as_ver"] / 100, R02, R10, R11 * Library.Flags["camera_as_ver"] / 100, R12, R20 * Library.Flags["camera_as_hor"] / 100, R21 * Library.Flags["camera_as_ver"] / 100, R22)
-            end
-        -- 
-
-        -- Desync Offset Removed
-            if not Flags["desync_hook"] then
-                Desync:RemoveOffset()
-            end
-        --
-    end
-
-    function Visuals:ApplyChams(part, material, color, transparency, reflectance)
-        material = Visuals.Materials[material]
-
-        local SpecialMesh = FindFirstChildWhichIsA(part, "SpecialMesh")
-
-        if SpecialMesh then
-            SpecialMesh.TextureId = "rbxassetid://0"
-            SpecialMesh.VertexColor = Vector3.new(color.R, color.G, color.B)
-        end
-
-        local MeshPart = FindFirstChildWhichIsA(part, "MeshPart")
-        if MeshPart then
-            MeshPart.TextureId = "rbxassetid://0"
-            MeshPart.VertexColor = Vector3.new(color.R, color.G, color.B)
-        end
-
-        if part.ClassName == "UnionOperation" then
-            part.UsePartColor = true
-        end
-
-        local SurfaceAppearance = FindFirstChildWhichIsA(part, "SurfaceAppearance")
-        if SurfaceAppearance then
-            SurfaceAppearance:Destroy()
-        end
-
-        local Decal = FindFirstChildWhichIsA(part, "Decal")
-        if Decal then
-            Decal:Destroy()
-        end
-
-        if IsA(part, "MeshPart") then
-            part.TextureID = "rbxassetid://0"
-        end
-
-        part.Color = color
-        part.Material = material
-        part.Transparency = transparency - 0.01
-        part.Reflectance = reflectance / 50
-	end
-
-    Utility:Connect(Lighting.Changed, function()
-        Visuals:UpdateWorldVisuals()
-    end, "Lighting Changed")
-
-    Utility:BindToRenderStep("Camera Visuals", Enum.RenderPriority.Camera.Value + 1, function(dt)
-        Visuals:UpdateCameraVisuals()
-    end)
---
-
--- Misc
-    local SpeedDirection = Vector3zero
-    local StrafeAngle = -0.1
-    local CFramePart = Utility:New("Part", {
-        CanCollide = false,
-        Anchored = true,
-        CFrame = CFramenew(-9e9, -9e9, -9e9),
-        Parent = workspace,
-        Material = Enum.Material.ForceField,
-        Color = Color3fromRGB(0, 179, 255)
-    })
-
-    local CFrameLine = Utility:New("Frame", {
-        Visible = false,
-        BorderSizePixel = 0,
-        Parent = ESP.Holder,
-        ZIndex = 1,
-        AnchorPoint = (Vector2.one * 0.5),
-    })
-
-    function Misc:MovementFeatures(dt)
-        local Character = Controller.Character
-        local Humanoid =  Controller.Humanoid
-        local Root = Controller.RootPart
-
-        if not (Character and Root) then
-            return
-        end
-
-        local OldCFrame, NewCFrame = Desync:GetPositions()
-        local DesyncPositions = Desync.Positions
-
-        local Looking = Camera.CFrame.lookVector
-
-        if Flags["movement_speed_hack"] and Flags["movement_speed_hack_key"] then
-            local Travel = Vector3zero
-
-            if Flags["movement_circle_strafe"] and Flags["movement_circle_strafe_key"] then
-                if SpeedDirection.x ~= SpeedDirection.x then 
-                    SpeedDirection = Vector3new(Looking.x, 0, Looking.y)
-                end
-
-                Travel = SpeedDirection
-                StrafeAngle = -0.1
-                
-                if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-                    StrafeAngle = 0.1
-                end
-                if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-                    StrafeAngle = -0.1
-                end
-
-                local Vec = Vector2new(SpeedDirection.x, SpeedDirection.z)
-                Vec = Utility:GetRotate(Vec, StrafeAngle)                
-                SpeedDirection = Vector3new(Vec.x, 0, Vec.y)
-            else
-                if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-                    Travel += Vector3new(Looking.x, 0, Looking.Z)
-                end
-
-                if UserInputService:IsKeyDown(Enum.KeyCode.S) then
-                    Travel -= Vector3new(Looking.x, 0, Looking.Z)
-                end
-                
-                if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-                    Travel += Vector3new(-Looking.Z, 0, Looking.x)
-                end
-
-                if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-                    Travel += Vector3new(Looking.Z, 0, -Looking.x)
-                end
-
-                --Travel = Travel.Unit
-
-                --local Factor = _Speedhack.Bypass and mathclamp((0.2 + 0.8 * math.abs(mathsin(tick() * 2))) * Flags["movement_speed_hack_factor"], 25, 5^12) or Flags["movement_speed_hack_factor"]
-
-                --local NewDirection = Vector3new(Travel.X, 0, Travel.Z)
-
-                SpeedDirection = Vector3new(Travel.X, 0, Travel.Z).Unit
-
-                StrafeAngle = -0.1
-
-
-                --[[if Travel.Unit.X == Travel.Unit.X then
-                    Root.Velocity = NewDirection     
-                end]]--
-            end
-
-            Travel = SpeedDirection
-
-            if Flags["movement_avoid_collisions"] then
-                local OrigPosition = OldCFrame and OldCFrame.p or Root.CFrame.p
-                if Flags["movement_circle_strafe"] and Flags["movement_circle_strafe_key"] then
-                    local Scale = Flags["movement_avoid_collisions_factor"] / 1000
-
-                    local Result = Raycast(Workspace, OrigPosition, Travel * Flags["movement_speed_hack_factor"] * Scale, Utility.Blacklist)
-                                        
-                    if Result then
-                        for i = -10, 10 do
-                            local Vec = Vector2new(Travel.x, Travel.z)
-
-                            Vec = Utility:GetRotate(Vec, StrafeAngle * i * -1)
-
-                            Vec = Vector3new(Vec.x, 0, Vec.y)
-
-                            Result = Raycast(Workspace, OrigPosition, Travel * Flags["movement_speed_hack_factor"] * Scale, Utility.Blacklist)
-
-                            if not Result then
-                                Travel = Vec
-                            end
-                        end
-                    end
-                elseif Flags["movement_avoid_collisions_standalone"] then
-                    for _ = 1, 10 do
-                        local Result = Raycast(Workspace,OrigPosition, (Travel * Flags["movement_speed_hack_factor"] / 10) + Vector3new(0, Root.Velocity.y / 10, 0), Utility.Blacklist)
-
-                        local Normal = Result and Result.Normal or Vector3zero
-                        local Position = Result and Result.Position or OrigPosition
-
-                        if Result then
-                            local Dot = Normal.Unit:Dot((Root.CFrame.p - Position).Unit)
-
-                            if Dot > 0 then
-                                Travel += Normal.Unit * Dot
-
-                                Travel = Travel.Unit
-
-                                if Travel.x == Travel.x then
-                                    StrafeAngle = Travel
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-
-            if Travel.x == Travel.x then
-                if Flags["movement_speed_hack_type"] == "Velocity" then
-                    Root.Velocity = Vector3new(Travel.x *  Flags["movement_speed_hack_factor"], Root.Velocity.y, Travel.z *  Flags["movement_speed_hack_factor"])
-                else
-                    if OldCFrame then
-                        DesyncPositions.Old += Vector3new(Travel.x * Flags["movement_speed_hack_factor"] * dt, 0, Travel.z *  Flags["movement_speed_hack_factor"] * dt)
-                    else
-                        Root.CFrame += Vector3new(Travel.x * Flags["movement_speed_hack_factor"] * dt, 0, Travel.z *  Flags["movement_speed_hack_factor"] * dt)
-                    end
-                end
-            end
-        end
-
-        if Flags["movement_auto_jump"] and Flags["movement_auto_jump_key"] and Humanoid then
-            Humanoid.Jump = true
-        end
-
-        if Flags["movement_fly_hack"] and Flags["movement_fly_hack_key"] then
-            local Travel = Vector3zero
-
-            if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-                Travel += Looking
-            end
-
-            if UserInputService:IsKeyDown(Enum.KeyCode.S) then
-                Travel -= Looking
-            end
-
-            if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-                Travel += Vector3new(-Looking.Z, 0, Looking.x)
-            end
-
-            if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-                Travel += Vector3new(Looking.Z, 0, -Looking.x)
-            end
-
-            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
-                Travel += Vector3new(0, 1, 0)
-            end
-
-            if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then
-                Travel -= Vector3new(0, 1, 0)
-            end
-
-            if Travel.Unit.X == Travel.Unit.X then
-                if Flags["movement_fly_hack_type"] == "Velocity" then
-                    Root.Velocity = Travel.Unit * Flags["movement_fly_hack_factor"]
-                    Root.Anchored = false
-                else
-                    Root.Velocity = Vector3zero
-
-                    if OldCFrame then
-                        DesyncPositions.Old += Travel.Unit * Flags["movement_fly_hack_factor"] * dt
-                    else
-                        Root.CFrame += Travel.Unit * Flags["movement_fly_hack_factor"] * dt
-                    end
-
-                    Root.Anchored = false
-                end
-            else
-                Root.Velocity = Vector3zero
-                Root.Anchored = true
-            end
-        else
-            Root.Anchored = false
-        end
-        
-        if Flags["velocity"] and Flags["velocity_key"] then
-            if game.PlaceId == 5104202731 then
-                local Car = Utility:GetPlayerCar(LocalPlayer)
-
-                if Car then
-                    local Part = Car.Body.DownforceR
-                    local PartF = Car.Body.DownforceF
-
-                    local OldVelocity = Part.Velocity
-                    local OldVelocityF = PartF.Velocity
-
-                    Part.Velocity = Vector3new(Flags["velocity_factor"], 0, Flags["velocity_factor"])
-                    PartF.Velocity = Vector3new(Flags["velocity_factor"], 0, Flags["velocity_factor"])
-
-                    RunService.RenderStepped:Wait()        
-        
-                    Part.Velocity = OldVelocity
-                    PartF.Velocity = OldVelocityF
-                end
-            else
-                local OldVelocity = Root.Velocity
-                
-                Root.Velocity = Vector3new(Flags["velocity_factor"], Flags["velocity_factor"], Flags["velocity_factor"])
-
-                RunService.RenderStepped:Wait()        
-
-                Root.Velocity = OldVelocity
-            end
-        end
-    end
-
-    function Misc:RandomMessages(message, items, min, max)
-		message = message or ""
-
-		if max > 0 then
-			for i = 1, mathrandom(min, max) do
-				local RandomMessage = items[mathrandom(1, #items)]
-
-				message = message .. RandomMessage .. " "
-			end
-		end
-
-		return message
-	end
-
-    function Misc:GetChatSpamMessage()
-        local Message = ""
-        local ChosenType = Flags["chat_spam_type"]
-        local CustomDirectory = Library.Folder .. "/Chat-Spam.txt"
-        local TypeTable = ChosenType == "Custom" and isfile(CustomDirectory) and readfile(CustomDirectory):split("\n") or Misc.ChatSpam[ChosenType]
-
-        for i = 1, Flags["chat_spam_repeat"] and mathrandom(Flags["chat_spam_repeat_min"], Flags["chat_spam_repeat_max"]) or 1 do
-            local RepeatedMessage = ""
-
-            -- Emojis
-                if Flags["chat_spam_emojis"] then
-                    RepeatedMessage = Misc:RandomMessages(RepeatedMessage, Misc.Emojis, Flags["chat_spam_emojis_min"], Flags["chat_spam_emojis_max"])
-                end
-            --
-
-            -- Symbols
-                if Flags["chat_spam_symbols"] then
-                    RepeatedMessage = Misc:RandomMessages(RepeatedMessage, Misc.Symbols, Flags["chat_spam_symbols_min"], Flags["chat_spam_symbols_max"])
-                end
-            --
-
-            -- Message
-                RepeatedMessage = Misc:RandomMessages(RepeatedMessage, TypeTable, 1, 1)
-            --
-
-            -- Symbols
-                if Flags["chat_spam_symbols"] then
-                    RepeatedMessage = Misc:RandomMessages(RepeatedMessage, Misc.Symbols, Flags["chat_spam_symbols_min"], Flags["chat_spam_symbols_max"])
-                end
-            --
-
-            -- Emojis
-                if Flags["chat_spam_emojis"] then
-                    RepeatedMessage = Misc:RandomMessages(RepeatedMessage, Misc.Emojis, Flags["chat_spam_emojis_min"], Flags["chat_spam_emojis_max"])
-                end
-            --
-
-            Message = Message .. " " .. RepeatedMessage
-        end
-
-        return Message
-    end
-
-    function Misc:NoSlow()
-        if not Flags["no_slow"] then
-            return
-        end
-
-        local Character = Controller.Character
-
-        if not Character then
-            return
-        end
-
-        local BodyEffects = FindFirstChild(Character, "BodyEffects")
-
-        if not BodyEffects then
-            return
-        end
-
-        local Reload = FindFirstChild(BodyEffects, "Reload")
-        if Reload then
-            Reload.Value = false
-        end
-
-        local Movement = FindFirstChild(BodyEffects, "Movement")
-
-        if Movement then
-            local SlowDowns = 
-                FindFirstChild(Movement, "NoJumping") or 
-                FindFirstChild(Movement, "NoWalkSpeed") or 
-                FindFirstChild(Movement, "ReduceWalk")
-
-            if SlowDowns then SlowDowns:Destroy() end
-        end
-    end
-
-    -- Hit Detection
-        function Misc:ClosestPlayerRange(position, maxradius)
-            local Radius = maxradius
-            local ClosestPlayer
-            local HealthRemaining = 0
-
-            for plr, health in Misc.CurrentHealth do
-                local Character = Utility:GetCharacter(plr)
-    
-                if not Character then
-                    continue
-                end
-
-                local Humanoid = Utility:GetHumanoid(Character)
-
-                if not Humanoid then
-                    continue
-                end
-
-                local HumanoidRootPart = Utility:GetRootPart(Character, Humanoid)
-
-                if not HumanoidRootPart then
-                    continue
-                end
-
-                local Distance = (position - HumanoidRootPart.Position).Magnitude
-                local CurrentHealth = Utility:GetHealth(plr, Humanoid)
-                if (Distance < Radius) and (CurrentHealth < health) then
-                    Radius = Distance
-                    ClosestPlayer = plr
-                    HealthRemaining = CurrentHealth
-                end
-            end
-
-            return ClosestPlayer, HealthRemaining
-        end
-
-        function Misc:HitDetection()
-            local Character = Controller.Character
-
-            if not Character then
-                return
-            end
-
-            local Ignored = FindFirstChild(workspace, "Ignored")
-
-            if not Ignored then
-                return
-            end
-
-            local Siren = FindFirstChild(Ignored, "Siren")
-
-            if not Siren then
-                return
-            end
-
-            local Radius = FindFirstChild(Siren, "Radius")
-
-            if not Radius then
-                return
-            end
-
-            local Tool = FindFirstChildWhichIsA(Character, "Tool")
-
-            if not Tool then
-                return
-            end
-            
-            local CurrentGun = {}
-
-            for _,v in Tool:GetChildren() do
-                if v.Name:lower():find("ammo") and not v.Name:lower():find("max") then
-                    CurrentGun.Tool = Tool
-                    CurrentGun.IsGunEquipped = true
-                    CurrentGun.Ammo = v
-
-                    break
-                end
-            end
-
-            if CurrentGun and CurrentGun.IsGunEquipped and CurrentGun.Tool then
-                if CurrentGun.Tool ~= Misc.Gun.PreviousGun then
-                    Misc.Gun.PreviousGun = CurrentGun.Tool
-                    Misc.Gun.PreviousAmmo = 999
-
-                    for _,v in Misc.GunConnections do
-                        v:Disconnect()
-                    end
-
-                    Misc.GunConnections = {}
-                end
-
-                if not Misc.GunConnections["GunAmmoChanged"] then
-                    Misc.GunConnections["GunAmmoChanged"] = Utility:Connect(CurrentGun.Ammo:GetPropertyChangedSignal("Value"), function()
-                        if CurrentGun.Ammo.Value == 0 and Flags["auto_reload"] then
-                            local Game = Games[PlaceId] or {
-                                Arg = "UpdateMousePosI", Remote = "MainEvent"
-                            }
-                            local MainEvent = FindFirstChild(ReplicatedStorage, Game.Remote)
-                
-                            if MainEvent then
-                                MainEvent:FireServer("Reload", CurrentGun.Tool)
-                            end
-                        end
-
-                        local NewAmmo = CurrentGun.Ammo.Value
-                        if NewAmmo < Misc.Gun.PreviousAmmo then
-                            local ChildAdded
-                            local ChildrenAdded = 0
-                            ChildAdded = Utility:Connect(Radius.ChildAdded, function(Object)
-                                if Object and Object.Name == "BULLET_RAYS" then
-                                    ChildrenAdded += 1
-                                    if tablefind(Misc.Gun.Shotguns, CurrentGun.Tool.Name) and ChildrenAdded <= 5 or ChildrenAdded == 1 then
-                                        local GunBeam = Object:WaitForChild("GunBeam")
-                                        local StartPos, EndPos = Object.Position, GunBeam.Attachment1.WorldPosition
-
-                                        if Flags["world_bullet_tracers"] then
-                                            Utility:CreateBulletTracer(StartPos, EndPos, Flags["world_bullet_tracers_color"].c, 1 - Flags["world_bullet_tracers_color"].a, Flags["world_bullet_tracers_time"], Flags["world_bullet_tracers_type"])
-                                        end
-
-                                        if Flags["world_hit_impact"] then
-                                            local Impact = Utility:New("Part", {
-                                                Anchored = true,
-												CanCollide = false,
-												Parent = workspace,
-												Material = "Neon",
-												Shape = Enum.PartType.Block,
-												Transparency = 1 - Flags["world_hit_impact_color"].a,
-												Color = Flags["world_hit_impact_color"].c,
-												Size = Vector3new(Flags["world_hit_impact_size"], Flags["world_hit_impact_size"], Flags["world_hit_impact_size"]),
-												CFrame = CFramenew(EndPos),
-                                            })
-                                            
-                                            Debris:AddItem(Impact, Flags["world_hit_impact_time"])
-                                        end
-
-                                        local Player, HealthRemaining = Misc:ClosestPlayerRange(EndPos, 20)
-
-                                        if Player then
-                                            if Flags["hitsound"] then
-                                                Utility:PlaySound(Misc.Hitsounds[Flags["hitsound_type"]], Flags["hitsound_volume"], Flags["hitsound_pitch"])
-                                            end
-
-                                            if Flags["hitlogs"] then
-                                                Library:Notify({
-                                                    Text = ("Hit player: %s, Health Remaining: %s"):format(Player.Name, tostring(HealthRemaining):sub(1, 5)),
-                                                    Time = Flags["hitlogs_time"],
-                                                })
-                                            end
-
-                                            if Flags["world_hit_chams"] then
-                                                Visuals:CopyPlayerCharacter(Player, Flags["world_hit_chams_time"], Flags["world_hit_chams_color"])
-                                            end
-
-                                            if Flags["hitmarker"] then
-                                                Visuals:NewHitmarker({
-                                                    Position = EndPos,
-                                                    Time = Flags["hitmarker_time"]
-                                                })
-                                            end
-                                        end
-
-                                        ChildAdded:Disconnect()
-                                    end
-                                else
-                                    ChildAdded:Disconnect()
-                                end
-                            end)
-                        end
-                        Misc.Gun.PreviousAmmo = NewAmmo
-                    end)
-                end
-
-                if not Misc.GunConnections["Activated"] then
-                    Misc.GunConnections["Activated"] = Utility:Connect(CurrentGun.Tool.Activated, function()
-                        if Flags["silent_remote"] then
-                            local Game = Games[PlaceId] or {
-                                Arg = "UpdateMousePosI", Remote = "MainEvent"
-                            }
-                            local MainEvent = FindFirstChild(ReplicatedStorage, Game.Remote)
-                
-                            if MainEvent then
-                                local Target = SilentAim.Target
-                
-                                if Target and Target.Position then
-                                    SilentAimActive = true
-
-                                    MainEvent:FireServer("UpdateMousePosI", Target.Position)
-                                end
-                            end
-                        end 
-                    end)
-                end
-            end
-        end
-    --
-
-    local Highlight = Utility:New("Highlight", {
-        Name = "\0",
-        Enabled = true,
-        DepthMode = Enum.HighlightDepthMode.AlwaysOnTop,
-        FillColor = Color3fromRGB(0, 0, 0),
-        OutlineColor = Color3fromRGB(255, 255, 255),
-        OutlineTransparency = 0.5,
-        FillTransparency = 0,
-        Parent = workspace
-    })
-
-    local Line = Utility:New("Frame", {
-        BorderSizePixel = 0,
-        Name = "\0",
-        Parent = ESP.Holder,
-        BorderSizePixel = 0,
-        Visible = false,
-        Position = UDim2new(0, 0, 0, 0),
-        Size = UDim2new(0, 0, 0, 0),
-        AnchorPoint = Vector2.one * 0.5
-    })
-    local NetworkTick = osclock()
-    local Networking = false
-    Utility:Connect(RunService.Heartbeat, function(dt)
-        Misc:MovementFeatures(dt)
-
-        Misc:NoSlow()
-
-        for _,v in Utility:GetPlayers() do
-            if v == LocalPlayer then
-                continue
-            end
-    
-            local Character = Utility:GetCharacter(v)
-    
-            if not Character then
-                continue
-            end
-    
-            local Humanoid = Utility:GetHumanoid(Character)
-            local Health = Utility:GetHealth(v, Humanoid)
-
-            Misc.CurrentHealth[v] = Health
-        end
-
-        if Flags["network_desync"] and Controller.RootPart and sethiddenproperty then
-            if osclock() - NetworkTick > Flags["network_desync_delay"] then 
-                NetworkTick = osclock() 
-                Networking = not Networking
-                sethiddenproperty(Controller.RootPart, "NetworkIsSleeping", Networking)
-            end 
-        end
-
-        Misc:HitDetection()
-
-        Aimbot:Think(dt)
-
-        local TargetCharacter = Aimbot.Target and Aimbot.Target.Character or SilentAim.Target and SilentAim.Target.Character
-
-        if Flags["world_highlight"] and TargetCharacter then
-            Highlight.Enabled = true 
-            Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-            Highlight.FillColor = Flags["world_highlight_fill_color"].c
-            Highlight.OutlineColor = Flags["world_highlight_outline_color"].c
-            Highlight.Adornee = TargetCharacter
-            Highlight.OutlineTransparency = 1 - Flags["world_highlight_outline_color"].a
-            Highlight.FillTransparency = 1 - Flags["world_highlight_fill_color"].a
-        else
-            Highlight.Enabled = false
-        end 
-        
-        local TargetHitbox = Aimbot.Target and Aimbot.Target.Hitbox or SilentAim.Target and SilentAim.Target.Hitbox
-
-        if Flags["world_line"] and TargetHitbox then
-            local MouseLocation = UserInputService:GetMouseLocation()
-            local FromPosition = Vector2new(MouseLocation.x, MouseLocation.y)
-
-            local ToPos, ToOnScreen = WorldToViewportPoint(Camera, TargetHitbox.Position)
-
-            if ToPos and ToOnScreen then
-                local MouseLocation = UserInputService:GetMouseLocation()
-                local FromPosition = Vector2new(MouseLocation.x, MouseLocation.y)
-
-                local ToPosition = Vector2new(ToPos.x, ToPos.y)
-
-                local direction = (ToPosition - FromPosition)
-                local center = (ToPosition + FromPosition) / 2
-                local distance = direction.Magnitude
-                local theta = math.deg(math.atan2(direction.Y, direction.X))
-                
-                Line.Position = UDim2new(0, center.X, 0, center.Y)
-                Line.Rotation = theta
-                Line.Size = UDim2new(0, distance, 0, 1)
-                Line.BackgroundColor3 = Flags["world_line_color"].c
-                Line.BackgroundTransparency = 1 - Flags["world_line_color"].a
-                Line.Visible = true
-            else
-                Line.Visible = false
-            end
-        else
-            Line.Visible = false
-        end
-    end, "Misc Heartbeat")
-
-    taskspawn(function()
-        if MainChannel then
-            while taskwait(Flags["chat_spam_delay"]) do
-                if Flags["chat_spam"] then
-                    MainChannel:SendAsync(Misc:GetChatSpamMessage())
-                end
-            end
+end
+
+-- Connect to PlayerAdded to allow new players to toggle tracers
+game.Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        -- Delay the toggle to ensure the character is fully loaded
+        wait(1)
+        local localPlayer = game.Players.LocalPlayer
+        if player ~= localPlayer then
+            toggleTracer(player)  -- Automatically toggle tracer for new players, except local player
         end
     end)
---
+end)
 
--- Desync
-    function Desync:Active()
-        return (Desync.NewStatus or Flags["desync"] and Flags["desync_key"]) and Controller.RootPart
+-- Example usage: Toggle tracers for all players except the local player
+local localPlayer = game.Players.LocalPlayer
+
+
+
+
+
+
+EnemyEspTab:AddSlider('esp fontsize',
+    { Text = 'esp font size', Default = 12, Min = 1, Max = 30, Rounding = 0, Compact = true })
+    :OnChanged(function(State)
+        _esplib.sharedSettings.textSize = State
+    end)
+
+local enemysets = _esplib.teamSettings.enemy
+EnemyEspTab:AddToggle('EspSwitch', {
+    Text = 'enable esp',
+    Default = false,
+    Callback = function(first)
+        enemysets.enabled = first
     end
-    
-    function Desync:SetStatus(status)
-        Desync.NewStatus = status
+})
+EnemyEspTab:AddToggle('boxswitch', {
+    Text = 'box esp',
+    Default = false,
+    Callback = function(first)
+        enemysets.box = first
     end
+}):AddColorPicker('boxcolor', {
+    Default = Color3.new(1, 1, 1),
+    Title = 'box color',
+    Transparency = 0,
 
-    function Desync:GetPositions()
-        local Positions = Desync.Positions
-        local Status = Desync:Active()
-
-        if not Status then
-            return
-        end
-
-        return Positions.Old, Positions.New
+    Callback = function(Value)
+        enemysets.boxColor[1] = Value
     end
+})
+EnemyEspTab:AddToggle('nameswitch', {
+    Text = 'name esp',
+    Default = false,
 
-    function Desync:RemoveOffset()
-        local Positions = Desync.Positions
-        local Status = Desync:Active()
 
-        if not (Status and Positions.Old and Positions.New) then
-            return
-        end
-
-        Camera.CFrame = Camera.CFrame - Utility:CFrameToVector3(Positions.New - Utility:CFrameToVector3(Positions.Old))
+    Callback = function(first)
+        enemysets.name = first
     end
+}):AddColorPicker('namecolor', {
+    Default = Color3.new(1, 1, 1),
+    Title = 'name color',
+    Transparency = 0,
 
-    function Desync:GetLerpValue(pulse, min, max, speed)
-        speed = speed or 1
-
-        local NormalizedSin = (mathsin(pulse * speed) + 1) / 2
-
-        return min + NormalizedSin * (max - min)
+    Callback = function(Value)
+        enemysets.nameColor[1] = Value
     end
-
-    function Desync:GetValue(pos_type)
-        local ClockPulse = osclock()
-
-        local Mode = Flags["desync_mode_" .. pos_type]
-        local Min = Flags["desync_min_" .. pos_type]
-        local Max = Flags["desync_max_" .. pos_type]
-        local Val = Flags["desync_val_" .. pos_type]
-
-        return 
-            Flags["desync_" .. pos_type] == true and 
-                (Mode == "Static" and Val 
-                or Mode == "Lerp" and Desync:GetLerpValue(ClockPulse, Min, Max, Flags["desync_speed_" .. pos_type])
-                or Mode == "Random" and mathrandom(Min * 100, Max * 100) / 100)
-            or not Flags["desync_" .. pos_type] and 0
-    end
-
-    function Desync:OverwritePosition(position)
-        Desync.Overwriten = position
-    end
-
-    function Desync:RemoveOverwrite()
-        Desync.Overwriten = nil
-    end
-
-    function Desync:CloneCharacter()
-        local Character = Controller.Character
-
-        if not Character then
-            return
-        end
-
-        Character.Archivable = true
-
-        local ClonedCharacter = Character:Clone()
-
-        ClonedCharacter.Archivable = true
-        ClonedCharacter.Name = "\0"
-        ClonedCharacter.Parent = workspace
-
-        Character.Archivable = false
-
-        local Humanoid = FindFirstChildWhichIsA(ClonedCharacter, "Humanoid")
-        local HumanoidRootPart = Utility:GetRootPart(ClonedCharacter, Humanoid)
-
-        for _,v in ClonedCharacter:GetChildren() do
-            if IsA(v, "Part") or IsA(v, "MeshPart") or IsA(v, "BasePart") then
-                if v.Transparency ~= 1 then
-                    local Color = Flags["desync_vis_color"]
-
-                    Visuals:ApplyChams(v, Flags["desync_vis_material"], Color.c, 1 - Color.a, 0)
-                end
-                
-                v.CanCollide = false
-            else
-                v:Destroy()
-            end
-        end
-
-        if Humanoid then
-            Humanoid:Destroy()
-        end
-
-        if HumanoidRootPart then
-            HumanoidRootPart.Anchored = true
-        end
-
-        Desync.ClonedCharacter = {
-            Character = ClonedCharacter,
-            RootPart = HumanoidRootPart        
-        }
-    end
-
-    function Desync:UpdateCharacter()
-        local ClonedCharacter = Desync.ClonedCharacter
-
-        if ClonedCharacter then
-            local Character = ClonedCharacter.Character
-
-            if Character then
-                for _,v in Character:GetChildren() do
-                    if IsA(v, "Part") or IsA(v, "MeshPart") or IsA(v, "BasePart") then
-                        if v.Transparency ~= 1 then
-                            local Color = Flags["desync_vis_color"]
-        
-                            Visuals:ApplyChams(v, Flags["desync_vis_material"], Color.c, 1 - Color.a, 0)
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    function Desync:DestroyClonedCharacter()
-        local ClonedCharacter = Desync.ClonedCharacter
-
-        if ClonedCharacter and ClonedCharacter.Character then
-            ClonedCharacter.Character:Destroy()
-
-            Desync.ClonedCharacter = nil
-        end
-    end
-
-    local Angle = 0
-    function Desync:Think()
-        local Root = Controller.RootPart
-        local Status = Desync:Active()
-        local Positions = Desync.Positions
-
-        local ClonedCharacter = Desync.ClonedCharacter
-
-        if not Status then
-            Positions.Old = nil
-            Positions.New = nil
-
-            if ClonedCharacter then
-                Desync:DestroyClonedCharacter()
-            end
-
-            return
-        end
-
-        if not Flags["desync_vis"] and ClonedCharacter then
-            Desync:DestroyClonedCharacter()
-        end
-
-        if Flags["desync_vis"] and not ClonedCharacter then
-            Desync:CloneCharacter()
-        end
-
-        ClonedCharacter = Desync.ClonedCharacter
-
-        Positions.Old = Root.CFrame
-
-        local TargetHitbox = Aimbot.Target and Aimbot.Target.Hitbox or SilentAim.Target and SilentAim.Target.Hitbox
-
-        local StrafeCFrame = nil
-
-        if Flags["desync_strafe"] and TargetHitbox and not (TargetHitbox.CFrame.x > 5000 or TargetHitbox.CFrame.y > 5000 or TargetHitbox.CFrame.z > 5000 or TargetHitbox.CFrame.x < -5000 or TargetHitbox.CFrame.y < -5000 or TargetHitbox.CFrame.z < -5000) then
-            Angle += Flags["desync_strafe_speed"]
-            
-            StrafeCFrame = TargetHitbox.CFrame * CFrameAngles(0, mathrad(Angle), 0) * CFramenew(0, 0, Flags["desync_strafe_distance"])
-        end
-
-        if Desync.Overwriten then
-            Root.CFrame = CFramenew(Desync.Overwriten)
-        elseif StrafeCFrame then
-            Root.CFrame = StrafeCFrame
-        else
-            local DesyncFactor = CFramenew(Vector3new(
-                Desync:GetValue("x"),
-                Desync:GetValue("y"),
-                Desync:GetValue("z")
-            ))
-
-            DesyncFactor *= CFrameAngles(
-                mathrad(Desync:GetValue("pitch")),
-                mathrad(Desync:GetValue("yaw")),
-                mathrad(Desync:GetValue("roll"))
-            )
-
-            Root.CFrame *= DesyncFactor
-        end
-
-        Positions.New = Root.CFrame
-
-        if ClonedCharacter then
-            ClonedCharacter.RootPart.CFrame = Positions.New
-        end
-
-        RunService.RenderStepped:Wait()
-
-        Root.CFrame = Positions.Old
-    end
-
-    Utility:Connect(RunService.Heartbeat, function()
-        Desync:Think()
-    end, "Desync Heartbeat")
---
-
--- Hooks
-    local OldIndex; OldIndex = hookmetamethod(game, "__index", newcclosure(function(self, prop)
-        if not checkcaller() then
-            if prop == "CFrame" then
-                if Desync:Active() and Flags["desync_hook"] and self == Controller.RootPart then
-                    local OldPosition = Desync:GetPositions()
-
-                    if OldPosition then
-                        return OldPosition
-                    end
-                end
-            end
-        end
-
-        return OldIndex(self, prop)
-    end))
-
-    local OldNameCall; OldNameCall = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
-        if self.Name == "MainEvent" then 
-            local Args = {...}
-
-            if mathrandom(1, 100) <= Flags["silent_hitchance"] and Args[1] == "UpdateMousePosI" then
-                local Target = SilentAim.Target
-                
-                if Target then
-                    local Position = Target.Position
-                    local Hitbox = Target.Hitbox
-                
-                    Args[2] = Position; 
-                    return OldNameCall(self, unpack(Args))
-                end
-            end
-        end 
-        
-        return OldNameCall(self, ...)
-    end))
-
-    local OldNewIndex; OldNewIndex = hookmetamethod(game, "__newindex", newcclosure(function(self, index, value)
-        if self == Camera then
-            if index == "CFrame" and Flags["camera_tp"] and Flags["camera_tp_key"] then
-                value *= CFramenew(Vector3new(Flags["camera_tp_x"], Flags["camera_tp_y"], Flags["camera_tp_z"]))
-            end
-        end
-
-        return OldNewIndex(self, index, value)
-    end))
---
-
--- Toggles
-    Window = Library:Window({ Name = "Puppyware - beta", Watermark = true, Keybinds = true, Size = Vector2new(558, 482) })
-    local CombatTab = Window:Tab({ Name = "Combat" })
-    local VisualsTab = Window:Tab({ Name = "Visuals" })
-    local MiscTab = Window:Tab({ Name = "Misc" })
-    local PlayersTab = Window:Tab({ Name = "Players" })
-    local SettingsTab = Window:Tab({ Name = "Settings" })
-
-    local Materials = {}
-
-    for _,v in Visuals.Materials do
-        Materials[#Materials + 1] = _
-    end
-
-    local Skyboxes = {"Off"}
-
-    for _,v in Visuals.Skyboxes do
-        Skyboxes[#Skyboxes + 1] = _
-    end
-
-    local ChatSpams = {"Custom"}
-
-    for _,v in Misc.ChatSpam do
-        ChatSpams[#ChatSpams + 1] = _
-    end
-
-    local ESPFonts = {}
-
-    for _,v in Fonts do
-        ESPFonts[#ESPFonts + 1] = _
-    end
-
-    local BulletTracers = {}
-
-    for _,v in Visuals.BulletTracers do
-        BulletTracers[#BulletTracers + 1] = _
-    end
-    
-    local Hitsounds = {}
-
-    for _,v in Misc.Hitsounds do
-        Hitsounds[#Hitsounds + 1] = _
-    end
-
-    -- Combat
-        local AimAssistSec =  CombatTab:Section({Name = "Aim Assist"}) do
-            local AimAssist = AimAssistSec:Toggle({Name = "Enabled", Flag = "aimbot"})
-            AimAssist:Keybind({Name = "Aim Assist", Flag = "aimbot_key"})
-
-            local FovSlider
-            AimAssist:Toggle({Name = "Use Field Of View", Flag = "aimbot_use_fov", Callback = function(v)
-                if FovSlider then
-                    FovSlider.SetVisibility(v)
-                end
-            end})
-            FovSlider = AimAssist:Slider({Name = "Field Of View Amount", Visible = false, Value = 60, Flag = "aimbot_fov_amount", Min = 0, Max = 360, Float = 1})
-            
-            AimAssist:Toggle({Name = "Use Mouse", Flag = "aimbot_mouse"})
-
-            AimAssist:Toggle({Name = "Sticky Aim", Flag = "aimbot_sticky_aim"})
-
-            AimAssist:Slider({Name = "Smoothing", Suffix = "%", Value = 20, Flag = "aimbot_smoothing", Min = 0, Max = 100, Float = 1})
-
-            AimAssist:Toggle({Name = "Use Velocity", Flag = "aimbot_velocity"})
-
-            AimAssist:Textbox({Name = "Prediction", Value = "", Flag = "aimbot_pred_box"})
-
-            AimAssist:Toggle({Name = "Auto Prediction", Flag = "aimbot_pred"})
-
-            AimAssistSec:Slider({Name = "Auto Prediction Factor", Value = 100, Flag = "aimbot_pred_amount", Min = 0, Max = 200, Float = 1})
-
-            AimAssistSec:Dropdown({Name = "Position", Values = {"Mouse", "Screen"}, Value = "Mouse", Flag = "aimbot_position"})
-
-            AimAssistSec:Dropdown({Name = "Hitbox", Values = {"Head", "HumanoidRootPart", "LowerTorso", "LeftUpperArm", "RightUpperArm", "LeftUpperLeg", "RightUpperLeg"}, Value = "Head", Flag = "aimbot_hitbox"})
-
-            AimAssistSec:Dropdown({Name = "Checks", Values = {"Force-Field", "Health"}, Value = {"Health"}, Flag = "aimbot_checks", Multi = true})
-
-            local LimitDistance
-            AimAssistSec:Toggle({Name = "Limit Distance", Flag = "aimbot_limit_distance", Callback = function(v)
-                if LimitDistance then
-                    LimitDistance.SetVisibility(v)
-                end
-            end})
-
-            LimitDistance = AimAssistSec:Slider({Name = "Limit Distance Amount", Visible = false, Flag = "aimbot_limit_distance_amount", Suffix = "st", Min = 0, Max = 2000, Float = 1, Value = 700})
-        end
-
-        local SilentAimSec =  CombatTab:Section({Name = "Silent Aim", Side = "Right"}) do
-            local SilentAim = SilentAimSec:Toggle({Name = "Enabled", Flag = "silent"})
-            SilentAim:Keybind({Name = "Silent Aim", Flag = "silent_key"})
-
-            SilentAim:Toggle({Name = "Remote Type", Flag = "silent_remote"})
-
-            local FovSlider
-            SilentAim:Toggle({Name = "Use Field Of View", Flag = "silent_use_fov", Callback = function(v)
-                if FovSlider then
-                    FovSlider.SetVisibility(v)
-                end
-            end})
-            FovSlider = SilentAim:Slider({Name = "Field Of View Amount", Visible = false, Value = 60, Flag = "silent_fov_amount", Min = 0, Max = 360, Float = 1})
-
-            SilentAim:Slider({Name = "Hitchance", Suffix = "%", Value = 20, Flag = "silent_hitchance", Min = 0, Max = 100, Float = 1})
-
-            SilentAim:Toggle({Name = "Sticky Aim", Flag = "silent_sticky_aim"})
-
-            SilentAim:Toggle({Name = "Auto Shoot", Flag = "silent_auto_shoot"})
-
-            SilentAim:Toggle({Name = "Use Velocity", Flag = "silent_velocity"})
-
-            SilentAim:Textbox({Name = "Prediction", Value = "", Flag = "silent_pred_box"})
-
-            SilentAim:Toggle({Name = "Auto Prediction", Flag = "silent_pred"})
-
-            SilentAim:Toggle({Name = "Table Type", Flag = "silent_pred_table"})
-                    
-            SilentAim:Slider({Name = "Auto Prediction Factor", Value = 100, Flag = "silent_pred_amount", Min = 0, Max = 200, Float = 1})
-
-            SilentAim:Toggle({Name = "Use Air Prediction", Flag = "silent_air_prediction"})
-
-            SilentAim:Slider({Name = "Offset", Suffix = "st", Value = 0, Flag = "silent_jump_offset", Min = -1, Max = 1, Float = 0.01})
-
-            SilentAimSec:Dropdown({Name = "Air Hitbox", Values = {"Head", "HumanoidRootPart", "LowerTorso", "LeftUpperArm", "RightUpperArm", "LeftUpperLeg", "RightUpperLeg"}, Value = "HumanoidRootPart", Flag = "silent_air_hitbox"})
-            
-            SilentAimSec:Dropdown({Name = "Position", Values = {"Mouse", "Screen"}, Value = "Mouse", Flag = "silent_position"})
-
-            SilentAimSec:Dropdown({Name = "Hitbox", Values = {"Head", "HumanoidRootPart", "LowerTorso", "LeftUpperArm", "RightUpperArm", "LeftUpperLeg", "RightUpperLeg"}, Value = "Head", Flag = "silent_hitbox"})
-
-            SilentAimSec:Dropdown({Name = "Checks", Values = {"Force-Field", "Health"}, Value = {"Health"}, Flag = "silent_checks", Multi = true})
-
-            local LimitDistance
-            SilentAimSec:Toggle({Name = "Limit Distance", Flag = "silent_limit_distance", Callback = function(v)
-                if LimitDistance then
-                    LimitDistance.SetVisibility(v)
-                end
-            end})
-
-            LimitDistance = SilentAimSec:Slider({Name = "Limit Distance Amount", Visible = false, Flag = "silent_limit_distance_amount", Suffix = "st", Min = 0, Max = 2000, Float = 1, Value = 700})
-        end
-    --
-
-    -- Visuals
-        local CameraSection = VisualsTab:Section({Name = "Camera", Side = "Left"}) do
-            local FovAmount = nil
-            
-            CameraSection:Toggle({Name = "Field Of View", Flag = "camera_fov"}):Slider({Name = "FoV Amount", Suffix = "°", Value = Camera.FieldOfView, Min = 0, Max = 120, Float = 1, Flag = "camera_fov_amount"})
-            CameraSection:Toggle({Name = "Zoom", Flag = "camera_fov_zoom", Callback = function(v)
-                if v and Flags["camera_fov_zoom_key"] then
-                    FovAmount = Camera.FieldOfView
-                else
-                    if FovAmount then
-                        Camera.FieldOfView = FovAmount
-                    end
-                end
-            end}):Keybind({Name = "Zoom", Flag = "camera_fov_zoom_key", Callback = function(v)
-                if v and Flags["camera_fov_zoom"] then
-                    FovAmount = Camera.FieldOfView
-                else
-                    if FovAmount then
-                        Camera.FieldOfView = FovAmount
-                    end
-                end
-            end})
-            CameraSection:Slider({Name = "FoV Amount", Suffix = "°", Value = Camera.FieldOfView, Min = 0, Max = 120, Float = 1, Flag = "camera_fov_zoom_amount"})
-            local ThirdPerson = CameraSection:Toggle({Name = "Third Person", Flag = "camera_tp"})
-            ThirdPerson:Keybind({Name = "Third Person", Flag = "camera_tp_key"})
-            ThirdPerson:Slider({Name = "Third Person X", Suffix = "st", Value = 0, Min = -10, Max = 10, Float = 1, Flag = "camera_tp_x"})
-            ThirdPerson:Slider({Name = "Third Person Y", Suffix = "st", Value = 0, Min = -10, Max = 10, Float = 1, Flag = "camera_tp_y"})
-            ThirdPerson:Slider({Name = "Third Person Z", Suffix = "st", Value = 0, Min = -10, Max = 10, Float = 1, Flag = "camera_tp_z"})
-            local AspectRatio = CameraSection:Toggle({Name = "Aspect Ratio", Flag = "camera_as"})
-            AspectRatio:Slider({Name = "Aspect Ratio Horizontal", Suffix = "%", Value = 100, Min = 0, Max = 100, Float = 1, Flag = "camera_as_hor"})
-            AspectRatio:Slider({Name = "Aspect Ratio Vertical", Suffix = "%", Value = 100, Min = 0, Max = 100, Float = 1, Flag = "camera_as_ver"})
-        end
-
-        local WorldSection = VisualsTab:Section({Name = "World", Side = "Right"}) do
-            WorldSection:Toggle({Name = "Clock Time", Flag = "world_clock_time", Callback = function(v)
-                if v and Flags["world_clock_time_amount"] then
-                    Lighting.ClockTime = Flags["world_clock_time_amount"]
-                end
-            end}):Slider({Name = "Time", Suffix = "hr", Value = Lighting.ClockTime, Min = 0, Max = 24, Float = 1, Flag = "world_clock_time_amount", Callback = function(v)
-                if Flags["world_clock_time"] and v then
-                    Lighting.ClockTime = v
-                end
-            end})
-            local Ambience = WorldSection:Toggle({Name = "Ambience Changer", Flag = "world_ambience", Callback = function(v)
-                if v and Flags["world_ambience_outside"] and Flags["world_ambience_inside"] then
-                    Lighting.OutdoorAmbient = Flags["world_ambience_outside"].c
-                    Lighting.Ambient = Flags["world_ambience_inside"].c
-                end
-            end})
-            Ambience:Colorpicker({Name = "Outside Ambient", Flag = "world_ambience_outside", Color = Lighting.OutdoorAmbient, Callback = function(v)
-                if Flags["world_ambience"] and v and Flags["world_ambience_inside"] then
-                    Lighting.OutdoorAmbient = v.c
-                    Lighting.Ambient = Flags["world_ambience_inside"].c
-                end
-            end})
-            Ambience:Colorpicker({Name = "Inside Ambient", Flag = "world_ambience_inside", Color = Lighting.Ambient, Callback = function(v)
-                if Flags["world_ambience"] and Flags["world_ambience_outside"] and v then
-                    Lighting.OutdoorAmbient = Flags["world_ambience_outside"].c
-                    Lighting.Ambient = v.c
-                end
-            end})
-            WorldSection:Toggle({Name = "Brightness", Flag = "world_brightness", Callback = function(v)
-                if v and Flags["world_brightness_amount"] then
-                    Lighting.Brightness = Flags["world_brightness_amount"] / 100
-                end
-            end}):Slider({Name = "Brightness Amount", Suffix = "lm", Value = Lighting.Brightness * 100, Min = 0, Max = 500, Float = 1, Flag = "world_brightness_amount", Callback = function(v)
-                if Flags["world_brightness"] and v then
-                    Lighting.Brightness = v / 100
-                end
-            end})
-            local FogChanger = WorldSection:Toggle({Name = "Fog Changer", Flag = "world_fog", Callback = function(v)
-                if v and Flags["world_fog_color"] and Flags["world_fog_start"] and Flags["world_fog_end"] then
-                    Lighting.FogColor = Flags["world_fog_color"].c
-                    Lighting.FogStart = Flags["world_fog_start"]
-                    Lighting.FogEnd = Flags["world_fog_end"]
-                end
-            end})
-            FogChanger:Colorpicker({Name = "Fog Color", Flag = "world_fog_color", Color = Lighting.FogColor, Callback = function(v)
-                if Flags["world_fog"] and v and Flags["world_fog_start"] and Flags["world_fog_end"] then
-                    Lighting.FogColor = v.c
-                    Lighting.FogStart = Flags["world_fog_start"]
-                    Lighting.FogEnd = Flags["world_fog_end"]
-                end
-            end})
-            WorldSection:Slider({Name = "Fog Start", Suffix = "st", Value = Lighting.FogStart, Min = 0, Max = 5000, Float = 1, Flag = "world_fog_start", Callback = function(v)
-                if Flags["world_fog"] and Flags["world_fog_color"] and v and Flags["world_fog_end"] then
-                    Lighting.FogColor = Flags["world_fog_color"].c
-                    Lighting.FogStart = v
-                    Lighting.FogEnd = Flags["world_fog_end"]
-                end
-            end})
-            WorldSection:Slider({Name = "Fog End", Suffix = "st", Value = Lighting.FogEnd, Min = 0, Max = 5000, Float = 1, Flag = "world_fog_end", Callback = function(v)
-                if Flags["world_fog"] and Flags["world_fog_color"] and Flags["world_fog_start"] and v then
-                    Lighting.FogColor = Flags["world_fog_color"].c
-                    Lighting.FogStart = Flags["world_fog_start"]
-                    Lighting.FogEnd = v
-                end
-            end})  
-
-            if sethiddenproperty and gethiddenproperty then
-                local TechnologyType = tostring(gethiddenproperty(Lighting, "Technology")):gsub("Enum.Technology.", "")
-
-                WorldSection:Dropdown({Name = "Technology Type", Values = {"Legacy", "Voxel", "Compatibility", "ShadowMap", "Future"}, Value = TechnologyType, Flag = "world_tech_type", Callback = function(v)
-                    if v and sethiddenproperty then
-                        sethiddenproperty(Lighting, "Technology", Enum.Technology[v])
-                    end
-                end})
-            end
-            
-            WorldSection:Dropdown({Name = "Skybox Changer", Values = Skyboxes, Value = "Off", Flag = "world_skybox_changer", Callback = function()
-                Visuals:UpdateWorldVisuals()
-            end}) 
-            
-            WorldSection:Toggle({Name = "Stars Count", Flag = "world_stars_count", Callback = function(v)
-                Visuals:UpdateWorldVisuals()
-            end}):Slider({Name = "Stars Count Amount", Value = Sky.StarCount, Min = 0, Max = 6000, Float = 1, Flag = "world_stars_count_amount", Callback = function(v)
-                Visuals:UpdateWorldVisuals()
-            end})
-
-            WorldSection:Toggle({Name = "Bullet Tracers", Flag = "world_bullet_tracers"}):Colorpicker({Name = "Bullet Tracers Color", Flag = "world_bullet_tracers_color", Color = Color3.fromRGB(255, 255, 255)})
-            WorldSection:Dropdown({Name = "Type", Values = BulletTracers, Value = BulletTracers[1], Flag = "world_bullet_tracers_type"}) 
-            WorldSection:Slider({Name = "Time", Suffix = "s", Value = 2, Min = 0, Max = 20, Float = 1, Flag = "world_bullet_tracers_time"})  
-
-            WorldSection:Toggle({Name = "Hit Impact", Flag = "world_hit_impact"}):Colorpicker({Name = "Hit Impact Color", Flag = "world_hit_impact_color", Color = Color3.fromRGB(255, 255, 255)})
-            WorldSection:Slider({Name = "Time", Suffix = "s", Value = 2, Min = 0, Max = 20, Float = 1, Flag = "world_hit_impact_time"})  
-            WorldSection:Slider({Name = "Size", Suffix = "st", Value = 1, Min = 0, Max = 5, Float = 0.01, Flag = "world_hit_impact_size"})  
-
-            local HighlightTarget = WorldSection:Toggle({Name = "Highlight Target", Flag = "world_highlight"})
-            HighlightTarget:Colorpicker({Name = "Highlight Fill Color", Flag = "world_highlight_fill_color", Color = Color3.fromRGB(255, 255, 255)})
-            HighlightTarget:Colorpicker({Name = "Highlight Outline Color", Flag = "world_highlight_outline_color", Color = Color3.fromRGB(255, 255, 255)})
-
-            WorldSection:Toggle({Name = "Target Line", Flag = "world_line"}):Colorpicker({Name = "Target Line Color", Flag = "world_line_color", Color = Color3.fromRGB(255, 255, 255)})
-        
-            WorldSection:Toggle({Name = "Hit Chams", Flag = "world_hit_chams"}):Colorpicker({Name = "Hit Chams Color", Flag = "world_hit_chams_color", Color = Color3.fromRGB(255, 255, 255)})
-            WorldSection:Slider({Name = "Time", Suffix = "s", Value = 2, Min = 0, Max = 20, Float = 1, Flag = "world_hit_chams_time"})  
-        
-            local Hitmarkers = WorldSection:Toggle({Name = "3D Hitmarkers", Flag = "hitmarker"})
-            Hitmarkers:Colorpicker({Name = "Hitmarkers Color", Flag = "hitmarker_color", Color = Color3.fromRGB(255, 255, 255)})
-            Hitmarkers:Colorpicker({Name = "Hitmarkers Color", Flag = "hitmarker_outline", Color = Color3.fromRGB(0, 0, 0)})
-            WorldSection:Slider({Name = "Time", Suffix = "s", Value = 2, Min = 0, Max = 20, Float = 1, Flag = "hitmarker_time"})
-            WorldSection:Slider({Name = "Size", Suffix = "px", Value = 2, Min = 0, Max = 50, Float = 1, Flag = "hitmarker_size"})  
-            WorldSection:Slider({Name = "Gap", Suffix = "px", Value = 2, Min = 0, Max = 50, Float = 1, Flag = "hitmarker_gap"})  
-        end
-    --
-
-    -- Misc
-        local Movement = MiscTab:Section({Name = "Movement"})  do
-            local SpeedHack = Movement:Toggle({Name = "Speed Hack", Flag = "movement_speed_hack"})
-            SpeedHack:Keybind({Name = "Speed Hack", Flag = "movement_speed_hack_key"})
-            SpeedHack:Slider({Name = "Speed Hack Factor", Float = 1, Suffix = "st", Value = 60, Min = 0, Max = 300, Flag = "movement_speed_hack_factor"})
-            SpeedHack:Dropdown({Name = "Speed Hack Type", Values = {"Velocity", "CFrame"}, Value = "CFrame", Flag = "movement_speed_hack_type"})
-
-            local AutoJump = Movement:Toggle({Name = "Auto Jump", Flag = "movement_auto_jump"})
-            AutoJump:Keybind({Name = "Auto Jump", Flag = "movement_auto_jump_key"})
-            
-            local FlyHack = Movement:Toggle({Name = "Fly Hack", Flag = "movement_fly_hack"})
-            FlyHack:Keybind({Name = "Fly Hack", Flag = "movement_fly_hack_key"})
-            FlyHack:Slider({Name = "Fly Hack Factor", Suffix = "st", Float = 1, Value = 60, Min = 0, Max = 300, Flag = "movement_fly_hack_factor"})
-            FlyHack:Dropdown({Name = "Fly Hack Type", Values = {"Velocity", "CFrame"}, Value = "CFrame", Flag = "movement_fly_hack_type"})
-
-            local CircleStrafe = Movement:Toggle({Name = "Circle Strafe", Flag = "movement_circle_strafe"})
-            CircleStrafe:Keybind({Name = "Circle Strafe", Flag = "movement_circle_strafe_key"})
-
-            local AvoidCollisions = Movement:Toggle({Name = "Avoid Collisions", Flag = "movement_avoid_collisions"})
-            AvoidCollisions:Toggle({Name = "Standalone", Flag = "movement_avoid_collisions_standalone"})
-            AvoidCollisions:Slider({Name = "Avoid Collisions Factor", Float = 1, Suffix = "st", Value = 100, Min = 0, Max = 300, Flag = "movement_avoid_collisions_factor"})
-        end
-
-        local DesyncSec
-        local ExtraSec
-
-        local MiscSecTab = MiscTab:Section({Name = "Misc Tabs", Side = "Right", Size = UDim2new(1, 0, 0, 56)}) do
-            MiscSecTab:Dropdown({Name = "Misc Tab", Values = {"Desynchronization", "Extra"}, Value = "Desynchronization", Flag = "selected_misc_tab", Close = true, Callback = function(v)
-                if DesyncSec then
-                    DesyncSec.SetVisibility(v == "Desynchronization")
-                end
-
-                if ExtraSec then
-                    ExtraSec.SetVisibility(v == "Extra")
-                end
-            end})
-        end
-
-        DesyncSec = MiscTab:Section({Name = "Desynchronization", Side = "Right", Size = UDim2new(1, 0, 1, -66)}) do
-            local DesyncTog = DesyncSec:Toggle({Name = "Enabled", Flag = "desync"})
-            DesyncTog:Keybind({Name = "Desynchronization", Flag = "desync_key"})
-
-            DesyncSec:Toggle({Name = "Use Hook", Flag = "desync_hook"})
-
-            local TargetStrafeDistance = nil
-            local TargetSrafe = DesyncSec:Toggle({Name = "Target Strafe", Flag = "desync_strafe", Callback = function(v)
-                if TargetStrafeDistance then
-                    TargetStrafeDistance.SetVisibility(v)
-                end
-            end})
-            TargetStrafeDistance =  TargetSrafe:Slider({Name = "Distance", Visible = false, Suffix = "st", Value = 8, Min = 0, Max = 20, Float = 1, Flag = "desync_strafe_distance"})
-            TargetStrafeDistance:Slider({Name = "Speed", Value = 5, Min = 0, Max = 30, Float = 1, Flag = "desync_strafe_speed"})
-            
-            local DesyncXMode
-            DesyncSec:Toggle({Name = "X Position", Flag = "desync_x", Callback = function(v)
-                if DesyncXMode then
-                    DesyncXMode.SetVisibility(v)
-                end
-            end})
-
-            local DesyncXMin
-            local DesyncXMax
-            local DesyncXVal
-            local DesyncXSpeed
-            DesyncXMode = DesyncSec:Dropdown({Name = "X Mode", Visible = false, Values = {
-                "Static",
-                "Lerp",
-                "Random"
-            }, Value = "Static", Flag = "desync_mode_x", Callback = function(v)
-                if DesyncXMin then
-                    DesyncXMin.SetVisibility(v == "Lerp" or v == "Random" or false)
-                end
-
-                if DesyncXMax then
-                    DesyncXMax.SetVisibility(v == "Lerp" or v == "Random" or false)
-                end
-
-                if DesyncXVal then
-                    DesyncXVal.SetVisibility(v == "Static")
-                end
-
-                if DesyncXSpeed then
-                    DesyncXSpeed.SetVisibility(v == "Lerp")
-                end
-            end})
-
-            DesyncXMin = DesyncXMode:Slider({Name = "Min", Visible = false, Suffix = "st", Value = 0, Min = -300, Max = 0, Float = 1, Flag = "desync_min_x"})
-            DesyncXMax = DesyncXMode:Slider({Name = "Max", Visible = false, Suffix = "st", Value = 0, Min = 0, Max = 300, Float = 1, Flag = "desync_max_x"})
-            DesyncXVal = DesyncXMode:Slider({Name = "Value", Suffix = "st", Value = 0, Min = -300, Max = 300, Float = 1, Flag = "desync_val_x"})
-            DesyncXSpeed = DesyncXMode:Slider({Name = "Lerp Speed", Value = 1, Min = 1, Max = 30, Float = 1, Flag = "desync_speed_x"})
-
-            local DesyncYMode
-            DesyncSec:Toggle({Name = "Y Position", Flag = "desync_y", Callback = function(v)
-                if DesyncYMode then
-                    DesyncYMode.SetVisibility(v)
-                end
-            end})
-
-            local DesyncYMin
-            local DesyncYMax
-            local DesyncYVal
-            local DesyncYSpeed
-            DesyncYMode = DesyncSec:Dropdown({Name = "Y Mode", Visible = false, Values = {
-                "Static",
-                "Lerp",
-                "Random"
-            }, Value = "Static", Flag = "desync_mode_y", Callback = function(v)
-                if DesyncYMin then
-                    DesyncYMin.SetVisibility(v == "Lerp" or v == "Random" or false)
-                end
-
-                if DesyncYMax then
-                    DesyncYMax.SetVisibility(v == "Lerp" or v == "Random" or false)
-                end
-
-                if DesyncYVal then
-                    DesyncYVal.SetVisibility(v == "Static")
-                end
-
-                if DesyncYSpeed then
-                    DesyncYSpeed.SetVisibility(v == "Lerp")
-                end
-            end})
-
-            DesyncYMin = DesyncYMode:Slider({Name = "Min", Visible = false, Suffix = "st", Value = 0, Min = -300, Max = 0, Float = 1, Flag = "desync_min_y"})
-            DesyncYMax = DesyncYMode:Slider({Name = "Max", Visible = false, Suffix = "st", Value = 0, Min = 0, Max = 300, Float = 1, Flag = "desync_max_y"})
-            DesyncYVal = DesyncYMode:Slider({Name = "Value", Suffix = "st", Value = 0, Min = -300, Max = 300, Float = 1, Flag = "desync_val_y"})
-            DesyncYSpeed = DesyncYMode:Slider({Name = "Lerp Speed", Value = 1, Min = 1, Max = 30, Float = 1, Flag = "desync_speed_y"})
-
-            local DesyncZMode
-            DesyncSec:Toggle({Name = "Z Position", Flag = "desync_z", Callback = function(v)
-                if DesyncZMode then
-                    DesyncZMode.SetVisibility(v)
-                end
-            end})
-
-            local DesyncZMin
-            local DesyncZMax
-            local DesyncZVal
-            local DesyncZSpeed
-            DesyncZMode = DesyncSec:Dropdown({Name = "Z Mode", Visible = false, Values = {
-                "Static",
-                "Lerp",
-                "Random"
-            }, Value = "Static", Flag = "desync_mode_z", Callback = function(v)
-                if DesyncZMin then
-                    DesyncZMin.SetVisibility(v == "Lerp" or v == "Random" or false)
-                end
-
-                if DesyncZMax then
-                    DesyncZMax.SetVisibility(v == "Lerp" or v == "Random" or false)
-                end
-
-                if DesyncZVal then
-                    DesyncZVal.SetVisibility(v == "Static")
-                end
-
-                if DesyncZSpeed then
-                    DesyncZSpeed.SetVisibility(v == "Lerp")
-                end
-            end})
-
-            DesyncZMin = DesyncZMode:Slider({Name = "Min", Visible = false, Suffix = "st", Value = 0, Min = -300, Max = 0, Float = 1, Flag = "desync_min_z"})
-            DesyncZMax = DesyncZMode:Slider({Name = "Max", Visible = false, Suffix = "st", Value = 0, Min = 0, Max = 300, Float = 1, Flag = "desync_max_z"})
-            DesyncZVal = DesyncZMode:Slider({Name = "Value", Suffix = "st", Value = 0, Min = -300, Max = 300, Float = 1, Flag = "desync_val_z"})
-            DesyncZSpeed = DesyncZMode:Slider({Name = "Lerp Speed", Value = 1, Min = 1, Max = 30, Float = 1, Flag = "desync_speed_z"})
-
-            local DesyncPitchMode
-            DesyncSec:Toggle({Name = "Pitch Position", Flag = "desync_pitch", Callback = function(v)
-                if DesyncPitchMode then
-                    DesyncPitchMode.SetVisibility(v)
-                end
-            end})
-
-            local DesyncPitchMin
-            local DesyncPitchMax
-            local DesyncPitchVal
-            local DesyncPitchSpeed
-            DesyncPitchMode = DesyncSec:Dropdown({Name = "Pitch Mode", Visible = false, Values = {
-                "Static",
-                "Lerp",
-                "Random"
-            }, Value = "Static", Flag = "desync_mode_pitch", Callback = function(v)
-                if DesyncPitchMin then
-                    DesyncPitchMin.SetVisibility(v == "Lerp" or v == "Random" or false)
-                end
-
-                if DesyncPitchMax then
-                    DesyncPitchMax.SetVisibility(v == "Lerp" or v == "Random" or false)
-                end
-
-                if DesyncPitchVal then
-                    DesyncPitchVal.SetVisibility(v == "Static")
-                end
-
-                if DesyncPitchSpeed then
-                    DesyncPitchSpeed.SetVisibility(v == "Lerp")
-                end
-            end})
-
-            DesyncPitchMin = DesyncPitchMode:Slider({Name = "Min", Visible = false, Suffix = "°", Value = 0, Min = -360, Max = 0, Float = 1, Flag = "desync_min_pitch"})
-            DesyncPitchMax = DesyncPitchMode:Slider({Name = "Max", Visible = false, Suffix = "°", Value = 0, Min = 0, Max = 360, Float = 1, Flag = "desync_max_pitch"})
-            DesyncPitchVal = DesyncPitchMode:Slider({Name = "Value", Suffix = "°", Value = 0, Min = -360, Max = 360, Float = 1, Flag = "desync_val_pitch"})
-            DesyncPitchSpeed = DesyncPitchMode:Slider({Name = "Lerp Speed", Value = 1, Min = 1, Max = 30, Float = 1, Flag = "desync_speed_pitch"})
-            
-            local DesyncYawMode
-            DesyncSec:Toggle({Name = "Yaw Position", Flag = "desync_yaw", Callback = function(v)
-                if DesyncYawMode then
-                    DesyncYawMode.SetVisibility(v)
-                end
-            end})
-
-            local DesyncYawMin
-            local DesyncYawMax
-            local DesyncYawVal
-            local DesyncYawSpeed
-            DesyncYawMode = DesyncSec:Dropdown({Name = "Yaw Mode", Visible = false, Values = {
-                "Static",
-                "Lerp",
-                "Random"
-            }, Value = "Static", Flag = "desync_mode_yaw", Callback = function(v)
-                if DesyncYawMin then
-                    DesyncYawMin.SetVisibility(v == "Lerp" or v == "Random" or false)
-                end
-
-                if DesyncYawMax then
-                    DesyncYawMax.SetVisibility(v == "Lerp" or v == "Random" or false)
-                end
-
-                if DesyncYawVal then
-                    DesyncYawVal.SetVisibility(v == "Static")
-                end
-
-                if DesyncYawSpeed then
-                    DesyncYawSpeed.SetVisibility(v == "Lerp")
-                end
-            end})
-
-            DesyncYawMin = DesyncYawMode:Slider({Name = "Min", Visible = false, Suffix = "°", Value = 0, Min = -360, Max = 0, Float = 1, Flag = "desync_min_yaw"})
-            DesyncYawMax = DesyncYawMode:Slider({Name = "Max", Visible = false, Suffix = "°", Value = 0, Min = 0, Max = 360, Float = 1, Flag = "desync_max_yaw"})
-            DesyncYawVal = DesyncYawMode:Slider({Name = "Value", Suffix = "°", Value = 0, Min = -360, Max = 360, Float = 1, Flag = "desync_val_yaw"})
-            DesyncYawSpeed = DesyncYawMode:Slider({Name = "Lerp Speed", Value = 1, Min = 1, Max = 30, Float = 1, Flag = "desync_speed_yaw"})
-
-            local DesyncRollMode
-            DesyncSec:Toggle({Name = "Roll Position", Flag = "desync_roll", Callback = function(v)
-                if DesyncRollMode then
-                    DesyncRollMode.SetVisibility(v)
-                end
-            end})
-
-            local DesyncRollMin
-            local DesyncRollMax
-            local DesyncRollVal
-            local DesyncRollSpeed
-            DesyncRollMode = DesyncSec:Dropdown({Name = "Roll Mode", Visible = false, Values = {
-                "Static",
-                "Lerp",
-                "Random"
-            }, Value = "Static", Flag = "desync_mode_roll", Callback = function(v)
-                if DesyncRollMin then
-                    DesyncRollMin.SetVisibility(v == "Lerp" or v == "Random" or false)
-                end
-
-                if DesyncRollMax then
-                    DesyncRollMax.SetVisibility(v == "Lerp" or v == "Random" or false)
-                end
-
-                if DesyncRollVal then
-                    DesyncRollVal.SetVisibility(v == "Static")
-                end
-
-                if DesyncRollSpeed then
-                    DesyncRollSpeed.SetVisibility(v == "Lerp")
-                end
-            end})
-
-            DesyncRollMin = DesyncRollMode:Slider({Name = "Min", Visible = false, Suffix = "°", Value = 0, Min = -360, Max = 0, Float = 1, Flag = "desync_min_roll"})
-            DesyncRollMax = DesyncRollMode:Slider({Name = "Max", Visible = false, Suffix = "°", Value = 0, Min = 0, Max = 360, Float = 1, Flag = "desync_max_roll"})
-            DesyncRollVal = DesyncRollMode:Slider({Name = "Value", Suffix = "°", Value = 0, Min = -360, Max = 360, Float = 1, Flag = "desync_val_roll"})
-            DesyncRollSpeed = DesyncRollMode:Slider({Name = "Lerp Speed", Value = 1, Min = 1, Max = 30, Float = 1, Flag = "desync_speed_roll"})
-
-            DesyncSec:Toggle({Name = "Void", Flag = "desync_void", Callback = function(v)
-                if v and Flags["desync_void_key"] then
-                    Desync:SetStatus(true)
-                    Desync:OverwritePosition(Vector3new(9e9, -9e9, 9e9))
-                else
-                    Desync:SetStatus(nil)
-                    Desync:RemoveOverwrite()
-                end
-            end}):Keybind({Name = "Void", Flag = "desync_void_key", Callback = function(v)
-                if v and Flags["desync_void"] then
-                    Desync:SetStatus(true)
-                    Desync:OverwritePosition(Vector3new(9e9, -9e9, 9e9))
-                else
-                    Desync:SetStatus(nil)
-                    Desync:RemoveOverwrite()
-                end
-            end})
-
-            DesyncSec:Toggle({Name = "Visualize", Flag = "desync_vis"}):Colorpicker({Name = "Desync Color", Flag = "desync_vis_color", Callback = Desync.UpdateCharacter})
-
-            DesyncSec:Dropdown({Name = "Material", Values = Materials, Value = "ForceField", Flag = "desync_vis_material", Callback = Desync.UpdateCharacter})
-        end
-
-        ExtraSec = MiscTab:Section({Name = "Extra", Visible = false, Side = "Right", Size = UDim2new(1, 0, 1, -66)}) do
-            ExtraSec:Toggle({Name = "Ignore Friends", Flag = "ignore_friends"})
-            ExtraSec:Toggle({Name = "Target Priority Only", Flag = "priority_only"})
-
-            local VelocityFactor
-            local VelocityTarget 
-            local Velocity = ExtraSec:Toggle({Name = "Velocity Spoofer", Flag = "velocity", Callback = function(v)
-                if VelocityFactor then
-                    VelocityFactor.SetVisibility(v)
-                end
-                if VelocityTarget then
-                    VelocityTarget.SetVisibility(v)
-                end
-            end})
-            
-            Velocity:Keybind({Name = "Velocity Spoofer", Flag = "velocity_key"})
-            VelocityFactor = Velocity:Slider({Name = "Spoof Factor", Visible = false, Suffix = "vel", Value = 0, Min = 0, Max = 99999, Float = 1, Flag = "velocity_factor"})
-
-            if sethiddenproperty then
-                ExtraSec:Toggle({Name = "Network Desync", Flag = "network_desync"})
-                ExtraSec:Slider({Name = "Delay", Visible = false, Suffix = "s", Value = 1, Min = 0, Max = 10, Float = 0.01, Flag = "network_desync_delay"})
-            end
-
-            if setfflag then
-                local SenderRateAmount
-                ExtraSec:Toggle({Name = "Physics Sender Rate", Flag = "physics_rate", Callback = function(v)
-                    if v and Flags["physics_rate_amount"] and Flags["physics_rate_key"] then
-                        setfflag("S2PhysicsSenderRate", tostring(Flags["physics_rate_amount"]))
-                    else
-                        setfflag("S2PhysicsSenderRate", "15")
-                    end
-
-                    if SenderRateAmount then
-                        SenderRateAmount.SetVisibility(v)
-                    end
-                end}):Keybind({Name = "Sender Rate", Flag = "physics_rate_key", Callback = function(v)
-                    if v and Flags["physics_rate"] and Flags["physics_rate_amount"] then
-                        setfflag("S2PhysicsSenderRate", tostring(Flags["physics_rate_amount"]))
-                    else
-                        setfflag("S2PhysicsSenderRate", "15")
-                    end
-                end})
-                SenderRateAmount = ExtraSec:Slider({Name = "Sender Rate Amount", Visible = false, Value = 3, Min = 0, Max = 15, Float = 1, Flag = "physics_rate_amount", Callback = function(v)
-                    if v and Flags["physics_rate"] and Flags["physics_rate_key"] then
-                        setfflag("S2PhysicsSenderRate", tostring(v))
-                    else
-                        setfflag("S2PhysicsSenderRate", "15")
-                    end
-
-                end})
-            end
-
-            local Ignored = workspace:FindFirstChild("Ignored")
-
-            if Ignored then
-                local Shop = Ignored:FindFirstChild("Shop")
-
-                if Shop then
-                    local Buying = false
-
-                    local Items = {}
-
-                    for _,v in next, Shop:GetChildren() do
-                        if not v:IsA("Model") then
-                            continue
-                        end
-
-                        local Name = v.Name:lower()
-
-                        if not (Name:find("phone") or Name:find("mask") or Name:find("weight")) then
-                            Items[v.Name] = v
-                        end
-                    end
-
-                    local ItemNames = {}
-
-                    for _,v in next, Items do
-                        ItemNames[#ItemNames + 1] = _
-                    end
-
-                    ExtraSec:Dropdown({Name = "Item", Values = ItemNames, Value = ItemNames[1], Flag = "item_buy"})
-                    ExtraSec:Button({Name = "Buy", Confirm = true, Callback = function()
-                        if Buying then
-                            Library:Notify({
-                                Text = "Already buying item!"
-                            })            
-                            
-                            return
-                        end
-
-                        Buying = true
-
-                        local ItemType = Flags["item_buy"] 
-
-                        local ItemModel = Items[ItemType]
-
-                        if not ItemModel then
-                            Buying = false
-                            return
-                        end
-
-                        local ClickDetector = ItemModel:FindFirstChildWhichIsA("ClickDetector")
-
-                        if not ClickDetector then
-                            Buying = false
-                            return
-                        end
-
-                        local ItemPart = ItemModel:FindFirstChildWhichIsA("Part") or ItemModel:FindFirstChildWhichIsA("MeshPart") or ItemModel:FindFirstChildWhichIsA("BasePart")
-
-                        if not ItemPart then
-                            Buying = false
-                            return
-                        end
-
-                        Desync:SetStatus(true)
-                        Desync:OverwritePosition(ItemPart.Position)
-
-                        taskwait(1)
-
-                        for i = 1, 10 do
-                            fireclickdetector(ClickDetector)
-
-                            taskwait()
-                        end
-
-                        taskwait(1)
-
-                        Desync:SetStatus()
-                        Desync:RemoveOverwrite()
-
-                        Buying = false
-                    end})
-                end
-            end
-
-            ExtraSec:Toggle({Name = "Hit Sound", Flag = "hitsound"})
-            ExtraSec:Dropdown({Name = "Type", Values = Hitsounds, Value = Hitsounds[1], Flag = "hitsound_type"})
-            ExtraSec:Slider({Name = "Volume", Value = 100, Min = 0, Max = 100, Float = 1, Flag = "hitsound_volume"})
-            ExtraSec:Slider({Name = "Pitch", Value = 100, Min = 0, Max = 200, Float = 1, Flag = "hitsound_pitch"})
-
-            ExtraSec:Toggle({Name = "Hit Logs", Flag = "hitlogs"})
-            ExtraSec:Slider({Name = "Time", Value = 3, Min = 0, Max = 10, Float = 1, Flag = "hitlogs_time"})
-
-            ExtraSec:Toggle({Name = "No Slow", Flag = "no_slow"})
-
-            ExtraSec:Toggle({Name = "Auto Reload", Flag = "auto_reload"})
-        end
-    --
-    
-    -- Players
-        local DataIndex = {
-            "None",
-            "Friend",
-            "Priority"
-        }
-
-        local DataIndexColors = {
-            ["None"] = Color3fromRGB(255, 255, 255),
-            ["Priority"] = Color3fromRGB(51, 255, 75),
-            ["Friend"] = Color3fromRGB(0, 200, 255),
-            ["Local"] = Color3fromRGB(0, 255, 157),        
-        }
-
-        local MainSec = PlayersTab:Section({Name = "Main"})  --
-            local SelectedPlayer = nil
-            local PlayersList = nil
-
-            local PlayerNameLabel = nil
-            local UserIdLabel = nil
-            local AccountAgeLabel = nil
-            local TeamLabel = nil
-            local StatusLabel = nil
-            local StatusDropdown = nil
-
-            local function PlayerSelected(plr)
-                SelectedPlayer = plr
-
-                local PlayerTbl = Puppyware.Players[plr]
-                local Player = PlayerTbl and PlayerTbl.Player
-                local StatusType = plr == LocalPlayer.Name and "Local" or PlayerTbl and PlayerTbl.Status or "None"
-
-                if PlayerNameLabel and Player then
-                    PlayerNameLabel.ChangeText(("Player Name - %s"):format(plr))
-                end
-
-                if UserIdLabel and Player then
-                    UserIdLabel.ChangeText(("User ID - %s"):format(Player.UserId))
-                end
-
-                if StatusLabel and StatusType then
-                    local StatusColor = DataIndexColors[StatusType]
-
-                    StatusLabel.ChangeText(('Status - <font color="rgb(%s, %s, %s)">%s</font>'):format(mathfloor(StatusColor.r * 255), mathfloor(StatusColor.g * 255), mathfloor(StatusColor.b * 255), StatusType))
-                end
-
-                if AccountAgeLabel and Player then
-                    AccountAgeLabel.ChangeText(("Account Age - %s days"):format(Player.AccountAge))
-                end
-
-                if TeamLabel and Player then
-                    local Team = Utility:GetTeam(Player)
-                    local TeamColor = Team and Team.TeamColor and Team.TeamColor.Color or Color3fromRGB(255, 255, 255)
-                    local TeamName = Team and tostring(Team) or "None"
-
-                    TeamLabel.ChangeText(('Team - <font color="rgb(%s, %s, %s)">%s</font>'):format(mathfloor(TeamColor.r * 255), mathfloor(TeamColor.g * 255), mathfloor(TeamColor.b * 255), TeamName))
-                end
-
-                if StatusDropdown then
-                    StatusDropdown.Set(StatusType)
-                end
-            end
-
-            local function SetStatus(status)
-                if not SelectedPlayer then
-                    return
-                end
-
-                if SelectedPlayer == LocalPlayer.Name then
-                    return
-                end
-
-                local PlayerTbl = Puppyware.Players[SelectedPlayer]
-
-                if not PlayerTbl then
-                    return
-                end
-
-                PlayerTbl.Status = status
-
-                if StatusLabel and status then
-                    local StatusColor = DataIndexColors[status]
-
-                    StatusLabel.ChangeText(('Status - <font color="rgb(%s, %s, %s)">%s</font>'):format(mathfloor(StatusColor.r * 255), mathfloor(StatusColor.g * 255), mathfloor(StatusColor.b * 255), status))
-                end
-            end
-
-            local StoredThumbnails = {}
-
-            local SearchTextbox = MainSec:Textbox({Name = "Search", Value = "", Flag = "playerlist_search", Callback = function(v)
-                if PlayersList then
-                    local Items = PlayersList.Items
-
-                    for name,itemtbl in Items do
-                        
-                        itemtbl.Holder.Visible = name:lower():find(v:lower())
-                    end
-                end
-            end})
-            PlayersList = MainSec:List({Name = "Players", Values = {}, Value = "-", Flag = "playerlist_list", Size = 290, Callback = PlayerSelected})
-
-            local function RefreshPlayers()
-                if not PlayersList then
-                    return
-                end
-
-                SearchTextbox.Set("")
-
-                local PlayersTbl = {}
-
-                for _,v in Players:GetPlayers() do
-                    local Thumbnail = StoredThumbnails[v.UserId] or Players:GetUserThumbnailAsync(v.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
-    
-                    StoredThumbnails[v.UserId] = Thumbnail
-    
-                    PlayersTbl[#PlayersTbl + 1] = {
-                        Name = v.Name,
-                        ImageId = Thumbnail
-                    }
-    
-                    if not Puppyware.Players[v.Name] then
-                        Puppyware.Players[v.Name] = {
-                            Status = "None",
-                            Player = v
-                        }
-                    end
-                end
-
-                PlayersList.Refresh(PlayersTbl)
-            end
-
-            MainSec:Button({Name = "Refresh", Callback = function()
-                RefreshPlayers()
-            end})
-
-        --
-
-        local InfoSec = PlayersTab:Section({Name = "Info", Side = "Right"}) --
-            PlayerNameLabel = InfoSec:Label({Name = "Player Name - "})
-            UserIdLabel = InfoSec:Label({Name = "User ID - "})
-            AccountAgeLabel = InfoSec:Label({Name = "Account Age - "})
-            TeamLabel = InfoSec:Label({Name = "Team - "})
-            StatusLabel = InfoSec:Label({Name = "Status - "})
-            StatusDropdown = InfoSec:Dropdown({Name = "Status", Values = DataIndex, Value = "None", Flag = "playerlist_status", Callback = SetStatus})
-        --
-    --
-
-    -- Settings
-        local ConfigsSection = SettingsTab:Section({
-            Name = "Configurations"
-        }) do
-            local ConfigDropdown = ConfigsSection:List({Name = "Configs", Values = {}, Value = "-", Flag = "config_dropdown", Size = 190, Callback = function(v)
-                if Library.ConfigFlags["config_name"] then
-                    Library.ConfigFlags["config_name"].Set(v)
-                end
-            end})
-            ConfigsSection:Textbox({Name = "Config Name", Value = "", Flag = "config_name"})
-            ConfigsSection:Button({Name = "Save Config", Confirm = true, Callback = function()
-                local ConfigName = Library.Flags["config_name"]
-
-                Library:Notify({
-                    Text = ("Successfully %s config (%s)!"):format(isfile(`{Library.Folder}/Configs/{ConfigName}.txt`) and "saved" or "created", ConfigName)
-                })
-
-                writefile(`{Library.Folder}/Configs/{ConfigName}.txt`, Library:GetConfig())
-
-                local _, FileNames = Utility.GetFiles("Configs", {".txt"})
-
-                ConfigDropdown.Refresh(FileNames)
-
-                ConfigDropdown.Set(ConfigName)
-            end})
-            ConfigsSection:Button({Name = "Load Config", Confirm = true, Callback = function()
-                local ConfigName = Library.Flags["config_name"]
-
-                if isfile(`{Library.Folder}/Configs/{ConfigName}.txt`) then
-                    Library:LoadConfig(readfile(`{Library.Folder}/Configs/{ConfigName}.txt`))
-
-                    Library:Notify({
-                        Text = ("Successfully loaded config (%s)!"):format(ConfigName)
-                    })
-                else
-                    Library:Notify({
-                        Text = ("Couldn't find config (%s)!"):format(ConfigName)
-                    })
-                end
-
-                local _, FileNames = Utility.GetFiles("Configs", {".txt"})
-
-                ConfigDropdown.Refresh(FileNames)
-            end})
-            ConfigsSection:Button({Name = "Reset Config", Confirm = true, Callback = function()
-                local ConfigName = Library.Flags["config_name"]
-
-                if isfile(`{Library.Folder}/Configs/{ConfigName}.txt`) then
-                    writefile(`{Library.Folder}/Configs/{ConfigName}.txt`, "")
-
-                    Library:Notify({
-                        Text = ("Successfully reseted config (%s)!"):format(ConfigName)
-                    })    
-                else
-                    Library:Notify({
-                        Text = ("Couldn't find config (%s)!"):format(ConfigName)
-                    })
-                end
-
-                local Files, FileNames = Utility.GetFiles("Configs", {".txt"})
-
-                ConfigDropdown.Refresh(FileNames)
-            end})
-            ConfigsSection:Button({Name = "Delete Config", Confirm = true, Callback = function()
-                local ConfigName = Library.Flags["config_name"]
-
-                if isfile(`{Library.Folder}/Configs/{ConfigName}.txt`) then
-                    delfile(`{Library.Folder}/Configs/{ConfigName}.txt`)
-
-                    Library:Notify({
-                        Text = ("Successfully deleted config (%s)!"):format(ConfigName)
-                    })
-                else
-                    Library:Notify({
-                        Text = ("Couldn't find config (%s)!"):format(ConfigName)
-                    })
-                end
-
-                local _, FileNames = Utility.GetFiles("Configs", {".txt"})
-
-                ConfigDropdown.Refresh(FileNames)
-
-                ConfigDropdown.Set(FileNames[1])
-            end})
-            ConfigsSection:Button({Name = "Refresh Config", Confirm = true, Callback = function()
-                local _, FileNames = Utility.GetFiles("Configs", {".txt"})
-
-                ConfigDropdown.Refresh(FileNames)
-            end})
-
-            local _, FileNames = Utility.GetFiles("Configs", {".txt"})
-
-            ConfigDropdown.Refresh(FileNames)
-        end
-
-        local ExtraSection = SettingsTab:Section({
-            Name = "Extra",
-            Side = "Right"
-        }) do
-            local Watermark = Window.Watermark
-            local KeybindList = Window.KeybindList
-
-            ExtraSection:Keybind({
-                Name = "Menu Keybind",
-                Flag = "menu_keybind",
-                Key = Enum.KeyCode.RightShift,
-                Ignore = true,
-                Value = true,
-                Callback = function(v)
-                    Library:Show(v)
-                end
-            })
-            ExtraSection:Button({Name = "Unload", Confirm = true, Callback = Utility.Unload})
-            ExtraSection:Button({Name = "Rejoin Game", Confirm = true, Callback = function()
-                TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
-            end})
-            ExtraSection:Button({Name = "Join New Game", Confirm = true, Callback = function()
-                local Notification = Library:Notify({
-                    Text = "Looking for a server...",
-                    Time = 9e9,
-                    Animation = "Bounce"
-                })
-
-                while taskwait() do
-                    local Success, Servers = pcall(function()
-                        return HttpService:JSONDecode(
-                            game:HttpGet(
-                                ("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100"):format(
-                                    game.PlaceId
-                                )
-                            )
-                        )
-                    end)
-
-                    if not Success then
-                        Notification.Text = "Failed to get server list."
-                        Notification.Type = "Warning"
-                        Notification.ClockTime = osclock() + 5
-
-                        break
-                    end
-                end
-            end})
-            ExtraSection:Button({Name = "Copy Join Script", Confirm = true, Callback = function()
-                Library:Notify({
-                    Text = "Successfully copied join script to clipboard!"
-                })
-
-                setclipboard(
-                    stringformat(
-                        'game:GetService("TeleportService"):TeleportToPlaceInstance(%s, "%s")',
-                        game.PlaceId,
-                        game.JobId
-                    )
-                )
-            end})
-            ExtraSection:Toggle({
-                Name = "Keybinds List",
-                Status = true,
-                Flag = "menu_keybinds_list",
-                Callback = function(v)
-                    if KeybindList then
-                        KeybindList.SetVisibility(v)
-                    end
-                end
-            })
-            ExtraSection:Toggle({
-                Name = "Watermark",
-                Status = true,
-                Flag = "menu_watermark",
-                Callback = function(v)
-                    if Watermark then
-                        Watermark.SetVisibility(v)
-                    end
-                end
-            })
-            ExtraSection:Textbox({Name = "Watermark Text", Value = Watermark.Text, Flag = "menu_watermark_text", Callback = function(v)
-                if Watermark then
-                    Watermark.SetText(v)
-                end
-            end}) 
-            ExtraSection:Slider({
-                Name = "Watermark Tick Rate",
-                Flag = "menu_watermark_tickrate",
-                Min = 0,
-                Max = 1000,
-                Value = 200,
-                Float = 1,
-                Callback = function(v)
-                    if Watermark then
-                        Watermark.SetTickRate(v / 1000)
-                    end
-                end
-            })
-            ExtraSection:Slider({
-                Name = "Tween Speed",
-                Flag = "menu_tween_speed",
-                Min = 0,
-                Max = 1000,
-                Value = 100,
-                Float = 1,
-                Callback = function(v)
-                    Library.TweenSpeed = v / 1000
-                end
-            })
-            ExtraSection:Slider({
-                Name = "Lerp Speed",
-                Flag = "menu_lerp_speed",
-                Min = 0,
-                Max = 1000,
-                Value = 100,
-                Float = 1,
-                Callback = function(v)
-                    Library.LerpSpeed = v / 1000
-                end
-            })
-
-            local TweenStyles = {}
-
-            for _,v in Enum.EasingStyle:GetEnumItems() do
-                TweenStyles[#TweenStyles + 1] = tostring(v):gsub("Enum.EasingStyle.", "")
-            end
-
-            ExtraSection:Dropdown({Name = "Easing Style", Values = TweenStyles, Value = "Quad", Flag = "menu_easing_style", Callback = function(v)
-                Library.TweenEasingStyle = Enum.EasingStyle[v]
-            end})
-
-            local ThemeColorpickers = {}
-            for _,v in Library.Theme do
-                ThemeColorpickers[_] = ExtraSection:Colorpicker({Name = _, Flag = _ .. "_theme", Color = v, Callback = function(v)
-                    Library:ChangeTheme(_, v.c)
-                end})
-            end
-
-            ExtraSection:Button({Name = "Reset Theme", Confirm = true, Callback = function()
-                for _,v in Library.OriginalTheme do
-                    Library:ChangeTheme(_, v)
-
-                    ThemeColorpickers[_].Set(v)
-                end
-            end})
-        end
-    --
-
-    SettingsTab.Select(true)
---
-
--- ESP Preview
-    local ESPPreview = {}
-    
-    local WindowHolder = Window.OutlineHolder
-
-    local ESPWindow = Library:Window({
-        Name = "ESP Interacts",
-        Size = Vector2new(350, 380),
-        Selects = false,
-        Holder = Library.Popups,
-        Position = UDim2new(0, WindowHolder.AbsolutePosition.x + WindowHolder.AbsoluteSize.x + 5, 0, WindowHolder.AbsolutePosition.y),
-        Resizing = false,
-    })
-
-    ESPWindow.OutlineHolder.Visible = false
-
-    function ESPPreview:CreatePreview(tab, type, flag)
-        local Page = tab.Page
-
-        local MainFlag = "esp_" .. type .. "_"
-
-        local Preview = {
-            Items = {},
-            Selected = {}
-        }
-
-        local ESPHolder = Library:New("Frame", {
-            Name = "ESPHolder",
-            Parent = Page,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 0, 0, 0),
-            Size = UDim2new(1, 0, 1, 0),
-        })
-
-        local ESPItemsOutline = Library:New("Frame", {
-            Name = "ESPItemsOutline",
-            Parent = ESPHolder,
-            BackgroundTransparency = 0,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 0, 1, -38),
-            Size = UDim2new(1, 0, 0, 38),
-        })
-
-        Library:AddTheme(ESPItemsOutline, {
-            BackgroundColor3 = "Outline",
-        })
-
-        local ESPItemsBackground = Library:New("Frame", {
-            Name = "ESPItemsBackground",
-            Parent = ESPItemsOutline,
-            BackgroundTransparency = 0,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 1, 0, 1),
-            Size = UDim2new(1, -2, 1, -2),
-        })
-
-        Library:AddTheme(ESPItemsBackground, {
-            BackgroundColor3 = "Element Background",
-        })
-
-        Library:New("UIPadding", {
-            Parent = ESPItemsBackground,
-            PaddingBottom = UDimnew(0, 5),
-            PaddingLeft = UDimnew(0, 5),
-            PaddingRight = UDimnew(0, 5),
-            PaddingTop = UDimnew(0, 5),
-        })
-
-        local ESPItemsOne = Library:New("Frame", {
-            Name = "ESPItemsOne",
-            Parent = ESPItemsBackground,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 0, 0, 0),
-            Size = UDim2new(1, 0, 0, 13),
-        })
-
-        Library:New("UIListLayout", {
-            Parent = ESPItemsOne,
-            FillDirection = Enum.FillDirection.Horizontal,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 5),
-        })
-
-        local ESPItemsSecond = Library:New("Frame", {
-            Name = "ESPItemsSecond",
-            Parent = ESPItemsBackground,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Position = UDim2new(0, 0, 0, 15),
-            Size = UDim2new(1, 0, 0, 13),
-        })
-
-        Library:New("UIListLayout", {
-            Parent = ESPItemsSecond,
-            FillDirection = Enum.FillDirection.Horizontal,
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDimnew(0, 5),
-        })
-
-        local BoxSize = Vector2new(131, 169)
-        local BoxPosition = Vector2new(0, 0)
-
-        local BoxHolder = Utility:New("Frame", {
-            Parent = ESPHolder,
-            BackgroundTransparency = 1,
-            Size = UDim2offset(BoxSize.x, BoxSize.y),
-            Position = UDim2new(0.5, -(BoxSize.x / 2), 0.5, -((BoxSize.y / 2) + (53 / 2))),
-            BorderSizePixel = 0,
-        })
-
-        local SetFlag = MainFlag .. "selected" .. flag
-
-        function Preview.Set(item)
-            if typeof(item) == "table" then
-                for _,v in item do
-                    if not tablefind(Preview.Selected, v) then
-                        Preview.Set(v)
-                    end
-                end
-            else
-                local Index = tablefind(Preview.Selected, item)
-                local Item = Preview.Items[item]
-
-                if Item then
-                    if Index then    
-                        Item.Set(false)
-
-                        tableremove(Preview.Selected, Index)
-
-                        Library.Flags[SetFlag] = Preview.Selected
-                    else    
-                        Item.Set(true)
-
-                        tableinsert(Preview.Selected, item)
-    
-                        Library.Flags[SetFlag] = Preview.Selected    
-                    end
-                end
-            end
-        end
-
-        local OldOpenedPopUp = nil
-
-        function Preview.CreateItem(name, callback, holder, popup)
-            callback = callback or function() end
-            holder = holder or ESPItemsOne
-            popup = popup == nil and true or popup
-
-            local Item = {
-                Selected = false
-            }
-
-            local ItemText = Library:New("TextButton", {
-                BackgroundTransparency = 1,
-                AutomaticSize = Enum.AutomaticSize.X,
-                Size = UDim2new(0, 0, 0, 13),
-                FontFace = Library.Font,
-                Text = name,
-                TextSize = Library.FontSize,
-                Parent = holder,
-                TextStrokeTransparency = 0,
-                RichText = true,
-                TextXAlignment = Enum.TextXAlignment.Left,
-            })
-
-            Item.Text = ItemText
-            Item.Name = name
-
-            Library:AddTheme(ItemText, {
-                TextColor3 = "Text",
-            })
-
-            local PopUpSection = nil
-            if popup then
-                PopUpSection = Utility:New("Frame", {
-                    Parent = Library.Popups,
-                    BackgroundTransparency = 0.5,
-                    Active = true,
-                    Draggable = true,
-                    Visible = false,
-                    Size = UDim2new(0, 250, 0, 150),
-                    Position = UDim2new(0, 0, 0, 0),
-                    BorderSizePixel = 0,
-                })
-
-                Item.PopUp = PopUpSection
-            end
-
-            function Item.Set(status)
-                Item.Selected = status
-
-                Library:ChangeObjectTheme(ItemText, {
-                    TextColor3 = Item.Selected and "Accent" or "Text"
-                }, true)
-
-                callback(status)
-            end
-
-            Utility:Connect(ItemText.MouseButton1Down, function()
-                Preview.Set(name)
-            end)
-
-            if popup then
-                Utility:Connect(ItemText.MouseButton2Down, function()
-                    PopUpSection.Visible = not PopUpSection.Visible
-
-                    local AbsolutePosition = ItemText.AbsolutePosition
-                    local AbsoluteSize = ItemText.AbsoluteSize
-
-                    PopUpSection.Position = UDim2new(0, AbsolutePosition.x, 0, AbsolutePosition.y + AbsoluteSize.y + 5)
-
-                    if OldOpenedPopUp then
-                        OldOpenedPopUp.Visible = false
-                    end
-
-                    if PopUpSection.Visible then
-                        OldOpenedPopUp = PopUpSection
-                    else
-                        OldOpenedPopUp = nil
-                    end
-                end)
-            end
-
-            Preview.Items[name] = Item
-
-            return Item
-        end
-
-        function Preview.CreateSeperator(holder)
-            local SeperatorHolder = Library:New("Frame", {
-                BackgroundTransparency = 1,
-                Size = UDim2new(0, 1, 1, 0),
-                Parent = holder,
-                BorderSizePixel = 0,
-            })
-            
-            local SeperatorAccent = Library:New("Frame", {
-                Position = UDim2new(0, 0, 0, 3),
-                Size = UDim2new(0, 1, 1, -6),
-                Parent = SeperatorHolder,
-                BorderSizePixel = 0,
-            })
-
-            Library:AddTheme(SeperatorAccent, {
-                BackgroundColor3 = "Accent",
-            })
-        end
-
-        Library.ConfigFlags[SetFlag] = Preview
-
-        -- On
-            Preview.CreateItem("On", function(v)
-                Library.Flags[MainFlag .. "enabled" .. flag] = v
-            end, ESPItemsOne, false)
-
-            Preview.CreateSeperator(ESPItemsOne)
-        --
-        
-        -- Box
-            local BoxItem = Preview.CreateItem("Box", function(v)
-                Library.Flags[MainFlag .. "box" .. flag] = v
-            end)
-
-            local BoxSection = Library.Section({Left = BoxItem.PopUp}, {Name = "Box Settings"})
-
-            BoxSection:Colorpicker({Name = "Box Color", Flag = MainFlag .. "box_color" .. flag})
-
-            BoxSection:Colorpicker({Name = "Box Outline Color", Flag = MainFlag .. "box_outline" .. flag, Color = Color3fromRGB(0, 0, 0), Transparency = 0.5})
-
-            local BoxGradientTog = BoxSection:Toggle({Name = "Box Gradient", Flag = MainFlag .. "box_gradient" .. flag})
-            BoxGradientTog:Colorpicker({Name = "Box Gradient Color", Flag = MainFlag .. "box_gradient_from_color" .. flag, Color = Color3fromRGB(0, 255, 0)})
-            BoxGradientTog:Colorpicker({Name = "To Gradient Color", Flag = MainFlag .. "box_gradient_to_color" .. flag, Color = Color3fromRGB(255, 0, 0)})
-
-            BoxSection:Toggle({Name = "Gradient Rainbow", Flag = MainFlag .. "box_gradient_rainbow" .. flag})
-            BoxSection:Slider({Name = "Rainbow Speed", Flag = MainFlag .. "box_gradient_rainbow_speed" .. flag, Min = 0, Max = 100, Float = 1, Value = 50})
-        
-            Preview.CreateSeperator(ESPItemsOne)
-        --
-
-        -- Box Fill
-            local BoxFillItem = Preview.CreateItem("Box Fill", function(v)
-                Library.Flags[MainFlag .. "box_fill" .. flag] = v
-            end)
-
-            local BoxFillSection = Library.Section({Left = BoxFillItem.PopUp}, {Name = "Box Fill Settings"})
-
-            BoxFillSection:Colorpicker({Name = "Box Fill Color", Flag = MainFlag .. "box_fill_color" .. flag, Transparency = 0})
-
-            local BoxFillGradientTog = BoxFillSection:Toggle({Name = "Box Fill Gradient", Flag = MainFlag .. "box_fill_gradient" .. flag})
-            BoxFillGradientTog:Colorpicker({Name = "Fill Gradient Color", Flag = MainFlag .. "box_fill_gradient_from_color" .. flag, Color = Color3fromRGB(0, 255, 0)})
-            BoxFillGradientTog:Colorpicker({Name = "To Gradient Color", Flag = MainFlag .. "box_fill_gradient_to_color" .. flag, Color = Color3fromRGB(255, 0, 0)})
-
-            BoxFillSection:Toggle({Name = "Gradient Rainbow", Flag = MainFlag .. "box_fill_gradient_rainbow" .. flag})
-            BoxFillSection:Slider({Name = "Rainbow Speed", Flag = MainFlag .. "box_fill_gradient_rainbow_speed" .. flag, Min = 0, Max = 100, Float = 1, Value = 50})
-        
-            Preview.CreateSeperator(ESPItemsOne)
-        --
-        
-        -- Name
-            local NameItem = Preview.CreateItem("Name", function(v)
-                Library.Flags[MainFlag .. "name" .. flag] = v
-            end)
-
-            NameItem.PopUp.Size = UDim2new(0, 250, 0, 180)
-
-            local NameSection = Library.Section({Left = NameItem.PopUp}, {Name = "Name Settings"})
-
-            NameSection:Colorpicker({Name = "Name Color", Flag = MainFlag .. "name_color" .. flag})
-
-            Library.Dropdown({Holder = NameSection.Holder, ContentHolder = Library.Popups}, {Name = "Name Font", Values = ESPFonts, Value = "Minecraftia", Flag = MainFlag .. "name_font" .. flag})
-            NameSection:Slider({Name = "Name Size", Suffix = "px", Min = 0, Max = 30, Float = 1, Value = 10, Flag = MainFlag .. "name_size" .. flag})
-
-            Library.Dropdown({Holder = NameSection.Holder, ContentHolder = Library.Popups}, {Name = "Text Case", Values = {"Normal", "UPPERCASE", "lowercase"}, Value = "Normal", Flag = MainFlag .. "name_case" .. flag})
-
-            NameSection:Slider({Name = "Max Name Length", Suffix = "px", Min = 0, Max = 30, Float = 1, Value = 10, Flag = MainFlag .. "name_max" .. flag})
-            
-            Preview.CreateSeperator(ESPItemsOne)
-        --
-
-        -- Distance
-            local DistanceItem = Preview.CreateItem("Distance", function(v)
-                Library.Flags[MainFlag .. "distance" .. flag] = v
-            end)
-
-            local DistanceSection = Library.Section({Left = DistanceItem.PopUp}, {Name = "Distance Settings"})
-
-            DistanceSection:Colorpicker({Name = "Distance Color", Flag = MainFlag .. "distance_color" .. flag})
-            
-            Library.Dropdown({Holder = DistanceSection.Holder, ContentHolder = Library.Popups}, {Name = "Distance Font", Values = ESPFonts, Value = "Minecraftia", Flag = MainFlag .. "distance_font" .. flag})
-            DistanceSection:Slider({Name = "Distance Size", Suffix = "px", Min = 0, Max = 30, Float = 1, Value = 10, Flag = MainFlag .. "distance_size" .. flag})
-        
-            Library.Dropdown({Holder = DistanceSection.Holder, ContentHolder = Library.Popups}, {Name = "Distance Case", Values = {"Normal", "UPPERCASE", "lowercase"}, Value = "Normal", Flag = MainFlag .. "distance_case" .. flag})
-        
-            Preview.CreateSeperator(ESPItemsOne)
-        --
-
-        -- Health Bar
-            local HealthBarItem = Preview.CreateItem("Health Bar", function(v)
-                Library.Flags[MainFlag .. "health_bar" .. flag] = v
-            end)
-
-            HealthBarItem.PopUp.Size = UDim2new(0, 250, 0, 154)
-
-            local HealthBarSection = Library.Section({Left = HealthBarItem.PopUp}, {Name = "Health Bar Settings"})
-
-            HealthBarSection:Colorpicker({Name = "Health Bar Color", Flag = MainFlag .. "health_bar_color" .. flag, Color = Color3fromRGB(0, 255, 0)})
-            HealthBarSection:Colorpicker({Name = "Health Bar Outline Color", Flag = MainFlag .. "health_bar_outline" .. flag, Color = Color3fromRGB(0, 0, 0), Transparency = 0.5})
-                
-            HealthBarSection:Slider({Name = "Health Bar Size", Flag = MainFlag .. "health_bar_size" .. flag, Suffix = "px", Min = 1, Max = 50, Float = 1, Value = 2})
-
-            local HealthBarGradientTog = HealthBarSection:Toggle({Name = "Health Bar Gradient", Flag = MainFlag .. "health_bar_gradient" .. flag})
-            HealthBarGradientTog:Colorpicker({Name = "From Gradient Color", Flag = MainFlag .. "health_bar_gradient_from_color" .. flag, Color = Color3fromRGB(0, 255, 0)})
-            HealthBarGradientTog:Colorpicker({Name = "To Gradient Color", Flag = MainFlag .. "health_bar_gradient_to_color" .. flag, Color = Color3fromRGB(255, 0, 0)})
-
-            HealthBarSection:Toggle({Name = "Gradient Rainbow", Flag = MainFlag .. "health_bar_gradient_rainbow" .. flag})
-            HealthBarSection:Slider({Name = "Rainbow Speed", Flag = MainFlag .. "health_bar_gradient_rainbow_speed" .. flag, Min = 0, Max = 100, Float = 1, Value = 50})
-        --
-
-        -- Health Number
-            local HealthNumberItem = Preview.CreateItem("Health Number", function(v)
-                Library.Flags[MainFlag .. "health_number" .. flag] = v
-            end, ESPItemsSecond)
-
-            local HealthNumberSection = Library.Section({Left = HealthNumberItem.PopUp}, {Name = "Health Number Settings"})
-
-            HealthNumberSection:Colorpicker({Name = "Health Number Color", Flag = MainFlag .. "health_number_color" .. flag})
-
-            HealthNumberSection:Toggle({Name = "Follow Health Bar", Flag = MainFlag .. "health_number_follow" .. flag})
-
-            Library.Dropdown({Holder = HealthNumberSection.Holder, ContentHolder = Library.Popups}, {Name = "Health Number Font", Values = ESPFonts, Value = "Minecraftia", Flag = MainFlag .. "health_number_font" .. flag})
-            HealthNumberSection:Slider({Name = "Health Number Size", Suffix = "px", Min = 0, Max = 30, Float = 1, Value = 10, Flag = MainFlag .. "health_number_size" .. flag})
-        
-            Preview.CreateSeperator(ESPItemsSecond)
-        --
-
-        -- Image
-            local ImageItem = Preview.CreateItem("Image", function(v)
-                Library.Flags[MainFlag .. "image" .. flag] = v
-            end, ESPItemsSecond)
-
-            local ImageSection = Library.Section({Left = ImageItem.PopUp}, {Name = "Image Settings"})
-
-            local ImageDirectory = `{Library.Folder}/Images/`
-
-            local _, FileNames = Utility.GetFiles("Images", {".png", ".jpeg"})
-            
-            local ImageType = Library.Dropdown({Holder = ImageSection.Holder, ContentHolder = Library.Popups}, {Name = "Image Type", Values = FileNames, Value = "-", Flag = MainFlag .. "image_type" .. flag, Callback = function(v)
-                if v ~= "-" then
-                    local FileType = isfile(ImageDirectory .. v .. ".png") and "png" or isfile(ImageDirectory .. v .. ".jpeg") and "jpeg"
-                    local File = isfile(ImageDirectory .. v .. ".png") and getcustomasset(ImageDirectory .. v .. ".png") or isfile(ImageDirectory .. v .. ".jpeg") and getcustomasset(ImageDirectory .. v .. ".jpeg")
-
-                    if File then
-                        if flag == "_enemy" then
-                            ESP.EnemyImage = File
-                            ESP.EnemyFileType = FileType
-                        elseif flag == "_team" then
-                            ESP.TeamImage = File
-                            ESP.TeamFileType = FileType
-                        else
-                            ESP.LocalImage = File
-                            ESP.LocalFileType = FileType
-                        end
-                    end
-                end
-            end})
-
-            ImageSection:Button({Name = "Refresh", Callback = function(v)
-                local _, FileNames = Utility.GetFiles("Images", {".png", ".jpeg"})
-
-                ImageType.Refresh(FileNames)
-            end})
-        
-            Preview.CreateSeperator(ESPItemsSecond)
-        --
-
-        -- Tool
-            local ToolItem = Preview.CreateItem("Tool", function(v)
-                Library.Flags[MainFlag .. "tool" .. flag] = v
-            end, ESPItemsSecond)
-
-            ToolItem.PopUp.Size = UDim2new(0, 250, 0, 180)
-
-            local ToolSection = Library.Section({Left = ToolItem.PopUp}, {Name = "Tool Settings"})
-
-            ToolSection:Colorpicker({Name = "Tool Color", Flag = MainFlag .. "tool_color" .. flag})
-
-            Library.Dropdown({Holder = ToolSection.Holder, ContentHolder = Library.Popups}, {Name = "Tool Font", Values = ESPFonts, Value = "Minecraftia", Flag = MainFlag .. "tool_font" .. flag})
-            ToolSection:Slider({Name = "Tool Size", Suffix = "px", Min = 0, Max = 30, Float = 1, Value = 10, Flag = MainFlag .. "tool_size" .. flag})
-        
-            Library.Dropdown({Holder = ToolSection.Holder, ContentHolder = Library.Popups}, {Name = "Tool Case", Values = {"Normal", "UPPERCASE", "lowercase"}, Value = "Normal", Flag = MainFlag .. "tool_case" .. flag})
-
-            ToolSection:Slider({Name = "Max Tool Length", Suffix = "px", Min = 0, Max = 30, Float = 1, Value = 10, Flag = MainFlag .. "tool_max" .. flag}) 
-        
-            Preview.CreateSeperator(ESPItemsSecond)
-        --
-
-        -- Force Field
-            local ForceFieldItem = Preview.CreateItem("Force Field", function(v)
-                Library.Flags[MainFlag .. "force" .. flag] = v
-            end, ESPItemsSecond)
-
-            local ForceFieldSection = Library.Section({Left = ForceFieldItem.PopUp}, {Name = "Force Field Settings"})
-
-            ForceFieldSection:Colorpicker({Name = "Force Field Color", Flag = MainFlag .. "force_color" .. flag})
-
-            Library.Dropdown({Holder = ForceFieldSection.Holder, ContentHolder = Library.Popups}, {Name = "Force Field Font", Values = ESPFonts, Value = "Minecraftia", Flag = MainFlag .. "force_font" .. flag})
-            ForceFieldSection:Slider({Name = "Force Field Size", Suffix = "px", Min = 0, Max = 30, Float = 1, Value = 10, Flag = MainFlag .. "force_size" .. flag})
-        
-            Library.Dropdown({Holder = ForceFieldSection.Holder, ContentHolder = Library.Popups}, {Name = "Force Field Case", Values = {"Normal", "UPPERCASE", "lowercase"}, Value = "Normal", Flag = MainFlag .. "force_case" .. flag})
-        
-            Preview.CreateSeperator(ESPItemsSecond)
-        --
-
-        -- Target
-            local TargetItem = Preview.CreateItem("Target", function(v)
-                Library.Flags[MainFlag .. "target" .. flag] = v
-            end, ESPItemsSecond)
-
-            local TargetSection = Library.Section({Left = TargetItem.PopUp}, {Name = "Target Settings"})
-
-            TargetSection:Colorpicker({Name = "Target Color", Flag = MainFlag .. "target_color" .. flag})
-
-            Library.Dropdown({Holder = TargetSection.Holder, ContentHolder = Library.Popups}, {Name = "Target Font", Values = ESPFonts, Value = "Minecraftia", Flag = MainFlag .. "target_font" .. flag})
-            TargetSection:Slider({Name = "Target Size", Suffix = "px", Min = 0, Max = 30, Float = 1, Value = 10, Flag = MainFlag .. "target_size" .. flag})
-        
-            Library.Dropdown({Holder = TargetSection.Holder, ContentHolder = Library.Popups}, {Name = "Target Case", Values = {"Normal", "UPPERCASE", "lowercase"}, Value = "Normal", Flag = MainFlag .. "target_case" .. flag})
-        --
-
-        local PlayerTable = {
-            Drawings = {},
-            Health = 0,
-            Offsets = {},
-            StaticOffsets = {
-                Right = 0,
-                Bottom = 0
-            },
-            Sides = {
-                Right = Vector2zero,
-                Bottom = Vector2zero
-            }
-        }
-
-        PlayerTable.Drawings = {}
-
-        local Holder = BoxHolder
-        local Drawings = PlayerTable.Drawings
-        local StaticOffsets = PlayerTable.StaticOffsets
-        local Sides = PlayerTable.Sides
-        local Offsets = PlayerTable.Offsets
-
-        Drawings.Box = Utility:New("Frame", {
-            Parent = Holder,
-            Visible = false,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-        })
-        Drawings.BoxFill = Utility:New("Frame", {
-            Parent = Drawings.Box,
-            Visible = true,
-            BackgroundTransparency = 1,
-            Position = UDim2new(0, -1, 0, -1),
-            Size = UDim2new(1, 2, 1, 2),
-            BorderSizePixel = 0,
-        })
-        Drawings.BoxOutline = Utility:New("UIStroke", {
-            Parent = Drawings.Box,
-            ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-            LineJoinMode = Enum.LineJoinMode.Miter,
-            Thickness = 3,
-            Color = Color3fromRGB()   
-        })
-        Drawings.BoxInline = Utility:New("UIStroke", {
-            Parent = Drawings.BoxFill,
-            ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-            LineJoinMode = Enum.LineJoinMode.Miter,
-            Thickness = 1,  
-        })
-        Drawings.BoxGradient = Utility:New("UIGradient", {
-            Enabled = false,
-            Rotation = 270,
-            Parent = Drawings.BoxInline
-        })
-        Drawings.BoxFillGradient = Utility:New("UIGradient", {
-            Enabled = false,
-            Rotation = 270,
-            Parent = Drawings.BoxFill
-        })
-        Drawings.Name = Utility:New("TextLabel", {
-            Parent = Holder,
-            Visible = false,
-            AutomaticSize = Enum.AutomaticSize.XY,
-            Size = UDim2new(0, 0, 0, 0),
-            Position = UDim2new(0, 0, 0, 0),
-            TextYAlignment = Enum.TextYAlignment.Top,
-            TextStrokeTransparency = 0,
-            BackgroundTransparency = 1,
-            RichText = true,
-        })
-        Drawings.HealthBarOutline = Utility:New("Frame", {
-            Visible = false,
-            BorderSizePixel = 0,
-            Parent = Holder,
-        })
-        Drawings.HealthBar = Utility:New("Frame", {
-            Visible = true,
-            BorderSizePixel = 0,
-            Parent = Drawings.HealthBarOutline,
-        })
-        Drawings.HealthBarGradient = Utility:New("UIGradient", {
-            Enabled = false,
-            Rotation = 270,
-            Parent = Drawings.HealthBar
-        })
-        Drawings.HealthNumber = Utility:New("TextLabel", {
-            Parent = Holder,
-            Visible = false,
-            AutomaticSize = Enum.AutomaticSize.XY,
-            Size = UDim2new(0, 0, 0, 0),
-            Position = UDim2new(0, 0, 0, 0),
-            TextYAlignment = Enum.TextYAlignment.Top,
-            TextStrokeTransparency = 0,
-            BackgroundTransparency = 1,
-        })
-        Drawings.ImageLabel = Utility:New("ImageLabel", {
-            Parent = Holder,
-            Visible = true,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-        })
-
-        function PlayerTable.CreateFlag(flag, text, colortbl, font, size, status, side, overwrite)
-            local Position = Sides[side]
-
-            local object = Drawings[flag]
-
-            if not object then
-                Drawings[flag] = Utility:New("TextLabel", {
-                    Parent = Holder,
-                    Visible = false,
-                    AutomaticSize = Enum.AutomaticSize.XY,
-                    Size = UDim2new(0, 0, 0, 0),
-                    Position = UDim2new(0, 0, 0, 0),
-                    TextYAlignment = Enum.TextYAlignment.Top,
-                    TextStrokeTransparency = 0,
-                    BackgroundTransparency = 1,
-                })
-
-                object = Drawings[flag]
-            end
-
-            local OffsetFlag = flag .. side
-
-            if not Offsets[OffsetFlag] then
-                Offsets[OffsetFlag] = 1
-            end
-
-            local EndVal = status and 255 or 0
-
-            if Offsets[OffsetFlag] ~= EndVal then
-                Offsets[OffsetFlag] = Utility:Lerp(Offsets[OffsetFlag], EndVal, 0.1)
-            end
-
-            if Offsets[OffsetFlag] == 0 then
-                object.Visible = false
-
-                return
-            end
-
-            object.Visible = true
-
-            object.Text = text
-
-            local LerpVal = Offsets[OffsetFlag] / 255
-
-            object.TextTransparency = 1 - (colortbl.a * LerpVal)
-            object.TextColor3 = overwrite or colortbl.c
-            object.FontFace = GetFontFromIndex(Fonts[font])
-            object.TextSize = size
-            object.Position = side == "Right" and UDim2new(0, Position.x, 0, Position.y + StaticOffsets[side]) or UDim2new(0, Position.x - object.TextBounds.x / 2, 0, Position.y + StaticOffsets[side])
-
-            StaticOffsets[side] += (object.TextBounds.y + 2) * LerpVal
-        end
-        
-        local HealthBarLerp = 0
-        local HealthBarDirection = 1
-
-        Utility:Connect(RunService.Heartbeat, function(DT)
-            if not tab.Page.Visible then
-                return
-            end
-
-            if not ESPWindow.OutlineHolder.Visible then
-                return
-            end
-
-            if not Library.Popups.Enabled then
-                return
-            end
-            
-            local TeamFlag = flag
-
-            local ClockPulse = osclock()
-
-            PlayerTable.Health = Utility:Lerp(PlayerTable.Health, PlayerTable.Health + HealthBarDirection * 100, 0.006)
-
-            if PlayerTable.Health >= 100 then
-                PlayerTable.Health = 100
-                HealthBarDirection = -1
-            elseif PlayerTable.Health <= 0 then
-                PlayerTable.Health = 0
-                HealthBarDirection = 1
-            end
-
-            local Health = PlayerTable.Health
-
-            local HealthScale = Health / 100
-
-            StaticOffsets = {
-                Right = 0,
-                Bottom = 0
-            }
-
-            Sides = {
-                Right = BoxPosition + Vector2new(BoxSize.x + 4, -4),
-                Bottom = BoxPosition + Vector2new(BoxSize.x / 2, BoxSize.y + 4)
-            }
-
-            local Box = Drawings.Box
-            local BoxOutline = Drawings.BoxOutline
-            local BoxInline = Drawings.BoxInline
-            local BoxGradient = Drawings.BoxGradient
-
-            local BoxStatus = Flags[MainFlag .. "box" .. TeamFlag]
-            Box.Visible = BoxStatus
-            if BoxStatus then
-                Box.Size = UDim2offset(BoxSize.X - 2, BoxSize.Y - 2)
-                Box.Position = UDim2offset(BoxPosition.X + 1, BoxPosition.Y + 1)
-
-                BoxOutline.Transparency = 1 - Flags[MainFlag .. "box_outline" .. TeamFlag].a
-                BoxOutline.Color = Flags[MainFlag .. "box_outline" .. TeamFlag].c
-
-                local BoxGradientStatus = Flags[MainFlag .. "box_gradient" .. TeamFlag]
-
-                BoxGradient.Enabled = BoxGradientStatus
-
-                if BoxGradientStatus then 
-                    BoxInline.Color = Color3fromRGB(255, 255, 255)
-                    BoxInline.Transparency = 0
-                    local Color = ColorSequence.new({
-                        ColorSequenceKeypoint.new(0, Flags[MainFlag .. "box_gradient_from_color" .. TeamFlag].c), 
-                        ColorSequenceKeypoint.new(1, Flags[MainFlag .. "box_gradient_to_color" .. TeamFlag].c)
-                    })
-
-                    local Transparency = NumberSequence.new({
-                        NumberSequenceKeypoint.new(0, 1 - Flags[MainFlag .. "box_gradient_from_color" .. TeamFlag].a),
-                        NumberSequenceKeypoint.new(1, 1 - Flags[MainFlag .. "box_gradient_to_color" .. TeamFlag].a),
-                    })
-
-                    if Flags[MainFlag .. "box_gradient_rainbow" .. TeamFlag] then 
-                        local Time = tick()
-                        local HueStart = (Time / 5) % 1
-                        local HueEnd = (HueStart + (Flags[MainFlag .. "box_gradient_rainbow_speed" .. TeamFlag] / 100)) % 1 
-                    
-                        local ColorStart = Color3fromHSV(HueStart, 1, 1)
-                        local ColorEnd = Color3fromHSV(HueEnd, 1, 1)
-                    
-                        Color = ColorSequence.new({
-                            ColorSequenceKeypoint.new(0, ColorStart),
-                            ColorSequenceKeypoint.new(1, ColorEnd)
-                        })
-                    end
-
-                    BoxGradient.Color = Color 
-                    BoxGradient.Transparency = Transparency 
-                else
-                    BoxInline.Color = Flags[MainFlag .. "box_color" .. TeamFlag].c
-                    BoxInline.Transparency = 1 - Flags[MainFlag .. "box_color" .. TeamFlag].a
-                end
-            end
-
-            local BoxFill = Drawings.BoxFill
-            local BoxFillGradient = Drawings.BoxFillGradient
-
-            local BoxFillStatus = Flags[MainFlag .. "box_fill" .. TeamFlag]
-
-            BoxFill.Visible = BoxFillStatus
-            if BoxFillStatus then
-                local BoxFillGradientStatus = Flags[MainFlag .. "box_fill_gradient" .. TeamFlag]
-
-                BoxFillGradient.Enabled = BoxFillGradientStatus
-
-                if BoxFillGradientStatus then 
-                    BoxFill.BackgroundColor3 = Color3fromRGB(255, 255, 255)
-                    BoxFill.BackgroundTransparency = 0
-
-                    local Color = ColorSequence.new({
-                        ColorSequenceKeypoint.new(0, Flags[MainFlag .. "box_fill_gradient_from_color" .. TeamFlag].c), 
-                        ColorSequenceKeypoint.new(1, Flags[MainFlag .. "box_fill_gradient_to_color" .. TeamFlag].c)
-                    })
-
-                    local Transparency = NumberSequence.new({
-                        NumberSequenceKeypoint.new(0, 1 - Flags[MainFlag .. "box_fill_gradient_from_color" .. TeamFlag].a),
-                        NumberSequenceKeypoint.new(1, 1 - Flags[MainFlag .. "box_fill_gradient_to_color" .. TeamFlag].a),
-                    })
-
-                    if Flags[MainFlag .. "box_fill_gradient_rainbow" .. TeamFlag] then 
-                        local Time = tick()
-                        local HueStart = (Time / 5) % 1
-                        local HueEnd = (HueStart + (Flags[MainFlag .. "box_fill_gradient_rainbow_speed" .. TeamFlag] / 100)) % 1 
-                    
-                        local ColorStart = Color3fromHSV(HueStart, 1, 1)
-                        local ColorEnd = Color3fromHSV(HueEnd, 1, 1)
-                    
-                        Color = ColorSequence.new({
-                            ColorSequenceKeypoint.new(0, ColorStart),
-                            ColorSequenceKeypoint.new(1, ColorEnd)
-                        })
-                    end
-
-                    BoxFillGradient.Color = Color 
-                    BoxFillGradient.Transparency = Transparency 
-                else
-                    BoxFill.BackgroundColor3 = Flags[MainFlag .. "box_fill_color" .. TeamFlag].c
-                    BoxFill.BackgroundTransparency = 1 - Flags[MainFlag .. "box_fill_color" .. TeamFlag].a
-                end 
-            end
-
-            local ImageLabel = Drawings.ImageLabel
-
-            local ImageId = TeamFlag == "_enemy" and ESP.EnemyImage or TeamFlag == "_team" and ESP.TeamImage or ESP.Image
-            local FileType = TeamFlag == "_enemy" and ESP.EnemyFileType or TeamFlag == "_team" and ESP.TeamFileType or ESP.FileType
-            local ImageStatus = Flags[MainFlag .. "image" .. TeamFlag] and ImageId
-
-            ImageLabel.Visible = ImageStatus and FileType
-
-            if ImageStatus then
-                ImageLabel.Size = UDim2offset(BoxSize.x, BoxSize.y)
-                ImageLabel.Position = UDim2offset(BoxPosition.x, BoxPosition.y)
-
-                if ImageLabel.Image ~= ImageId then
-                    ImageLabel.Image = ImageId
-                end
-            end
-
-            local Name = Drawings.Name
-            
-            local NameStatus = Flags[MainFlag .. "name" .. TeamFlag]
-
-            Name.Visible = NameStatus
-            if NameStatus then
-                Name.Position = UDim2offset(BoxPosition.x + BoxSize.x / 2 - Name.TextBounds.x / 2, BoxPosition.y - Name.TextBounds.y - 4)
-                Name.TextColor3 = OverwritenColor or Flags[MainFlag .. "name_color" .. TeamFlag].c
-                Name.TextTransparency = 1 - Flags[MainFlag .. "name_color" .. TeamFlag].a
-                Name.Text = ESP.GetCase(("Player"):sub(0, Flags[MainFlag .. "name_max" .. TeamFlag]), Flags[MainFlag .. "name_case" .. TeamFlag])
-                Name.FontFace = GetFontFromIndex(Fonts[Flags[MainFlag .. "name_font" .. TeamFlag]])
-                Name.TextSize = Flags[MainFlag .. "name_size" .. TeamFlag]
-            end
-
-            local ToolStatus = Flags[MainFlag .. "tool" .. TeamFlag]
-
-            PlayerTable.CreateFlag(
-                "Tool", 
-                ESP.GetCase("Tool", Flags[MainFlag .. "tool_case" .. TeamFlag]):sub(0, Flags[MainFlag .. "tool_max" .. TeamFlag]), 
-                Flags[MainFlag .. "tool_color" .. TeamFlag], 
-                Flags[MainFlag .. "tool_font" .. TeamFlag], 
-                Flags[MainFlag .. "tool_size" .. TeamFlag], 
-                ToolStatus, 
-                "Bottom",
-                OverwritenColor
-            )
-
-            local DistanceStatus = Flags[MainFlag .. "distance" .. TeamFlag]
-
-            PlayerTable.CreateFlag(
-                "Distance", 
-                ESP.GetCase("100 ST", Flags[MainFlag .. "distance_case" .. TeamFlag]), 
-                Flags[MainFlag .. "distance_color" .. TeamFlag], 
-                Flags[MainFlag .. "distance_font" .. TeamFlag], 
-                Flags[MainFlag .. "distance_size" .. TeamFlag], 
-                DistanceStatus, 
-                "Bottom",
-                OverwritenColor
-            )
-
-            local HealthNumber = Drawings.HealthNumber
-            local HealthBarOutline = Drawings.HealthBarOutline
-            local HealthBar = Drawings.HealthBar
-            local HealthBarGradient = Drawings.HealthBarGradient
-
-            local HealthBarStatus = Flags[MainFlag .. "health_bar" .. TeamFlag]
-            local HealthBarSize = Flags[MainFlag .. "health_bar_size" .. TeamFlag] + 2
-
-            HealthBarOutline.Visible = HealthBarStatus
-
-            if HealthBarStatus then
-                HealthBarOutline.Size = UDim2offset(HealthBarSize, BoxSize.y + 4)
-                HealthBarOutline.Position = UDim2offset(BoxPosition.x - 4 - HealthBarSize, BoxPosition.y - 2)
-                HealthBarOutline.BackgroundColor3 = Flags[MainFlag .. "health_bar_outline" .. TeamFlag].c
-                HealthBarOutline.BackgroundTransparency = 1 - Flags[MainFlag .. "health_bar_outline" .. TeamFlag].a
-
-                local HealthScaleSize = (HealthBarOutline.AbsoluteSize.y - 2) * HealthScale
-
-                HealthBar.Size = UDim2new(1, -2, 0, HealthScaleSize)
-                HealthBar.Position = UDim2new(0, 1, 1, -(HealthScaleSize + 1))
-
-                local HealthBarGradientStatus = Flags[MainFlag .. "health_bar_gradient" .. TeamFlag]
-
-                HealthBarGradient.Enabled = HealthBarGradientStatus
-
-                if HealthBarGradientStatus then 
-                    HealthBar.BackgroundColor3 = Color3fromRGB(255, 255, 255)
-                    HealthBar.BackgroundTransparency = 0
-
-                    local Color = ColorSequence.new({
-                        ColorSequenceKeypoint.new(0, Flags[MainFlag .. "health_bar_gradient_from_color" .. TeamFlag].c), 
-                        ColorSequenceKeypoint.new(1, Flags[MainFlag .. "health_bar_gradient_to_color" .. TeamFlag].c)
-                    })
-
-                    local Transparency = NumberSequence.new({
-                        NumberSequenceKeypoint.new(0, 1 - Flags[MainFlag .. "health_bar_gradient_from_color" .. TeamFlag].a),
-                        NumberSequenceKeypoint.new(1, 1 - Flags[MainFlag .. "health_bar_gradient_to_color" .. TeamFlag].a),
-                    })
-
-                    if Flags[MainFlag .. "health_bar_gradient_rainbow" .. TeamFlag] then 
-                        local Time = tick()
-                        local HueStart = (Time / 5) % 1
-                        local HueEnd = (HueStart + (Flags[MainFlag .. "health_bar_gradient_rainbow_speed" .. TeamFlag] / 100)) % 1 
-                    
-                        local ColorStart = Color3fromHSV(HueStart, 1, 1)
-                        local ColorEnd = Color3fromHSV(HueEnd, 1, 1)
-                    
-                        Color = ColorSequence.new({
-                            ColorSequenceKeypoint.new(0, ColorStart),
-                            ColorSequenceKeypoint.new(1, ColorEnd)
-                        })
-                    end
-
-                    HealthBarGradient.Color = Color 
-                    HealthBarGradient.Transparency = Transparency 
-                else
-                    HealthBar.BackgroundColor3 = Flags[MainFlag .. "health_bar_color" .. TeamFlag].c
-                    HealthBar.BackgroundTransparency = 1 - Flags[MainFlag .. "health_bar_color" .. TeamFlag].a
-                end 
-            end
-
-            local HealthNumberStatus = Flags[MainFlag .. "health_number" .. TeamFlag] and PlayerTable.Health <= 90
-
-            HealthNumber.Visible = HealthNumberStatus
-
-            if HealthNumberStatus then
-                local HealthScaleSize = (HealthBarOutline.AbsoluteSize.y - 2) * HealthScale
-
-                local FollowHealthBar = Flags[MainFlag .. "health_number_follow" .. TeamFlag]
-
-                local HealthPosition = UDim2offset(BoxPosition.x - (HealthBarStatus and not FollowHealthBar and HealthBarOutline.Size.X.Offset + 4 or 4) - HealthNumber.TextBounds.x, BoxPosition.y - 6)
-
-                if FollowHealthBar and HealthBarStatus then
-                    HealthPosition = UDim2offset(BoxPosition.x - 4 - HealthBarSize / 2 - HealthNumber.TextBounds.x / 2, (BoxPosition.y + BoxSize.y) - HealthScaleSize - HealthNumber.TextBounds.y / 2)
-                end
-
-                HealthNumber.Position = HealthPosition
-                HealthNumber.TextColor3 = Flags[MainFlag .. "health_number_color" .. TeamFlag].c
-                HealthNumber.TextTransparency = 1 - Flags[MainFlag .. "health_number_color" .. TeamFlag].a
-                HealthNumber.Text = tostring(mathfloor(PlayerTable.Health))
-                HealthNumber.FontFace = GetFontFromIndex(Fonts[Flags[MainFlag .. "health_number_font" .. TeamFlag]])
-                HealthNumber.TextSize = Flags[MainFlag .. "health_number_size" .. TeamFlag]
-            end
-
-            local ForceFieldStatus = Flags[MainFlag .. "force" .. TeamFlag]
-
-            PlayerTable.CreateFlag(
-                "Force Field", 
-                ESP.GetCase("Force-Field", Flags[MainFlag .. "force_case" .. TeamFlag]), 
-                Flags[MainFlag .. "force_color" .. TeamFlag], 
-                Flags[MainFlag .. "force_font" .. TeamFlag], 
-                Flags[MainFlag .. "force_size" .. TeamFlag], 
-                ForceFieldStatus, 
-                "Right"
-            )
-
-            local TargetStatus = Flags[MainFlag .. "target" .. TeamFlag]
-
-            PlayerTable.CreateFlag(
-                "Target", 
-                ESP.GetCase("Target", Flags[MainFlag .. "target_case" .. TeamFlag]), 
-                Flags[MainFlag .. "target_color" .. TeamFlag], 
-                Flags[MainFlag .. "target_font" .. TeamFlag], 
-                Flags[MainFlag .. "target_size" .. TeamFlag], 
-                TargetStatus, 
-                "Right"
-            )
-        end, "ESP Preview Heartbeat")
-    end
-
-    ESPPreview.Window = ESPWindow
-
-    local Enemies = ESPWindow:Tab({Name = "Enemy"})
-
-    ESPPreview:CreatePreview(Enemies, "players", "_enemy")
-
-    ESPPreview.Enemies = Enemies
-
-    -- local Teammates = ESPWindow:Tab({Name = "Team"})
-
-    -- ESPPreview:CreatePreview(Teammates, "players", "_team")
-
-    -- ESPPreview.Teammates = Teammates
-
-    local Local = ESPWindow:Tab({Name = "Local"})
-
-    ESPPreview:CreatePreview(Local, "players", "_local")
-
-    ESPPreview.Local = Local
-
-    local SettingsESP = ESPWindow:Tab({Name = "Options"})
-
-    local SettingsESPHolder = Library:New("TextButton", {
-        Name = "SettingsESPHolder",
-        Parent = SettingsESP.Page,
-        BackgroundTransparency = 1,
-        BorderSizePixel = 0,
-        Position = UDim2new(0, 0, 0, 0),
-        Text = "",
-        Size = UDim2new(1, 0, 0, 0),
-        AutomaticSize = Enum.AutomaticSize.Y,
-    })
-
-    Library:New("UIListLayout", {
-        Parent = SettingsESPHolder,
-        FillDirection = Enum.FillDirection.Vertical,
-        SortOrder = Enum.SortOrder.LayoutOrder,
-        Padding = UDimnew(0, 4),
-    })
-    
-    Library.Toggle({Holder = SettingsESPHolder}, {Name = "Highlight Targets", Flag = "esp_highlight_targets"}):Colorpicker({Name = "Targets Color", Flag = "esp_highlight_targets_color", Color = Color3fromRGB(255, 0, 0)})
-    Library.Toggle({Holder = SettingsESPHolder}, {Name = "Highlight Friends", Flag = "esp_highlight_friends"}):Colorpicker({Name = "Friends Color", Flag = "esp_highlight_friends_color", Color = Color3fromRGB(0, 166, 255)})
-    Library.Toggle({Holder = SettingsESPHolder}, {Name = "Highlight Priority", Flag = "esp_highlight_priority"}):Colorpicker({Name = "Priority Color", Flag = "esp_highlight_priority_color", Color = Color3fromRGB(0, 255, 115)})
-
-    local LimitDistance
-    Library.Toggle({Holder = SettingsESPHolder}, {Name = "Limit Distance", Flag = "esp_players_limit", Callback = function(v)
-        if LimitDistance then
-            LimitDistance.SetVisibility(v)
-        end
-    end})
-
-    LimitDistance = Library.Slider({Holder = SettingsESPHolder}, {Name = "Limit Distance Amount", Visible = false, Flag = "esp_players_limit_amount", Suffix = "st", Min = 0, Max = 2000, Float = 1, Value = 700})
-
-    Library.Dropdown({Holder = SettingsESPHolder, ContentHolder = Library.Popups}, {Name = "Box Sizing", Values = {"Simple", "Automatic"}, Value = "Simple", Flag = "esp_auto_sizing"})
-
-    Library.Slider({Holder = SettingsESPHolder}, {Name = "Health Fade Speed", Min = 1, Max = 300, Float = 1, Value = 80, Flag = "esp_health_fade_speed"})
-
-    Library.Button({Holder = SettingsESPHolder}, {Name = "Test Fade", Callback = function()
-        for _,v in ESP.Players do
-            v.Health = 0
-        end
-    end})
-
-    ESPWindow.OutlineHolder.Visible = true
---
-
-LoadingNotification.ClockTime = osclock() + 20
-LoadingNotification.Text = ("Welcome to Puppyware, loaded cheat in %sms!\nExecuted at: %s. Press RightShift to open/close menu."):format(mathfloor((tick() - StartTick) * 1000), os.date("%H:%M:%S"))
-
-Library:Notify({
-    Text = "This cheat might be detected on\ngames with hook detection. Be cautious!",
-    Time = 15,
-    Type = "Warning",
 })
 
-RefreshPlayers()
+EnemyEspTab:AddToggle('FaceDirectionEsp', {
+    Text = 'Face Direction Esp',
+    Tooltip = 'Face Direction Esp',
+    Default = false,
+
+    Callback = function(first)
+
+
+
+toggleTracersForAllPlayersExceptLocal(localPlayer)
+
+
+
+
+
+       
+    end
+})
+
+EnemyEspTab:AddToggle('healthswitch', {
+    Text = 'health bar esp',
+    Default = false,
+
+
+    Callback = function(first)
+        enemysets.healthBar = first
+    end
+})
+EnemyEspTab:AddToggle('healthswitch', {
+    Text = 'health text esp',
+    Default = false,
+
+
+    Callback = function(first)
+        enemysets.healthText = first
+    end
+}):AddColorPicker('healthcolor', {
+    Default = Color3.new(0, 1, 0),
+    Title = 'health color',
+    Transparency = 0,
+
+    Callback = function(Value)
+        enemysets.healthTextColor[1] = Value
+    end
+})
+
+EnemyEspTab:AddToggle('distswitchniger', {
+    Text = 'Outline',
+    Default = false,
+
+    Callback = function(first)
+        enemysets.chams = first
+    end
+})
+EnemyEspTab:AddToggle('tracerswitch', {
+    Text = 'tracers esp',
+    Default = false,
+    Callback = function(first)
+        enemysets.tracer = first
+    end
+}):AddColorPicker('tracercolor', {
+    Default = Color3.new(0, 1, 0),
+    Title = 'tracer color',
+    Transparency = 0,
+
+    Callback = function(Value)
+        enemysets.tracerColor[1] = Value
+    end
+})
+EnemyEspTab:AddDropdown('Enemy Tracer Origin',
+    {
+        Values = { 'Top', 'Bottom' },
+        Default = 1,
+        Multi = false,
+        Text = 'tracer origin',
+        Tooltip = 'select origin',
+        Callback = function(Value)
+            enemysets.tracerOrigin = Value
+        end
+    })
+EnemyEspTab:AddToggle('distswitch', {
+    Text = 'distance esp',
+    Default = false,
+
+    Callback = function(first)
+        enemysets.distance = first
+    end
+}):AddColorPicker('distcolor', {
+    Default = Color3.new(1, 1, 1),
+    Title = 'distance color',
+    Transparency = 0,
+
+    Callback = function(Value)
+        enemysets.distanceColor[1] = Value
+    end
+}):AddColorPicker('distcolor1337', {
+    Default = Color3.new(1, 1, 1),
+    Title = 'chams outline',
+    Transparency = 0,
+
+    Callback = function(Value)
+        enemysets.chamsOutlineColor[1] = Value
+    end
+}):AddColorPicker('distcolor228', {
+    Default = Color3.new(1, 1, 1),
+    Title = 'chams fill',
+    Transparency = 0,
+
+    Callback = function(Value)
+        enemysets.chamsFillColor[1] = Value
+    end
+})
+
+EnemyEspTab:AddToggle('outOfViewArrows/switch', { --//outOfViewArrows for EnemySets
+    Text = 'oof arrows',
+    Default = false,
+    Callback = function(first)
+        enemysets.offScreenArrow = first
+    end
+}):AddColorPicker('outOfViewArrowscolor', {
+    Default = Color3.new(1, 1, 1),
+    Title = 'oof color',
+    Transparency = 0,
+
+    Callback = function(Value)
+        enemysets.offScreenArrowColor[1] = Value
+    end
+})
+EnemyEspTab:AddToggle('outOfViewArrows/switch', { --//outOfViewArrows for EnemySets
+    Text = 'oof outline',
+    Default = false,
+    Callback = function(first)
+        enemysets.offScreenArrowOutline = first
+    end
+})
+EnemyEspTab:AddSlider('outOfViewArrowsOutlines radius',
+    { Text = 'oof radius', Default = 60, Min = 0, Max = 600, Rounding = 0, Compact = true })
+    :OnChanged(function(State)
+        enemysets.offScreenArrowRadius = State
+    end)
+EnemyEspTab:AddSlider('outOfViewArrowsOutlines Size',
+    { Text = 'oof size', Default = 60, Min = 0, Max = 600, Rounding = 0, Compact = true })
+    :OnChanged(function(State)
+        enemysets.offScreenArrowSize = State
+    end)
+
+_esplib.Load()
+print('load_' .. tostring(counter))
+counter = counter + 1
+local WorldTab = Visuals:AddTab('world')
+local Misc = Tabs.Misc:AddLeftGroupbox('misc1')
+local CrosshairTab = Tabs.Misc:AddLeftGroupbox('crosshair')
+local movetab = Tabs.Misc:AddRightGroupbox('misc2')
+local stuffz = Tabs.Settings:AddLeftGroupbox('stuffz')
+local luatab = Tabs.Lua:AddRightGroupbox('dogelua');
+do
+    local Sky = game:GetService("Lighting"):FindFirstChildOfClass("Sky")
+    if not Sky then Sky = Instance.new("Sky", Lighting) end
+    local value = "Standard"
+    local SkyBoxes = {
+        ["Standard"] = { ["SkyboxBk"] = Sky.SkyboxBk, ["SkyboxDn"] = Sky.SkyboxDn, ["SkyboxFt"] = Sky.SkyboxFt, ["SkyboxLf"] = Sky.SkyboxLf, ["SkyboxRt"] = Sky.SkyboxRt, ["SkyboxUp"] = Sky.SkyboxUp, },
+        ["Among Us"] = { ["SkyboxBk"] = "rbxassetid://5752463190", ["SkyboxDn"] = "rbxassetid://5752463190", ["SkyboxFt"] = "rbxassetid://5752463190", ["SkyboxLf"] = "rbxassetid://5752463190", ["SkyboxRt"] = "rbxassetid://5752463190", ["SkyboxUp"] = "rbxassetid://5752463190" },
+        ["Doge"] = { ["SkyboxBk"] = "rbxassetid://159713165", ["SkyboxDn"] = "rbxassetid://159713165", ["SkyboxFt"] = "rbxassetid://5752463190", ["SkyboxLf"] = "rbxassetid://5752463190", ["SkyboxRt"] = "rbxassetid://159713165", ["SkyboxUp"] = "rbxassetid://159713165" },
+        ["Spongebob"] = { ["SkyboxBk"] = "rbxassetid://277099484", ["SkyboxDn"] = "rbxassetid://277099500", ["SkyboxFt"] = "rbxassetid://277099554", ["SkyboxLf"] = "rbxassetid://277099531", ["SkyboxRt"] = "rbxassetid://277099589", ["SkyboxUp"] = "rbxassetid://277101591" },
+        ["Deep Space"] = { ["SkyboxBk"] = "rbxassetid://159248188", ["SkyboxDn"] = "rbxassetid://159248183", ["SkyboxFt"] = "rbxassetid://159248187", ["SkyboxLf"] = "rbxassetid://159248173", ["SkyboxRt"] = "rbxassetid://159248192", ["SkyboxUp"] = "rbxassetid://159248176" },
+        ["Winter"] = { ["SkyboxBk"] = "rbxassetid://510645155", ["SkyboxDn"] = "rbxassetid://510645130", ["SkyboxFt"] = "rbxassetid://510645179", ["SkyboxLf"] = "rbxassetid://510645117", ["SkyboxRt"] = "rbxassetid://510645146", ["SkyboxUp"] = "rbxassetid://510645195" },
+        ["Clouded Sky"] = { ["SkyboxBk"] = "rbxassetid://252760981", ["SkyboxDn"] = "rbxassetid://252763035", ["SkyboxFt"] = "rbxassetid://252761439", ["SkyboxLf"] = "rbxassetid://252760980", ["SkyboxRt"] = "rbxassetid://252760986", ["SkyboxUp"] = "rbxassetid://252762652" },
+        --["test"] = {"SkyboxBk"="rbxassetid://","SkyboxDn"="rbxassetid://","SkyboxFt"="rbxassetid://","SkyboxLf"="rbxassetid://","SkyboxRt"="rbxassetid://","SkyboxUp"="rbxassetid://"},
+    }
+
+
+
+    WorldTab:AddDropdown('SkyboxeChange',
+        {
+            Values = { "Standard", "Among Us", "Doge", "Spongebob", "Deep Space", "Winter", "Clouded Sky" },
+            Default = 3,
+            Multi = false,
+            Text =
+            'Sky'
+        }):OnChanged(function(Value)
+        value = Value
+    end);
+    RunService.Heartbeat:Connect(function()
+        for i, v in pairs(SkyBoxes[value]) do
+            Sky[i] = v
+        end
+    end);
+end
+(function()
+    local draw, objects = {}, {}
+    function draw:new(type, props)
+        local obj = Drawing.new(type)
+        for i, v in pairs(props) do
+            obj[i] = v
+        end
+        objects[#objects + 1] = obj
+        return obj
+    end
+
+    function draw:removeall()
+        for i, v in pairs(objects) do
+            v:Remove()
+        end
+    end
+
+    function draw:changevis(value)
+        for i, v in pairs(objects) do
+            v.Visible = value
+        end
+    end
+
+    local color = Color3.fromRGB(139, 68, 235)
+    Misc:AddToggle('showwatermark', {
+        Text = 'watermark',
+        Default = true,
+        Callback = function(v)
+            draw:changevis(v)
+        end
+    }):AddColorPicker('watercolor',
+        {
+            Default = Color3.fromRGB(139, 68, 235),
+            Title = 'watermark color',
+            Transparency = 0,
+            Callback = function(v)
+                color =
+                    v
+            end
+        })
+    local toprightpos = Vector2.new(camera.ViewportSize.X - 10, 10)
+
+    local background = draw:new("Line", {
+        To = toprightpos - Vector2.new(200, -(6 + 3)),
+        From = toprightpos - Vector2.new(0, -(6 + 3)),
+        Thickness = 15,
+        Transparency = 0.7,
+        Visible = true,
+        Color = Color3.new(0, 0, 0),
+        ZIndex = 1,
+    })
+    local topbar = draw:new("Line", {
+        To = toprightpos - Vector2.new(200, 0),
+        From = toprightpos - Vector2.new(0, 0),
+        Thickness = 1,
+        Transparency = 1,
+        Visible = true,
+        Color = color,
+        ZIndex = 1,
+    })
+    local topbar1 = draw:new("Line", {
+        To = toprightpos - Vector2.new(200, -1),
+        From = toprightpos - Vector2.new(0, -1),
+        Thickness = 1,
+        Transparency = 1,
+        Visible = true,
+        Color = color,
+        ZIndex = 2,
+    })
+
+WorldTab:AddButton('no fog', function()
+    if Lighting:FindFirstChildOfClass("Atmosphere") then
+        Lighting:FindFirstChildOfClass("Atmosphere"):Destroy()
+ end
+ end)
+
+
+-- Call the function to apply ForceField and remove SurfaceAppearance
+
+
+
+
+		
+    local logotext = draw:new("Text", {
+        Text = "Doge",
+        Size = 13,
+        Font = varsglobal.visuals.font,
+        Outline = true,
+        Center = false,
+        Position = toprightpos - Vector2.new(200 - 5, -2),
+        Transparency = 1,
+        Visible = true,
+        Color = color,
+        ZIndex = 2,
+    })
+    local text = draw:new("Text", {
+        Text = ".sigma | Fps | Ping",
+        Size = 13,
+        Font = varsglobal.visuals.font,
+        Outline = true,
+        Center = false,
+        Position = toprightpos - Vector2.new(200 - 5, -2),
+        Transparency = 1,
+        Visible = true,
+        Color = Color3.new(1, 1, 1),
+        ZIndex = 2,
+    })
+    draw:changevis(false)
+    local FrameTimer = tick()
+    local FrameCounter = 0;
+    local FPS = 60;
+    local vector2_new = Vector2.new
+    RunService.Stepped:Connect(LPH_JIT_MAX(function()
+        local txtboundsx = text.TextBounds.X
+        local lgtextboundsx = logotext.TextBounds.X
+        toprightpos = vector2_new(camera.ViewportSize.X - 10, 10)
+
+        topbar.From = toprightpos
+        topbar1.From = toprightpos - vector2_new(0, -1)
+        background.From = toprightpos - vector2_new(0, -(6 + 3))
+
+        topbar.To = toprightpos - vector2_new(lgtextboundsx + txtboundsx + 10, 0)
+        topbar1.To = toprightpos - vector2_new(lgtextboundsx + txtboundsx + 10, -1)
+        background.To = toprightpos - vector2_new(lgtextboundsx + txtboundsx + 10, -(6 + 3))
+
+        logotext.Position = toprightpos - vector2_new(lgtextboundsx + txtboundsx + 5, -2)
+        text.Position = toprightpos - vector2_new(txtboundsx + 5, -2)
+
+        topbar.Color = color
+        topbar1.Color = color
+        logotext.Color = color
+        logotext.Font = varsglobal.visuals.font
+        text.Font = varsglobal.visuals.font
+
+        FrameCounter = FrameCounter + 1;
+        if (tick() - FrameTimer) >= 1 then
+            FPS = FrameCounter;
+            FrameTimer = tick();
+            FrameCounter = 0;
+        end;
+
+        text.Text = title:format(
+            swimguardvars.user,
+            swimguardvars.version,
+            math.floor(FPS)
+        );
+    end))
+end)();
+makefolder("dogehub661")
+luatab:AddLabel("Sigma Or Bigma?")
+local set_identity = (type(syn) == 'table' and syn.set_thread_identity) or setidentity or setthreadcontext
+luatab:AddLabel("1.2")
+
+luatab:AddButton('DEX', function()
+loadstring(game:HttpGet('https://raw.githubusercontent.com/Doge747713/DogeHub1/main/dex.lua'))()
+
+ end)
+
+luatab:AddButton('Infinite Yield', function()
+loadstring(game:HttpGet('https://raw.githubusercontent.com/DarkNetworks/Infinite-Yield/main/latest.lua'))()
+
+ end)
+
+do
+    varsglobal.cursor.rainbow = false
+    varsglobal.cursor.sussy = false
+    CrosshairTab:AddToggle('crosshairenable', {
+        Text = 'enable crosshair',
+        Default = false,
+
+        Callback = function(first)
+            varsglobal.cursor.Enabled = first
+        end
+    }):AddColorPicker('crosshaircolor', {
+        Default = Color3.new(1, 1, 1),
+        Title = 'crosshair color',
+        Transparency = 0,
+        Callback = function(Value)
+            varsglobal.cursor.Color = Value
+        end
+    })
+    CrosshairTab:AddSlider('crosshairspeed', {
+        Text = 'speed',
+        Default = 1.5,
+        Min = 0.1,
+        Max = 15,
+        Rounding = 1,
+        Compact = true,
+    }):OnChanged(function(State)
+        varsglobal.cursor.Speed = State / 10
+    end)
+    CrosshairTab:AddSlider('crosshairradius', {
+        Text = 'radius',
+        Default = 25,
+        Min = 0.1,
+        Max = 100,
+        Rounding = 1,
+        Compact = true,
+    }):OnChanged(function(State)
+        varsglobal.cursor.Radius = State
+    end)
+    CrosshairTab:AddSlider('crosshairthickness', {
+        Text = 'thickness',
+        Default = 1.5,
+        Min = 0.1,
+        Max = 10,
+        Rounding = 1,
+        Compact = true,
+    }):OnChanged(function(State)
+        varsglobal.cursor.Thickness = State
+    end)
+    CrosshairTab:AddSlider('crosshairgapsize', {
+        Text = 'gap',
+        Default = 5,
+        Min = 0,
+        Max = 50,
+        Rounding = 1,
+        Compact = true,
+    }):OnChanged(function(State)
+        varsglobal.cursor.Gap = State
+    end)
+    CrosshairTab:AddToggle('crosshairenablegap', {
+        Text = 'math divide gap',
+        Default = false,
+
+        Callback = function(first)
+            varsglobal.cursor.TheGap = first
+        end
+    })
+    CrosshairTab:AddToggle('crosshairenableoutline', {
+        Text = 'outline',
+        Default = false,
+
+        Callback = function(first)
+            varsglobal.cursor.Outline = first
+        end
+    })
+    CrosshairTab:AddToggle('crosshairenableresize', {
+        Text = 'resize animation',
+        Default = false,
+
+        Callback = function(first)
+            varsglobal.cursor.Resize = first
+        end
+    })
+    CrosshairTab:AddToggle('crosshairenabledot', {
+        Text = 'dot',
+        Default = false,
+
+        Callback = function(first)
+            varsglobal.cursor.Dot = first
+        end
+    })
+    CrosshairTab:AddToggle('crosshairenablenazi', {
+        Text = 'sussy',
+        Default = false,
+
+        Callback = function(first)
+            varsglobal.cursor.sussy = first
+        end
+    })
+    CrosshairTab:AddToggle('crosshairenablefaggot', {
+        Text = 'rainbow',
+        Default = false,
+
+        Callback = function(first)
+            varsglobal.cursor.rainbow = first
+        end
+    })
+    CrosshairTab:AddToggle('crosshairtextLogo', {
+        Text = 'text logo',
+        Default = false,
+
+        Callback = function(first)
+            varsglobal.cursor.Text.Logo = first
+        end
+    }):AddColorPicker('crosshairlogocolor', {
+        Default = Color3.new(1, 1, 1),
+        Title = 'logo color',
+        Transparency = 0,
+        Callback = function(Value)
+            varsglobal.cursor.Text.LogoColor = Value
+        end
+    })
+    CrosshairTab:AddToggle('crosshairtextName', {
+        Text = 'text name',
+        Default = false,
+
+        Callback = function(first)
+            varsglobal.cursor.Text.Name = first
+        end
+    }):AddColorPicker('crosshairtextcolor', {
+        Default = Color3.new(1, 1, 1),
+        Title = 'text color',
+        Transparency = 0,
+        Callback = function(Value)
+            varsglobal.cursor.Text.NameColor = Value
+        end
+    })
+    CrosshairTab:AddSlider('crosshairlogooffset', {
+        Text = 'logo fade offset',
+        Default = 0,
+        Min = 0,
+        Max = 5,
+        Rounding = 1,
+        Compact = true,
+    }):OnChanged(function(State)
+        varsglobal.cursor.Text.LogoFadingOffset = State
+    end)
+    local utility = {}
+
+    -- // Functions
+    function utility:new(type, properties)
+        local object = Drawing.new(type)
+
+        for i, v in pairs(properties) do
+            object[i] = v
+        end
+        return object
+    end
+
+    -- // Initilisation
+    local lines = {}
+    -- // Drawings
+    local outline = utility:new("Square", {
+        Visible = true,
+        Size = Vector2.new(4, 4),
+        Color = Color3.fromRGB(0, 0, 0),
+        Filled = true,
+        ZIndex = 1,
+        Transparency = 1
+    })
+    --
+    local dot = utility:new("Square", {
+        Visible = true,
+        Size = Vector2.new(2, 2),
+        Color = varsglobal.cursor.Color,
+        Filled = true,
+        ZIndex = 2,
+        Transparency = 1
+    })
+    --
+    local logotext = utility:new("Text", {
+        Visible = false,
+        Font = varsglobal.visuals.font,
+        Size = 13,
+        Color = Color3.fromRGB(138, 128, 255),
+        ZIndex = 3,
+        Transparency = 1,
+        Text = "Doge.sigma",
+        Center = true,
+        Outline = true,
+    })
+    local text = utility:new("Text", {
+        Visible = false,
+        Font = varsglobal.visuals.font,
+        Size = 13,
+        Color = Color3.new(1, 1, 1),
+        ZIndex = 3,
+        Transparency = 1,
+        Text = plr.Name,
+        Center = true,
+        Outline = true,
+    })
+    --
+    for i = 1, 4 do
+        --
+        local line_outline = utility:new("Line", {
+            Visible = true,
+            From = Vector2.new(200, 500),
+            To = Vector2.new(200, 500),
+            Color = Color3.fromRGB(0, 0, 0),
+            Thickness = varsglobal.cursor.Thickness + 2.5,
+            ZIndex = 1,
+            Transparency = 1
+        })
+        --
+        local line = utility:new("Line", {
+            Visible = true,
+            From = Vector2.new(200, 500),
+            To = Vector2.new(200, 500),
+            Color = varsglobal.cursor.Color,
+            Thickness = varsglobal.cursor.Thickness,
+            ZIndex = 2,
+            Transparency = 1
+        })
+
+        local naziline = utility:new("Line", {
+            Visible = true,
+            From = Vector2.new(200, 500),
+            To = Vector2.new(200, 500),
+            Color = varsglobal.cursor.Color,
+            Thickness = varsglobal.cursor.Thickness,
+            ZIndex = 2,
+            Transparency = 1
+        })
+
+        lines[i] = { line, line_outline, naziline }
+    end
+    -- // Main
+    local angle = 0
+    local transp = 0
+    local reverse = false
+    local function setreverse(value)
+        if reverse ~= value then
+            reverse = value
+        end
+    end
+    --
+    local pos, rainbow, rotationdegree, color = Vector2.zero, 0, 0, Color3.new()
+    local math_cos, math_atan, math_pi, math_sin = math.cos, math.atan, math.pi, math.sin
+    local function DEG2RAD(x) return x * math_pi / 180 end
+    local function RAD2DEG(x) return x * 180 / math_pi end
+    RunService.RenderStepped:Connect(LPH_NO_VIRTUALIZE(function(delta)
+        if varsglobal.cursor.Enabled then
+            rainbow = rainbow + (delta * 0.5)
+            if rainbow > 1.0 then rainbow = 0.0 end
+            color = Color3.fromHSV(rainbow, 1, 1)
+            if varsglobal.cursor.CustomPos then
+                pos = varsglobal.cursor.Position
+            else
+                pos = Vector2.new(
+                    game.Players.LocalPlayer:GetMouse().X,
+                    game.Players.LocalPlayer:GetMouse().Y + game:GetService("GuiService"):GetGuiInset().Y)
+            end
+            if varsglobal.cursor.rainbow then color = Color3.fromHSV(rainbow, 1, 1) else color = varsglobal.cursor.Color end
+            if transp <= 1.5 + varsglobal.cursor.Text.LogoFadingOffset and not reverse then
+                transp = transp + ((varsglobal.cursor.Speed * 10) * delta)
+                if transp >= 1.5 + varsglobal.cursor.Text.LogoFadingOffset then setreverse(true) end
+            elseif reverse then
+                transp = transp - ((varsglobal.cursor.Speed * 10) * delta)
+                if transp <= 0 - varsglobal.cursor.Text.LogoFadingOffset then setreverse(false) end
+            end
+            logotext.Position = Vector2.new(pos.X, (pos + Vector2.new(0, varsglobal.cursor.Radius + 5)).Y)
+            logotext.Transparency = transp
+            logotext.Visible = varsglobal.cursor.Text.Logo
+            logotext.Color = varsglobal.cursor.Text.LogoColor
+            logotext.Font = varsglobal.visuals.font
+            --
+            text.Position = Vector2.new(pos.X,
+                (pos + Vector2.new(0, varsglobal.cursor.Radius + (varsglobal.cursor.Text.Logo and 19 or 5))).Y)
+            text.Visible = varsglobal.cursor.Text.Name
+            text.Color = varsglobal.cursor.Text.NameColor
+            text.Font = varsglobal.visuals.font
+
+            if varsglobal.cursor.sussy then
+                local frametime = delta
+                local a = varsglobal.cursor.Radius - 10
+                local gamma = math_atan(a / a)
+
+                if rotationdegree >= 90 then rotationdegree = 0 end
+
+                for i = 1, 4 do
+                    local p_0 = (a * math_sin(DEG2RAD(rotationdegree + (i * 90))))
+                    local p_1 = (a * math_cos(DEG2RAD(rotationdegree + (i * 90))))
+                    local p_2 = ((a / math_cos(gamma)) * math_sin(DEG2RAD(rotationdegree + (i * 90) + RAD2DEG(gamma))))
+                    local p_3 = ((a / math_cos(gamma)) * math_cos(DEG2RAD(rotationdegree + (i * 90) + RAD2DEG(gamma))))
+
+
+                    lines[i][1].From = Vector2.new(pos.X, pos.Y)
+                    lines[i][1].To = Vector2.new(pos.X + p_0, pos.Y - p_1)
+                    lines[i][1].Color = color
+                    lines[i][1].Thickness = varsglobal.cursor.Thickness
+                    lines[i][1].Visible = true
+                    lines[i][3].From = Vector2.new(pos.X + p_0, pos.Y - p_1)
+                    lines[i][3].To = Vector2.new(pos.X + p_2, pos.Y - p_3)
+                    lines[i][3].Color = color
+                    lines[i][3].Thickness = varsglobal.cursor.Thickness
+                    lines[i][3].Visible = true
+                end
+                rotationdegree = rotationdegree + ((varsglobal.cursor.Speed * frametime) * 1000)
+            else
+                angle = angle + ((varsglobal.cursor.Speed * 10) * delta)
+
+                if angle >= 90 then
+                    angle = 0
+                end
+                --
+                dot.Visible = varsglobal.cursor.Dot
+                dot.Color = color
+                dot.Position = Vector2.new(pos.X - 1, pos.Y - 1)
+                --
+                outline.Visible = varsglobal.cursor.Outline and varsglobal.cursor.Dot
+                outline.Position = Vector2.new(pos.X - 2, pos.Y - 2)
+                --
+
+                --
+                for index, line in pairs(lines) do
+                    index = index
+                    if varsglobal.cursor.Resize then
+                        x = { pos.X +
+                        (math.cos(angle + (index * (math.pi / 2))) * (varsglobal.cursor.Radius + ((varsglobal.cursor.Radius * math.sin(angle)) / 9))),
+                            pos.X +
+                            (math.cos(angle + (index * (math.pi / 2))) * ((varsglobal.cursor.Radius - 20) - (varsglobal.cursor.TheGap and (((varsglobal.cursor.Radius - 20) * math.cos(angle)) / 4) or (((varsglobal.cursor.Radius - 20) * math.cos(angle)) - 4)))) }
+                        y = { pos.Y +
+                        (math.sin(angle + (index * (math.pi / 2))) * (varsglobal.cursor.Radius + ((varsglobal.cursor.Radius * math.sin(angle)) / 9))),
+                            pos.Y +
+                            (math.sin(angle + (index * (math.pi / 2))) * ((varsglobal.cursor.Radius - 20) - (varsglobal.cursor.TheGap and (((varsglobal.cursor.Radius - 20) * math.cos(angle)) / 4) or (((varsglobal.cursor.Radius - 20) * math.cos(angle)) - 4)))) }
+                        x1 = { pos.X + (math.cos(angle + (index * (math.pi / 2))) * (varsglobal.cursor.Radius + 1)), pos
+                        .X +
+                        (math.cos(angle + (index * (math.pi / 2))) * ((varsglobal.cursor.Radius - 20 + 1) - (varsglobal.cursor.TheGap and ((varsglobal.cursor.Radius - 20 + 1) / varsglobal.cursor.Gap) or ((varsglobal.cursor.Radius - 20 + 1) - varsglobal.cursor.Gap)))) }
+                        y1 = { pos.Y + (math.sin(angle + (index * (math.pi / 2))) * (varsglobal.cursor.Radius + 1)), pos
+                        .Y +
+                        (math.sin(angle + (index * (math.pi / 2))) * ((varsglobal.cursor.Radius - 20 + 1) - (varsglobal.cursor.TheGap and ((varsglobal.cursor.Radius - 20 + 1) / varsglobal.cursor.Gap) or ((varsglobal.cursor.Radius - 20 + 1) - varsglobal.cursor.Gap)))) }
+                    else
+                        x = { pos.X + (math.cos(angle + (index * (math.pi / 2))) * (varsglobal.cursor.Radius)), pos.X +
+                        (math.cos(angle + (index * (math.pi / 2))) * ((varsglobal.cursor.Radius - 20) - (varsglobal.cursor.TheGap and ((varsglobal.cursor.Radius - 20) / varsglobal.cursor.Gap) or ((varsglobal.cursor.Radius - 20) - varsglobal.cursor.Gap)))) }
+                        y = { pos.Y + (math.sin(angle + (index * (math.pi / 2))) * (varsglobal.cursor.Radius)), pos.Y +
+                        (math.sin(angle + (index * (math.pi / 2))) * ((varsglobal.cursor.Radius - 20) - (varsglobal.cursor.TheGap and ((varsglobal.cursor.Radius - 20) / varsglobal.cursor.Gap) or ((varsglobal.cursor.Radius - 20) - varsglobal.cursor.Gap)))) }
+                        x1 = { pos.X + (math.cos(angle + (index * (math.pi / 2))) * (varsglobal.cursor.Radius + 1)), pos
+                        .X +
+                        (math.cos(angle + (index * (math.pi / 2))) * ((varsglobal.cursor.Radius - 20 + 1) - (varsglobal.cursor.TheGap and ((varsglobal.cursor.Radius - 20 + 1) / varsglobal.cursor.Gap) or ((varsglobal.cursor.Radius - 20 + 1) - varsglobal.cursor.Gap)))) }
+                        y1 = { pos.Y + (math.sin(angle + (index * (math.pi / 2))) * (varsglobal.cursor.Radius + 1)), pos
+                        .Y +
+                        (math.sin(angle + (index * (math.pi / 2))) * ((varsglobal.cursor.Radius - 20 + 1) - (varsglobal.cursor.TheGap and ((varsglobal.cursor.Radius - 20 + 1) / varsglobal.cursor.Gap) or ((varsglobal.cursor.Radius - 20 + 1) - varsglobal.cursor.Gap)))) }
+                    end
+                    --
+                    line[1].Visible = true
+                    line[1].Color = color
+                    line[1].From = Vector2.new(x[2], y[2])
+                    line[1].To = Vector2.new(x[1], y[1])
+                    line[1].Thickness = varsglobal.cursor.Thickness
+                    --
+                    line[2].Visible = varsglobal.cursor.Outline
+                    line[2].From = Vector2.new(x1[2], y1[2])
+                    line[2].To = Vector2.new(x1[1], y1[1])
+                    line[2].Thickness = varsglobal.cursor.Thickness + 2.5
+
+                    line[3].Visible = false
+                end
+            end
+        else
+            dot.Visible = false
+            outline.Visible = false
+            logotext.Visible = false
+            text.Visible = false
+            --
+            for index, line in pairs(lines) do
+                line[1].Visible = false
+                line[2].Visible = false
+                line[3].Visible = false
+            end
+        end
+    end))
+end
+print('load_' .. tostring(counter))
+counter = counter + 1
+--[[WorldTab:AddToggle('nograsss', {
+    Text = 'no grass',
+    Default = false,
+    Callback = function(first)
+        sethiddenproperty(game:GetService("Workspace").Terrain, "Decoration", not first)
+    end
+})]]
+
+if true then
+    WorldTab:AddSlider('timechanger', {
+        Text = 'time changer',
+
+        Default = varsglobal.visuals.oldTime,
+        Min = 0,
+        Max = 24,
+        Rounding = 1,
+
+        Compact = false,
+    }):OnChanged(function(State)
+        varsglobal.visuals.Time = State
+    end)
+    WorldTab:AddLabel('zoom bind'):AddKeyPicker('zoombind', {
+        Default = 'None',
+        SyncToggleState = false,
+        Mode = 'Toggle',
+        Text = 'zoom onto thing',
+        NoUI = false,
+        Callback = function(first)
+            varsglobal.visuals.FovZoom = first
+            if first then
+                workspace.CurrentCamera.FieldOfView = varsglobal.visuals.ZoomAmt
+            else
+                workspace.CurrentCamera.FieldOfView = varsglobal.visuals.OldFov
+            end
+        end,
+    })
+    WorldTab:AddSlider('zoomslider', {
+        Text = 'zoom slider',
+        Default = varsglobal.visuals.OldFov - 30,
+        Min = 0,
+        Max = 120,
+        Rounding = 0,
+        Compact = false,
+    }):OnChanged(function(State)
+        varsglobal.visuals.ZoomAmt = State
+    end)
+end
+print('load_' .. tostring(counter))
+counter = counter + 1
+WorldTab:AddToggle('ambientswitch', {
+    Text = 'enable ambient',
+    Default = false,
+
+
+    Callback = function(first)
+        varsglobal.visuals.gradientenabled = first
+    end
+}):AddColorPicker('ambientcolor', {
+    Default = Color3.new(1, 1, 1),
+    Title = 'ambient color1',
+    Transparency = 0,
+
+    Callback = function(Value)
+        varsglobal.visuals.gradientcolor1 = Value
+    end
+}):AddColorPicker('ambientcolor1', {
+    Default = Color3.new(1, 1, 1),
+    Title = 'ambient color2',
+    Transparency = 0,
+
+    Callback = function(Value)
+        varsglobal.visuals.gradientcolor2 = Value
+    end
+})
+WorldTab:AddToggle('fogswitch', {
+    Text = 'enable fog',
+    Default = false,
+
+
+    Callback = function(first)
+        varsglobal.visuals.FogEnabled = first
+    end
+}):AddColorPicker('fogcolor', {
+    Default = Color3.new(1, 1, 1),
+    Title = 'fog color',
+    Transparency = 0,
+
+    Callback = function(Value)
+        varsglobal.visuals.FogColor = Value
+    end
+})
+WorldTab:AddSlider('fogstart', {
+    Text = 'fog start',
+
+    Default = 0,
+    Min = 0,
+    Max = 1000,
+    Rounding = 0,
+
+    Compact = false,
+}):OnChanged(function(State)
+    varsglobal.visuals.FogStart = State
+end)
+WorldTab:AddSlider('fogend', {
+    Text = 'fog end',
+
+    Default = 10000,
+    Min = 0,
+    Max = 10000,
+    Rounding = 0,
+
+    Compact = false,
+}):OnChanged(function(State)
+    varsglobal.visuals.FogEnd = State
+end)
+print('load_' .. tostring(counter))
+counter = counter + 1
+if true then
+    local visuals_BloomInstance = Instance.new("BloomEffect", Lighting)
+
+    local visuals_BloomIntensity = 0
+    local visuals_BloomSize = 17
+    local visuals_BloomThreshold = 0.9
+    local visuals_BloomEnabled = false
+    RunService.Stepped:Connect(function()
+        visuals_BloomInstance.Intensity = visuals_BloomIntensity
+        visuals_BloomInstance.Size = visuals_BloomSize
+        visuals_BloomInstance.Threshold = visuals_BloomThreshold
+        visuals_BloomInstance.Enabled = visuals_BloomEnabled
+    end)
+end
+print('load_' .. tostring(counter))
+counter = counter + 1
+Misc:AddToggle('keybindshoww', {
+    Text = 'show keybinds',
+    Default = false,
+
+
+    Callback = function(first)
+        Library.KeybindFrame.Visible = first;
+    end
+})
+Misc:AddToggle('ChatSPAM', {
+    Text = 'chatspam',
+    Default = false,
+
+
+    Callback = function(first)
+        spamsets.enabled = first
+    end
+})
+
+
+WorldTab:AddButton('Delete Solters Anti Cheat', function()
+
+
+
+		
+ end)
+
+Misc:AddSlider('fpslimiter', {
+    Text = 'FPS Limiter',
+    Default = 120,
+    Min = 10,
+    Max = 500,
+    Rounding = 3,
+    Compact = true,
+}):OnChanged(function(State)
+    setfpscap(State)
+end)
+
+
+Misc:AddSlider('spamspeed', {
+    Text = 'message interval',
+    Default = 3,
+    Min = 0,
+    Max = 10,
+    Rounding = 1,
+    Compact = false,
+}):OnChanged(function(State)
+    spamsets.speed = State
+end)
+Misc:AddToggle('chatpsa1mcdstlbols', {
+    Text = 'custom word',
+    Default = false,
+
+
+    Callback = function(first)
+        spamsets.customwordenabled = first
+    end
+})
+Misc:AddInput('customwordtextbox', {
+    Default = 'Doge.sigma on top!',
+    Numeric = false,
+    Finished = false,
+
+    Text = 'custom word',
+    Tooltip = 'hmmm',
+
+    Placeholder = 'enter text',
+
+    Callback = function(Value)
+        spamsets.customword = Value
+    end
+})
+do
+    do
+        local csb = Misc
+        local speed, enabled, pos, ytspam = 3, false, 1, false
+        --[[local spam_words = {
+            "Hack", "Cheat", "Roblox", "Mod Menu", "Mod", "Menu", "God Mode", "Kill All", "Silent", "Silent Aim", "X Ray", "Aim", "Bypass", "Glitch", "Wallhack", "ESP", "Dupe", "Dupe Script",
+            "SwimHub", "Server Backdoor", "Serverside", "2021", "Working", "(WORKING)", "瞄准无声目标绕过", "Gamesense", "Onetap", "PD Exploit", "Project Delt",
+            "Cracked", "TP Hack", "PD MOD MENU", "DOWNLOAD", "Paste Bin", "download", "Download", "Teleport", "100% legit", "100%", "pro", "Professional", "灭性的神经",
+            "No Virus All Clean", "No Survey", "No Ads", "Free", "Not Paid", "Real", "REAL 2024", "2024", "Real 2024", "SwimHub", "Cracked", "SwimHub CRACKED", "2014", "picklespub crack",
+            "Aimware", "Hacks", "Cheats", "Exploits", "(FREE)", "🕶😎", "😎", "😂", "😛", "paste bin", "swimhub script", "hard code", "正免费下载和使", "SERVER BACKDOOR",
+            "Secret", "SECRET", "Unleaked", "Not Leaked", "Method", "Minecraft Steve", "Steve", "Minecraft", "Swim Hub", "Crumble Ware", "Script", "Octo Hook",
+            "(OP)", "Verified", "All Clean", "Program",
+            "Anti Ban", "Speed", "Fly", "Big Head", "Magic Bullet", "No Clip", "Auto", "Rapid Fire",
+            "God Mode", "God", "Speed Fly", "Magic Bullet", "Infinite XRay", "Kill All", "Sigma", "And", "LEAKED",
+            "🥳🥳🥳", "RELEASE", "IP RESOLVER", "Infinite Wall Bang", "Wall Bang", "Trickshot", "Sniper", "Wall Hack", "😍😍", "🤩", "🤑", "😱😱", "Free Download SwimHUB", "Taps", "Owns",
+            "Owns All", "Trolling", "Troll", "Grief", "Kill", "弗吉艾尺艾杰开", "swim", "kavkaznation", "JSON", "SWIMHUB Developers",
+            "Server Hack", "Babies", "Children", "TAP", "Meme", "MEME", "Laugh", "LOL!", "Lol!", "ROFLSAUCE", "Rofl", ";p", ":D", "=D", "xD", "XD", "=>", "₽", "$", "8=>", "😹😹😹", "🎮🎮🎮", "🎱", "⭐", "✝",
+            "Ransomware", "Malware", "SKID", "Pasted vw", "Encrypted", "Brute Force", "Cheat Code", "Hack Code", ";v", "No Ban", "Bot", "Editing", "Modification", "injection", "Bypass Anti Cheat",
+            "铜色类别创意", "Cheat Exploit", "Hitbox Expansion", "Cheating AI", "Auto Wall Shoot", "Konami Code", "Debug", "Debug Menu", "🗿", "£", "¥", "₽", "₭", "€", "₿", "Meow", "MEOW", "meow",
+            "Under Age", "underage", "UNDER AGE", "18-", "not finite", "Left", "Right", "Up", "Down", "Left Right Up Down A B Start", "Noclip Cheat", "Bullet Check Bypass",
+            "AssemblyLinearVelocity SPEED CHEAT."
+        }
+        local spam_chinese = {
+            "音频少年公民记忆欲求无尽 heywe 僵尸强迫身体哑集中排水",
+            "持有毁灭性的神经重景气游行脸红青铜色类别创意案",
+            "诶比西迪伊艾弗吉艾尺艾杰开艾勒艾马艾娜哦屁吉吾",
+            "完成与草屋两个苏巴完成与草屋两个苏巴完成与草屋",
+            "庆崇你好我讨厌你愚蠢的母愚蠢的母庆崇",
+            "坐下，一直保持着安静的状态。 谁把他拥有的东西给了他，所以他不那么爱欠债务，却拒  参加锻炼，这让他爱得更少了",
+            ", yīzhí bǎochízhe ānjìng de zhuàngtài. Shéi bǎ tā yǒngyǒu de dōngxī gěile tā, suǒyǐ tā bù nàme ài qiàn zhàiwù, què jùjué cānjiā duànliàn, z",
+            "他，所以他不那r给了他东西给了他爱欠s，却拒绝参加锻炼，这让他爱得更UGT少了",
+            "swimhub 有的东西给了他，所以他不那rblx trader captain么有的东西给了他爱欠绝参加锻squidward炼，务，却拒绝参加锻炼，这让他爱得更UGT少了",
+            "wocky slush他爱欠债了他他squilliam拥有的东西给爱欠绝参加锻squidward炼",
+            "坐下，一直保持着安静的状态swimhub 谁把他拥有的东西给了他，所以他不那rblx trader captain么有的东西给了他爱欠债了他他squilliam拥有的东西给爱欠绝参加锻squidward炼，务，却拒绝参加锻炼，这让他爱得更UGT少了",
+            "免费手榴弹swimhub hack绕过作弊工作Trident Surviv roblox aimbot瞄准无声目标绕过2020工作真正免费下载和使用",
+            "zal發明了roblox汽車貿易商的船長ro blocks，並將其洩漏到整個宇宙，還修補了虛假的角神模式和虛假的身體，還發明了基於速度的AUTOWALL和無限制的自動壁紙遊戲 ",
+            "彼が誤って禁止されたためにファントムからautowallgamingを禁止解除する請願とそれはでたらめですそれはまったく意味がありませんなぜあなたは合法的なプレーヤーを禁止するのですか ",
+            "ジェイソンは私が神に誓う女性的な男の子ではありません ",
+            "傑森不是我向上帝發誓女性男孩 ",
+        }]]
+        --[[local spam_original = {
+            "gEt OuT oF tHe GrOuNd 🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡 ",
+            "brb taking a nap 💤💤💤 ",
+            "gonna go take a walk 🚶‍♂️🚶‍♀️🚶‍♂️🚶‍♀️ ",
+            "low orbit ion cannon booting up ",
+            "how does it feel to not have swimhub 🤣🤣🤣😂😂😹😹😹 ",
+            "im a firing my laza! 🙀🙀🙀 ",
+            "😂😂😂😂😂GAMING CHAIR😂😂😂😂😂",
+            "retardheadass",
+            "can't hear you over these kill sounds ",
+            "i'm just built different yo 🧱🧱🧱 ",
+            "📈📈📈📈📈📈📈📈📈📈📈📈📈📈📈📈📈📈📈📈📈📈",
+            "OFF📈THE📈CHART📈",
+            "KICK HIM 🦵🦵🦵",
+            "THE AMOUNT THAT I CARE --> 🤏 ",
+            "🤏🤏🤏🤏🤏🤏🤏🤏🤏🤏🤏🤏🤏🤏🤏🤏🤏🤏🤏🤏🤏🤏🤏🤏🤏🤏🤏",
+            "SORRY I HURT YOUR ROBLOX EGO BUT LOOK -> 🤏 I DON'T CARE ",
+            'table.find(charts, "any other script other than swimhub") -> nil 💵💵💵',
+            "LOL WHAT ARE YOU SHOOTING AT BRO ",
+            "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥",
+            "BRO UR SHOOTING AT LIKE NOTHING LOL UR A CLOWN",
+            "🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡",
+            "ARE U USING EHUB? 🤡🤡🤡🤡🤡",
+            "'FRAG PUB IS THE BEST' 🤡 PASTED LINES OF CODE WITH UNREFERENCED AND UNINITIALIZED VARIABLES AND PEOPLE HAVE NO IDEA WHY IT'S NOT WORKING ",
+            "LOL",
+            "GIVE UP ",
+            "GIVE UP BECAUSE YOU'RE NOT GOING TO BE ABLE TO KILL ME OR WIN LOL",
+            "Can't hear you over these bands ",
+            "I’m better than you in every way 🏆",
+            "I’m smarter than you (I can verify this because I took an online IQ test and got 150) 🧠",
+            "my personality shines and it’s generally better than your personality. Yours has flaws",
+            "I’m more ambitious than you 🏆💰📣",
+            "I’m more funny than you (long shot) ",
+            "I’m less turbulent and more assertive and calm than you (proof) 🎰",
+            "I’m stronger than you 💪 🦵 ",
+            "my attention span is greater and better than yours (proven from you not reading entire list) ",
+            "I am more creative and expressive than you will ever be 🎨 🖌",
+            "I’m a faster at typing than you 💬 ",
+            "In 30 minutes, I will have lifted more weights than you can solve algebraic equations 📓 ",
+            "By the time you have completed reading this very factual and groundbreaking evidence that I am truly more superior, thoughtful, and presentable than you are, I will have prospered (that means make negotiable currency or the American Dollar) more than your entire family hierarchy will have ever made in its time span 💰",
+            "I am more seggsually stable and better looking than you are 👨",
+            "I get along with women easier than you do 👩‍🚀", -- end
+            "I am very good at debating 🗣🧑‍⚖️ ",
+            "I win more hvh than you do 🏆", -- end yes this is actually how im going to fix this stupid shit
+            "I am more victorious than you are 🏆",
+            "Due to my agility, I am better than you at basketball, and all of your favorite sports or any sport for that matter (I will probably break your ankles in basketball by pure accident) ",
+            "WE THE BEST CHEATS 🔥🔥🔥🔥 ",
+            "antares hack client isn't real ",
+            "interpolation DWORD* C++ int 32 bit programming F# c# coding",
+            "Mad?",
+            "are we in a library? 🤔 📚 cause you're 👉 in hush 🤫 mode 🤣 😂",
+            "🏀🏀 did i break your ankles brother ",
+            "he has access to HACK SERVER AND CHANGE WEIGHTS!!!!! STOOOOOOP 😡😒😒😡😡😡😡😡",
+            '"cmon dude don\'t use that" you asked for it LOL ',
+            "ima just quit mid hvh 🚶‍♀️ ",
+            "BABY 😭",
+            "BOO HOO 😢😢😭😭😭 STOP CRYING ",
+            "🤏",
+            "🤏 <-- just to elaborate that i have no care for this situation or you at all, kid (not that you would understand anyways, you're too stupid to understand what i'm saying to begin with)",
+            "y",
+            "b",
+            "before swimhub 😭 📢                after swimhub 😁😁😜                    don't be like the person who doesn't have swimhub",
+            "                            MADE YOU LOOK ",
+            "                            LOOK BRO LOOK LOOK AT ME ",
+            "    A    ",
+            "            S        W        I        M    ",
+            "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                I HAVE AJAX YALL BETTER WATCH OUT OR YOU'LL DIE, WATCH WHO YOU'RE SHOOTING",
+            "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                WATCH YOUR STEP KID",
+            "BROOOO HE HAS                                                                                                        GOD MODE BRO HE HAS GOD MODE 🚶‍♀️🚶‍♀️🚶‍♀️😜😂😂🤦‍♂️🤦‍♂️😭😭😭👶",
+            '"guys what hub has auto shooting"                                                                                                         ',
+            "god i wish i had swimhub..... 🙏🙏🥺🥺🥺                                                    plzzzzz brooooo 🛐 GIVE IT🛐🛐",
+            "swum huh                                                 ",
+            "votekick him!!!!!!! 😠 vk VK VK VK VOTEKICK HIM!!!!!!!!! 😠 😢 VOTE KICK !!!!! PRESS Y WHY DIDNT U PRESS Y LOL!!!!!! 😭 ", -- shufy made this
+            "Swimhub omg omggg omggg its SwimHub its SwimHub OMGGG!!!  🙏🙏🥺🥺😌😒😡",
+            "HOw do you get ACCESS to this SWIMHUB ", -- end
+            "I NEED ACCESS 🔑🔓 TO SWIMHUB 🤖📃📃📃 👈 THIS THING CALLED SWIMHUB SCRIPT, I NEED IT ",
+            '"this god mode guy is annoying", Pr0blematicc says as he loses roblox hvh ',
+            "you can call me king of spades 🦹‍♂️🦹‍♂️ cause i turned your screen black ⬛⬛⬛⬛                                     ",
+            "clipped that 🤡 ",
+            "Clipped and Uploaded. 🤡",
+            "nodus client slime castle crashers minecraft dupeing hack wizardhax xronize grief ... Tlcharger minecraft crack Oggi spiegheremo come creare un ip grabber!",
+            "Off synonyme syls midge, smiled at mashup 2 mixed in key free download procom, ... Okay, love order and chaos online gameplayer hack amber forcen ahdistus",
+            "ˢᵗᵃʸ ᵐᵃᵈ ˢᵗᵃʸ ˢʷⁱᵐʰᵘᵇˡᵉˢˢ $ ",
+            "swimhub does not relent ",
+        }]]
+        local spam_ytthumbs = {
+            "\72\97\99\107",
+            "\67\104\101\97\116",
+            "\82\111\98\108\111\120",
+            "\77\111\100\32\77\101\110\117",
+            "\77\111\100",
+            "\77\101\110\117",
+            "\71\111\100\32\77\111\100\101",
+            "\75\105\108\108\32\65\108\108",
+            "\83\105\108\101\110\116",
+            "\83\105\108\101\110\116\32\65\105\109",
+            "\88\32\82\97\121",
+            "\65\105\109",
+            "\66\121\112\97\115\115",
+            "\71\108\105\116\99\104",
+            "\87\97\108\108\104\97\99\107",
+            "\69\83\80",
+            "\68\117\112\101",
+            "\68\117\112\101\32\83\99\114\105\112\116",
+            "\83\119\105\109\72\117\98",
+            "\83\101\114\118\101\114\32\66\97\99\107\100\111\111\114",
+            "\83\101\114\118\101\114\115\105\100\101",
+            "\50\48\50\49",
+            "\87\111\114\107\105\110\103",
+            "\40\87\79\82\75\73\78\71\41",
+            "\231\158\132\229\135\134\230\151\160\229\163\176\231\155\174\230\160\135\231\187\149\232\191\135",
+            "\71\97\109\101\115\101\110\115\101",
+            "\79\110\101\116\97\112",
+            "\80\68\32\69\120\112\108\111\105\116",
+            "\80\114\111\106\101\99\116\32\68\101\108\116",
+            "\67\114\97\99\107\101\100",
+            "\84\80\32\72\97\99\107",
+            "\80\68\32\77\79\68\32\77\69\78\85",
+            "\68\79\87\78\76\79\65\68",
+            "\80\97\115\116\101\32\66\105\110",
+            "\100\111\119\110\108\111\97\100",
+            "\68\111\119\110\108\111\97\100",
+            "\84\101\108\101\112\111\114\116",
+            "\49\48\48\37\32\108\101\103\105\116",
+            "\49\48\48\37",
+            "\112\114\111",
+            "\80\114\111\102\101\115\115\105\111\110\97\108",
+            "\231\129\173\230\128\167\231\154\132\231\165\158\231\187\143",
+            "\78\111\32\86\105\114\117\115\32\65\108\108\32\67\108\101\97\110",
+            "\78\111\32\83\117\114\118\101\121",
+            "\78\111\32\65\100\115",
+            "\70\114\101\101",
+            "\80\97\105\100",
+            "\82\101\97\108",
+            "\82\69\65\76\32\50\48\50\52",
+            "\50\48\50\52",
+            "\82\101\97\108\32\50\48\50\52",
+            "\83\119\105\109\72\117\98",
+            "\67\114\97\99\107\101\100",
+            "\83\119\105\109\72\117\98\32\67\82\65\67\75\69\68",
+            "\50\48\50\51",
+            "\112\105\99\107\108\101\115\112\117\98\32\99\114\97\99\107",
+            "\65\105\109\119\97\114\101",
+            "\72\97\99\107\115",
+            "\67\104\101\97\116\115",
+            "\69\120\112\108\111\105\116\115",
+            "\40\70\82\69\69\41",
+            "\240\159\149\182\240\159\152\142",
+            "\240\159\152\142",
+            "\240\159\152\130",
+            "\112\97\115\116\101\32\98\105\110",
+            "\115\119\105\109\104\117\98\32\115\99\114\105\112\116",
+            "\104\97\114\100\32\99\111\100\101",
+            "\230\173\163\229\133\141\232\180\185\228\184\139\232\189\189\229\146\140\228\189\191",
+            "\83\69\82\86\69\82\32\66\65\67\75\68\79\79\82",
+            "\83\101\99\114\101\116",
+            "\83\69\67\82\69\84",
+            "\85\110\108\101\97\107\101\100",
+            "\78\111\116\32\76\101\97\107\101\100",
+            "\77\101\116\104\111\100",
+            "\77\105\110\101\99\114\97\102\116\32\83\116\101\118\101",
+            "\83\116\101\118\101",
+            "\77\105\110\101\99\114\97\102\116",
+            "\83\119\105\109\32\72\117\98",
+            "\67\114\117\109\98\108\101\32\87\97\114\101",
+            "\83\99\114\105\112\116",
+            "\79\99\116\111\32\72\111\111\107",
+            "\40\79\80\41",
+            "\86\101\114\105\102\105\101\100",
+            "\65\108\108\32\67\108\101\97\110",
+            "\80\114\111\103\114\97\109",
+            "\65\110\116\105\32\66\97\110",
+            "\83\112\101\101\100",
+            "\70\108\121",
+            "\66\105\103\32\72\101\97\100",
+            "\77\97\103\105\99\32\66\117\108\108\101\116",
+            "\78\111\32\67\108\105\112",
+            "\65\117\116\111",
+            "\82\97\112\105\100\32\70\105\114\101",
+            "\71\111\100\32\77\111\100\101",
+            "\71\111\100",
+            "\83\112\101\101\100\32\70\108\121",
+            "\77\97\103\105\99\32\66\117\108\108\101\116",
+            "\73\110\102\105\110\105\116\101\32\88\82\97\121",
+            "\75\105\108\108\32\65\108\108",
+            "\83\105\103\109\97",
+            "\65\110\100",
+            "\76\69\65\75\69\68",
+            "\240\159\165\179\240\159\165\179\240\159\165\179",
+            "\82\69\76\69\65\83\69",
+            "\84\114\105\99\107\115\104\111\116",
+            "\83\110\105\112\101\114",
+            "\87\97\108\108\32\72\97\99\107",
+            "\240\159\164\169",
+            "\240\159\164\145",
+            "\240\159\152\177\240\159\152\177",
+            "\70\114\101\101\32\68\111\119\110\108\111\97\100\32\83\119\105\109\72\85\66",
+            "\84\97\112\115",
+            "\79\119\110\115",
+            "\79\119\110\115\32\65\108\108",
+            "\84\114\111\108\108\105\110\103",
+            "\84\114\111\108\108",
+            "\71\114\105\101\102",
+            "\75\105\108\108",
+            "\229\188\151\229\144\137\232\137\190\229\176\186\232\137\190\230\157\176\229\188\128",
+            "\115\119\105\109",
+            "\107\97\118\107\97\122\110\97\116\105\111\110",
+            "\74\83\79\78",
+            "\83\87\73\77\72\85\66\32\68\101\118\101\108\111\112\101\114\115",
+            "\83\101\114\118\101\114\32\72\97\99\107",
+            "\84\65\80",
+            "\77\101\109\101",
+            "\77\69\77\69",
+            "\76\97\117\103\104",
+            "\76\79\76\33",
+            "\76\111\108\33",
+            "\82\79\70\76\83\65\85\67\69",
+            "\82\111\102\108",
+            "\59\112",
+            "\58\68",
+            "\61\68",
+            "\120\68",
+            "\88\68",
+            "\61\62",
+            "\226\130\189",
+            "\36",
+            "\240\159\152\185\240\159\152\185\240\159\152\185",
+            "\240\159\142\174\240\159\142\174\240\159\142\174",
+            "\240\159\142\177",
+            "\226\173\144",
+            "\226\156\157",
+            "\82\97\110\115\111\109\119\97\114\101",
+            "\77\97\108\119\97\114\101",
+            "\83\75\73\68",
+            "\80\97\115\116\101\100\32\118\119",
+            "\69\110\99\114\121\112\116\101\100",
+            "\66\114\117\116\101\32\70\111\114\99\101",
+            "\67\104\101\97\116\32\67\111\100\101",
+            "\72\97\99\107\32\67\111\100\101",
+            "\59\118",
+            "\78\111\32\66\97\110",
+            "\66\111\116",
+            "\69\100\105\116\105\110\103",
+            "\77\111\100\105\102\105\99\97\116\105\111\110",
+            "\105\110\106\101\99\116\105\111\110",
+            "\66\121\112\97\115\115\32\65\110\116\105\32\67\104\101\97\116",
+            "\233\147\156\232\137\178\231\177\187\229\136\171\229\136\155\230\132\143",
+            "\67\104\101\97\116\32\69\120\112\108\111\105\116",
+            "\72\105\116\98\111\120\32\69\120\112\97\110\115\105\111\110",
+            "\67\104\101\97\116\105\110\103\32\65\73",
+            "\65\117\116\111\32\87\97\108\108\32\83\104\111\111\116",
+            "\75\111\110\97\109\105\32\67\111\100\101",
+            "\68\101\98\117\103",
+            "\68\101\98\117\103\32\77\101\110\117",
+            "\240\159\151\191",
+            "\194\163",
+            "\194\165",
+            "\226\130\189",
+            "\226\130\173",
+            "\226\130\172",
+            "\226\130\191",
+            "\77\101\111\119",
+            "\77\69\79\87",
+            "\109\101\111\119",
+        }
+        local spam_original = {
+            "\103\69\116\32\79\117\84\32\111\70\32\116\72\101\32\71\114\79\117\78\100\32\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\32",
+            "\98\114\98\32\116\97\107\105\110\103\32\97\32\110\97\112\32\240\159\146\164\240\159\146\164\240\159\146\164\32",
+            "\103\111\110\110\97\32\103\111\32\116\97\107\101\32\97\32\119\97\108\107\32\240\159\154\182\226\128\141\226\153\130\239\184\143\240\159\154\182\226\128\141\226\153\128\239\184\143\240\159\154\182\226\128\141\226\153\130\239\184\143\240\159\154\182\226\128\141\226\153\128\239\184\143\32",
+            "\108\111\119\32\111\114\98\105\116\32\105\111\110\32\99\97\110\110\111\110\32\98\111\111\116\105\110\103\32\117\112\32",
+            "\104\111\119\32\100\111\101\115\32\105\116\32\102\101\101\108\32\116\111\32\110\111\116\32\104\97\118\101\32\115\119\105\109\104\117\98\32\240\159\164\163\240\159\164\163\240\159\164\163\240\159\152\130\240\159\152\130\240\159\152\185\240\159\152\185\240\159\152\185\32",
+            "\105\109\32\97\32\102\105\114\105\110\103\32\109\121\32\108\97\122\97\33\32\240\159\153\128\240\159\153\128\240\159\153\128\32",
+            "\240\159\152\130\240\159\152\130\240\159\152\130\240\159\152\130\240\159\152\130\71\65\77\73\78\71\32\67\72\65\73\82\240\159\152\130\240\159\152\130\240\159\152\130\240\159\152\130\240\159\152\130",
+            "\99\97\110\39\116\32\104\101\97\114\32\121\111\117\32\111\118\101\114\32\116\104\101\115\101\32\107\105\108\108\32\115\111\117\110\100\115\32",
+            "\105\39\109\32\106\117\115\116\32\98\117\105\108\116\32\100\105\102\102\101\114\101\110\116\32\121\111\32\240\159\167\177\240\159\167\177\240\159\167\177\32",
+            "\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136\240\159\147\136",
+            "\79\70\70\240\159\147\136\84\72\69\240\159\147\136\67\72\65\82\84\240\159\147\136",
+            "\66\65\78\32\72\73\77\32\240\159\148\168\240\159\148\168",
+            "\84\72\69\32\65\77\79\85\78\84\32\84\72\65\84\32\73\32\67\65\82\69\32\45\45\62\32\240\159\164\143\32",
+            "\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143\240\159\164\143",
+            "\83\79\82\82\89\32\73\32\72\85\82\84\32\89\79\85\82\32\82\79\66\76\79\88\32\69\71\79\32\66\85\84\32\76\79\79\75\32\45\62\32\240\159\164\143\32\73\32\68\79\78\39\84\32\67\65\82\69\32",
+            "\116\97\98\108\101\46\102\105\110\100\40\99\104\97\114\116\115\44\32\34\97\110\121\32\111\116\104\101\114\32\115\99\114\105\112\116\32\111\116\104\101\114\32\116\104\97\110\32\115\119\105\109\104\117\98\34\41\32\45\62\32\110\105\108\32\240\159\146\181\240\159\146\181\240\159\146\181",
+            "\76\79\76\32\87\72\65\84\32\65\82\69\32\89\79\85\32\83\72\79\79\84\73\78\71\32\65\84\32\66\82\79\32",
+            "\240\159\148\165\240\159\148\165\240\159\148\165\240\159\148\165\240\159\148\165\240\159\148\165\240\159\148\165\240\159\148\165\240\159\148\165\240\159\148\165\240\159\148\165\240\159\148\165\240\159\148\165\240\159\148\165\240\159\148\165\240\159\148\165\240\159\148\165\240\159\148\165",
+            "\66\82\79\32\85\82\32\83\72\79\79\84\73\78\71\32\65\84\32\76\73\75\69\32\78\79\84\72\73\78\71\32\76\79\76\32\85\82\32\65\32\67\76\79\87\78",
+            "\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161",
+            "\65\82\69\32\85\32\85\83\73\78\71\32\70\82\65\71\32\80\85\66\63\32\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161\240\159\164\161",
+            "\39\70\82\65\71\32\80\85\66\32\73\83\32\84\72\69\32\66\69\83\84\39\32\240\159\164\161\32\80\65\83\84\69\68\32\76\73\78\69\83\32\79\70\32\67\79\68\69\32\87\73\84\72\32\85\78\82\69\70\69\82\69\78\67\69\68\32\65\78\68\32\85\78\73\78\73\84\73\65\76\73\90\69\68\32\86\65\82\73\65\66\76\69\83\32\65\78\68\32\80\69\79\80\76\69\32\72\65\86\69\32\78\79\32\73\68\69\65\32\87\72\89\32\73\84\39\83\32\78\79\84\32\87\79\82\75\73\78\71\32",
+            "\76\79\76",
+            "\71\73\86\69\32\85\80\32",
+            "\71\73\86\69\32\85\80\32\66\69\67\65\85\83\69\32\89\79\85\39\82\69\32\78\79\84\32\71\79\73\78\71\32\84\79\32\66\69\32\65\66\76\69\32\84\79\32\75\73\76\76\32\77\69\32\79\82\32\87\73\78\32\76\79\76",
+            "\67\97\110\39\116\32\104\101\97\114\32\121\111\117\32\111\118\101\114\32\116\104\101\115\101\32\98\97\110\100\115\32",
+            "\73\226\128\153\109\32\98\101\116\116\101\114\32\116\104\97\110\32\121\111\117\32\105\110\32\101\118\101\114\121\32\119\97\121\32\240\159\143\134",
+            "\73\226\128\153\109\32\115\109\97\114\116\101\114\32\116\104\97\110\32\121\111\117\32\40\73\32\99\97\110\32\118\101\114\105\102\121\32\116\104\105\115\32\98\101\99\97\117\115\101\32\73\32\116\111\111\107\32\97\110\32\111\110\108\105\110\101\32\73\81\32\116\101\115\116\32\97\110\100\32\103\111\116\32\49\53\48\41\32\240\159\167\160",
+            "\109\121\32\112\101\114\115\111\110\97\108\105\116\121\32\115\104\105\110\101\115\32\97\110\100\32\105\116\226\128\153\115\32\103\101\110\101\114\97\108\108\121\32\98\101\116\116\101\114\32\116\104\97\110\32\121\111\117\114\32\112\101\114\115\111\110\97\108\105\116\121\46\32\89\111\117\114\115\32\104\97\115\32\102\108\97\119\115",
+            "\73\226\128\153\109\32\109\111\114\101\32\97\109\98\105\116\105\111\117\115\32\116\104\97\110\32\121\111\117\32\240\159\143\134\240\159\146\176\240\159\147\163",
+            "\73\226\128\153\109\32\109\111\114\101\32\102\117\110\110\121\32\116\104\97\110\32\121\111\117\32\40\108\111\110\103\32\115\104\111\116\41\32",
+            "\73\226\128\153\109\32\108\101\115\115\32\116\117\114\98\117\108\101\110\116\32\97\110\100\32\109\111\114\101\32\97\115\115\101\114\116\105\118\101\32\97\110\100\32\99\97\108\109\32\116\104\97\110\32\121\111\117\32\40\112\114\111\111\102\41\32\240\159\142\176",
+            "\73\226\128\153\109\32\115\116\114\111\110\103\101\114\32\116\104\97\110\32\121\111\117\32\240\159\146\170\32\240\159\166\181\32",
+            "\109\121\32\97\116\116\101\110\116\105\111\110\32\115\112\97\110\32\105\115\32\103\114\101\97\116\101\114\32\97\110\100\32\98\101\116\116\101\114\32\116\104\97\110\32\121\111\117\114\115\32\40\112\114\111\118\101\110\32\102\114\111\109\32\121\111\117\32\110\111\116\32\114\101\97\100\105\110\103\32\101\110\116\105\114\101\32\108\105\115\116\41\32",
+            "\73\32\97\109\32\109\111\114\101\32\99\114\101\97\116\105\118\101\32\97\110\100\32\101\120\112\114\101\115\115\105\118\101\32\116\104\97\110\32\121\111\117\32\119\105\108\108\32\101\118\101\114\32\98\101\32\240\159\142\168\32\240\159\150\140",
+            "\73\226\128\153\109\32\97\32\102\97\115\116\101\114\32\97\116\32\116\121\112\105\110\103\32\116\104\97\110\32\121\111\117\32\240\159\146\172\32",
+            "\73\110\32\51\48\32\109\105\110\117\116\101\115\44\32\73\32\119\105\108\108\32\104\97\118\101\32\108\105\102\116\101\100\32\109\111\114\101\32\119\101\105\103\104\116\115\32\116\104\97\110\32\121\111\117\32\99\97\110\32\115\111\108\118\101\32\97\108\103\101\98\114\97\105\99\32\101\113\117\97\116\105\111\110\115\32\240\159\147\147\32",
+            "\66\121\32\116\104\101\32\116\105\109\101\32\121\111\117\32\104\97\118\101\32\99\111\109\112\108\101\116\101\100\32\114\101\97\100\105\110\103\32\116\104\105\115\32\118\101\114\121\32\102\97\99\116\117\97\108\32\97\110\100\32\103\114\111\117\110\100\98\114\101\97\107\105\110\103\32\101\118\105\100\101\110\99\101\32\116\104\97\116\32\73\32\97\109\32\116\114\117\108\121\32\109\111\114\101\32\115\117\112\101\114\105\111\114\44\32\116\104\111\117\103\104\116\102\117\108\44\32\97\110\100\32\112\114\101\115\101\110\116\97\98\108\101\32\116\104\97\110\32\121\111\117\32\97\114\101\44\32\73\32\119\105\108\108\32\104\97\118\101\32\112\114\111\115\112\101\114\101\100\32\40\116\104\97\116\32\109\101\97\110\115\32\109\97\107\101\32\110\101\103\111\116\105\97\98\108\101\32\99\117\114\114\101\110\99\121\32\111\114\32\116\104\101\32\65\109\101\114\105\99\97\110\32\68\111\108\108\97\114\41\32\109\111\114\101\32\116\104\97\110\32\121\111\117\114\32\101\110\116\105\114\101\32\102\97\109\105\108\121\32\104\105\101\114\97\114\99\104\121\32\119\105\108\108\32\104\97\118\101\32\101\118\101\114\32\109\97\100\101\32\105\110\32\105\116\115\32\116\105\109\101\32\115\112\97\110\32\240\159\146\176",
+            "\73\32\119\105\110\32\109\111\114\101\32\104\118\104\32\116\104\97\110\32\121\111\117\32\100\111\32\240\159\143\134",
+            "\68\117\101\32\116\111\32\109\121\32\97\103\105\108\105\116\121\44\32\73\32\97\109\32\98\101\116\116\101\114\32\116\104\97\110\32\121\111\117\32\97\116\32\98\97\115\107\101\116\98\97\108\108\44\32\97\110\100\32\97\108\108\32\111\102\32\121\111\117\114\32\102\97\118\111\114\105\116\101\32\115\112\111\114\116\115\32\111\114\32\97\110\121\32\115\112\111\114\116\32\102\111\114\32\116\104\97\116\32\109\97\116\116\101\114\32\40\73\32\119\105\108\108\32\112\114\111\98\97\98\108\121\32\98\114\101\97\107\32\121\111\117\114\32\97\110\107\108\101\115\32\105\110\32\98\97\115\107\101\116\98\97\108\108\32\98\121\32\112\117\114\101\32\97\99\99\105\100\101\110\116\41\32",
+            "\87\69\32\84\72\69\32\66\69\83\84\32\67\72\69\65\84\83\32\240\159\148\165\240\159\148\165\240\159\148\165\240\159\148\165\32",
+            "\97\110\116\97\114\101\115\32\104\97\99\107\32\99\108\105\101\110\116\32\105\115\110\39\116\32\114\101\97\108\32",
+            "\105\110\116\101\114\112\111\108\97\116\105\111\110\32\68\87\79\82\68\42\32\67\43\43\32\105\110\116\32\51\50\32\98\105\116\32\112\114\111\103\114\97\109\109\105\110\103\32\70\35\32\99\35\32\99\111\100\105\110\103",
+            "\77\97\100\63",
+            "\97\114\101\32\119\101\32\105\110\32\97\32\108\105\98\114\97\114\121\63\32\240\159\164\148\32\240\159\147\154\32\99\97\117\115\101\32\121\111\117\39\114\101\32\240\159\145\137\32\105\110\32\104\117\115\104\32\240\159\164\171\32\109\111\100\101\32\240\159\164\163\32\240\159\152\130",
+            "\240\159\143\128\240\159\143\128\32\100\105\100\32\105\32\98\114\101\97\107\32\121\111\117\114\32\97\110\107\108\101\115\32\98\114\111\116\104\101\114\32",
+            "\104\101\32\104\97\115\32\97\99\99\101\115\115\32\116\111\32\72\65\67\75\32\83\69\82\86\69\82\32\65\78\68\32\65\78\84\73\67\72\69\65\84\32\68\73\83\65\66\76\69\82\33\33\33\33\33\32\83\84\79\79\79\79\79\79\80\32\240\159\152\161\240\159\152\146\240\159\152\146\240\159\152\161\240\159\152\161\240\159\152\161\240\159\152\161\240\159\152\161",
+            "\34\99\109\111\110\32\100\117\100\101\32\100\111\110\39\116\32\117\115\101\32\116\104\97\116\34\32\121\111\117\32\97\115\107\101\100\32\102\111\114\32\105\116\32\76\79\76\32",
+            "\105\109\97\32\106\117\115\116\32\113\117\105\116\32\109\105\100\32\104\118\104\32\240\159\154\182\226\128\141\226\153\128\239\184\143\32",
+            "\66\65\66\89\32\240\159\152\173",
+            "\66\79\79\32\72\79\79\32\240\159\152\162\240\159\152\162\240\159\152\173\240\159\152\173\240\159\152\173\32\83\84\79\80\32\67\82\89\73\78\71\32",
+            "\240\159\164\143",
+            "\98\101\102\111\114\101\32\115\119\105\109\104\117\98\32\240\159\152\173\32\240\159\147\162\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\97\102\116\101\114\32\115\119\105\109\104\117\98\32\240\159\152\129\240\159\152\129\240\159\152\156\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\100\111\110\39\116\32\98\101\32\108\105\107\101\32\116\104\101\32\112\101\114\115\111\110\32\119\104\111\32\100\111\101\115\110\39\116\32\104\97\118\101\32\115\119\105\109\104\117\98",
+            "\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\77\65\68\69\32\89\79\85\32\76\79\79\75\32",
+            "\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\76\79\79\75\32\66\82\79\32\76\79\79\75\32\76\79\79\75\32\65\84\32\77\69\32",
+            "\32\32\32\32\83\32\32\32\32\87\32\32\32\32\73\32\32\32\32\77\32\32\32\32\72\32\32\32\32\85\32\32\32\32\66\32\32\32\32",
+            "\103\111\100\32\105\32\119\105\115\104\32\105\32\104\97\100\32\115\119\105\109\104\117\98\46\46\46\46\46\32\240\159\153\143\240\159\153\143\240\159\165\186\240\159\165\186\240\159\165\186\32\32\112\108\122\122\122\122\122\32\98\114\111\111\111\111\111\32\240\159\155\144\32\71\73\86\69\32\73\84\240\159\155\144\240\159\155\144",
+            "\115\119\117\109\32\104\117\104\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32",
+            "\98\97\110\32\104\105\109\33\33\33\33\33\33\33\32\240\159\152\160\32\98\97\110\32\66\65\78\32\66\65\78\32\66\65\78\32\66\65\78\32\72\73\77\33\33\33\33\33\33\33\33\33\32\240\159\152\160\32\240\159\152\162\32\66\65\78\32\33\33\33\33\33\32\80\82\69\83\83\32\66\65\78\32\87\72\89\32\68\73\68\78\84\32\85\32\80\82\69\83\83\32\66\65\78\32\76\79\76\33\33\33\33\33\33\32\240\159\152\173\32",
+            "\83\119\105\109\104\117\98\32\111\109\103\32\111\109\103\103\103\32\111\109\103\103\103\32\105\116\115\32\83\119\105\109\72\117\98\32\105\116\115\32\83\119\105\109\72\117\98\32\79\77\71\71\71\33\33\33\32\32\240\159\153\143\240\159\153\143\240\159\165\186\240\159\165\186\240\159\152\140\240\159\152\146\240\159\152\161",
+            "\72\79\119\32\100\111\32\121\111\117\32\103\101\116\32\65\67\67\69\83\83\32\116\111\32\116\104\105\115\32\83\87\73\77\72\85\66\32",
+            "\73\32\78\69\69\68\32\65\67\67\69\83\83\32\240\159\148\145\240\159\148\147\32\84\79\32\83\87\73\77\72\85\66\32\240\159\164\150\240\159\147\131\240\159\147\131\240\159\147\131\32\240\159\145\136\32\84\72\73\83\32\84\72\73\78\71\32\67\65\76\76\69\68\32\83\87\73\77\72\85\66\32\83\67\82\73\80\84\44\32\73\32\78\69\69\68\32\73\84\32",
+            "\34\116\104\105\115\32\103\111\100\32\109\111\100\101\32\103\117\121\32\105\115\32\97\110\110\111\121\105\110\103\34\44\32\80\114\48\98\108\101\109\97\116\105\99\99\32\115\97\121\115\32\97\115\32\104\101\32\108\111\115\101\115\32\114\111\98\108\111\120\32\104\118\104\32",
+            "\121\111\117\32\99\97\110\32\99\97\108\108\32\109\101\32\107\105\110\103\32\111\102\32\115\112\97\100\101\115\32\240\159\166\185\226\128\141\226\153\130\239\184\143\240\159\166\185\226\128\141\226\153\130\239\184\143\32\99\97\117\115\101\32\105\32\116\117\114\110\101\100\32\121\111\117\114\32\115\99\114\101\101\110\32\98\108\97\99\107\32\226\172\155\226\172\155\226\172\155\226\172\155\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32\32",
+            "\99\108\105\112\112\101\100\32\116\104\97\116\32\240\159\164\161\32",
+            "\67\108\105\112\112\101\100\32\97\110\100\32\85\112\108\111\97\100\101\100\46\32\240\159\164\161",
+            "\110\111\100\117\115\32\99\108\105\101\110\116\32\115\108\105\109\101\32\99\97\115\116\108\101\32\99\114\97\115\104\101\114\115\32\109\105\110\101\99\114\97\102\116\32\100\117\112\101\105\110\103\32\104\97\99\107\32\119\105\122\97\114\100\104\97\120\32\120\114\111\110\105\122\101\32\103\114\105\101\102\32\46\46\46\32\84\108\99\104\97\114\103\101\114\32\109\105\110\101\99\114\97\102\116\32\99\114\97\99\107\32\79\103\103\105\32\115\112\105\101\103\104\101\114\101\109\111\32\99\111\109\101\32\99\114\101\97\114\101\32\117\110\32\105\112\32\103\114\97\98\98\101\114\33",
+            "\79\102\102\32\115\121\110\111\110\121\109\101\32\115\121\108\115\32\109\105\100\103\101\44\32\115\109\105\108\101\100\32\97\116\32\109\97\115\104\117\112\32\50\32\109\105\120\101\100\32\105\110\32\107\101\121\32\102\114\101\101\32\100\111\119\110\108\111\97\100\32\112\114\111\99\111\109\44\32\46\46\46\32\79\107\97\121\44\32\108\111\118\101\32\111\114\100\101\114\32\97\110\100\32\99\104\97\111\115\32\111\110\108\105\110\101\32\103\97\109\101\112\108\97\121\101\114\32\104\97\99\107\32\97\109\98\101\114\32\102\111\114\99\101\110\32\97\104\100\105\115\116\117\115",
+            "\203\162\225\181\151\225\181\131\202\184\32\225\181\144\225\181\131\225\181\136\32\203\162\225\181\151\225\181\131\202\184\32\203\162\202\183\226\129\177\225\181\144\202\176\225\181\152\225\181\135\203\161\225\181\137\203\162\203\162\32\36\32",
+            "\115\119\105\109\104\117\98\32\100\111\101\115\32\110\111\116\32\114\101\108\101\110\116\32",
+        }
+        csb:AddToggle('newchatspam_enabled', {
+            Text = 'new chat spam',
+            Default = false,
+            Callback = function(first)
+                enabled = first
+            end
+        })
+        csb:AddSlider('newchatspam_multiplier',
+            { Text = 'spam speed', Default = 3, Min = 1, Max = 5, Rounding = 1, Suffix = "s", Compact = false })
+            :OnChanged(function(
+                State)
+                speed = State
+            end)
+        local function genyt()
+            local len = 150
+            local currstring = ""
+            while currstring:len() <= len do
+                currstring = currstring .. spam_ytthumbs[math.random(#spam_ytthumbs)] .. " "
+            end
+            return currstring
+        end
+        task.spawn(LPH_JIT_MAX(function()
+            while wait(speed) do
+                if enabled then
+                    local tosend = ytspam and genyt() or spam_original[pos]
+                    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(tosend,
+                        "Global")
+                    pos = (#spam_original <= pos + 1 and 1 or pos + 1)
+                end
+            end
+        end))
+    end
+end
+Misc:AddButton('Rejoin', function()
+    if #plrs:GetPlayers() <= 1 then
+        plrs.LocalPlayer:Kick("\nrejoining⚡")
+        wait()
+        game:GetService("TeleportService"):Teleport(game.PlaceId, plrs.LocalPlayer)
+    else
+        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, plrs.LocalPlayer)
+    end
+end)
+--[[do
+    local socket
+    local rand = game:service("HttpService"):GenerateGUID(false):sub(1,5)
+    if not ( websocket and websocket.connect and pcall(function()socket = websocket.connect("ws://31.210.171.229:8080")end) ) then
+        return print("chat failed\nsupported: "..(websocket and websocket.connect and "✅\n" or "❌\n").."connected: ❌")
+    else
+        socket.OnMessage:Connect(function(txt)
+            print(txt)
+        end)
+        Misc:AddInput('chatboxtest', {Default = 'hello there',Numeric = false,Finished = false,Text = 'chat',Tooltip = 'chat',Placeholder = 'enter text'})
+        Misc:AddButton('send message in swimhub chat', function()
+            socket:Send("swimhub_"..rand..":-/-:"..tostring(Options.chatboxtest.Value))
+        end)
+    end
+end;]]
+
+-- Toggle function to enable or disable third-person mode
+local function toggleThirdPerson(enable)
+    if enable then
+        -- Enable third-person view
+        player.CameraMode = Enum.CameraMode.Classic
+        player.CameraMaxZoomDistance = 10
+        player.CameraMinZoomDistance = 10
+        camera.CameraType = Enum.CameraType.Custom
+        camera.CameraSubject = player.Character:FindFirstChild("Humanoid")
+    else
+        -- Disable third-person view
+        player.CameraMode = Enum.CameraMode.LockFirstPerson
+        camera.CameraType = Enum.CameraType.Custom
+        camera.CameraSubject = nil  -- No specific subject in first-person
+    end
+end
+
+-- Add toggle to the UI
+movetab:AddToggle('ThirdPerson', {
+    Text = 'Third Person',
+    Default = false,
+
+    Callback = function(isEnabled)
+        toggleThirdPerson(isEnabled)
+    end
+}):AddKeyPicker('thirdpersonkeybind', {
+    Default = 'None',
+    SyncToggleState = true,
+
+    Mode = 'Toggle',
+
+    Text = 'Third Person Keybind',
+    NoUI = false,
+
+    Callback = function(Value)
+    end,
+})
+
+print('Fuckers_' .. tostring(counter))
+counter = counter + 2
+
+do
+    local tpwalking = false
+    movetab:AddToggle('ToggleSpeed', {
+        Text = 'speed toggle',
+        Default = false,
+
+
+        Callback = function(first)
+            tpwalking = first
+        end
+    })
+    RunService.Heartbeat:Connect(LPH_JIT_MAX(function(delta)
+        if tpwalking then
+            local chr = plr.Character
+            local hum = chr and chr:FindFirstChildOfClass("Humanoid")
+            if hum and hum.MoveDirection.Magnitude > 0 then
+                if varsglobal.tpwalkspeed then
+                    chr:TranslateBy(hum.MoveDirection * tonumber(varsglobal.tpwalkspeed) * delta * 10)
+                else
+                    chr:TranslateBy(hum.MoveDirection * delta * 10)
+                end
+            end
+        end
+    end))
+
+
+
+    movetab:AddSlider('CFrameSpeed', {
+        Text = 'speed slider',
+
+        Default = 0,
+        Min = 0,
+        Max = 2,
+        Rounding = 3,
+
+        Compact = false,
+    }):OnChanged(function(State)
+        varsglobal.tpwalkspeed = State
+    end)
+end
+print('load_' .. tostring(counter))
+counter = counter + 1
+movetab:AddToggle('justspin', { Text = 'spin', Default = false, }):OnChanged(function(State)
+    varsglobal.spin = State
+end)
+movetab:AddSlider('justspinspeed', { Text = 'spin speed', Default = 1, Min = 1, Max = 220, Rounding = 1, Compact = false })
+    :OnChanged(function(State)
+        varsglobal.spinspeed = State
+    end)
+print('load_' .. tostring(counter))
+counter = counter + 1
+-- totally not cripware
+local function ToYRotation(_CFrame)
+    local _, Y, _ = _CFrame:ToOrientation()
+    return CFrame.new(_CFrame.Position) * CFrame.Angles(0, Y, 0)
+end
+local OriginalAutoRotate = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid") and
+    plr.Character:FindFirstChildOfClass("Humanoid").AutoRotate or true
+RunService.Stepped:Connect(LPH_NO_VIRTUALIZE(function()
+    camera = game:GetService("Workspace").CurrentCamera
+    if varsglobal.visuals.gradientenabled then
+        Lighting.Ambient = varsglobal.visuals.gradientcolor1
+        Lighting.OutdoorAmbient = varsglobal.visuals.gradientcolor2
+    else
+        Lighting.Ambient = varsglobal.visuals.oldgradient1
+        Lighting.OutdoorAmbient = varsglobal.visuals.oldgradient2
+    end
+    if varsglobal.visuals.FogEnabled then
+        Lighting.FogStart = varsglobal.visuals.FogStart
+        Lighting.FogEnd = varsglobal.visuals.FogEnd
+        Lighting.FogColor = varsglobal.visuals.FogColor
+    else
+        Lighting.FogStart = varsglobal.visuals.oldFogStart
+        Lighting.FogEnd = varsglobal.visuals.oldFogEnd
+        Lighting.FogColor = varsglobal.visuals.oldFogColor
+    end
+    if varsglobal.visuals.FovZoom then
+        camera.FieldOfView = varsglobal.visuals.ZoomAmt
+    end
+
+    Lighting.ClockTime = varsglobal.visuals.Time
+
+    local SelfCharacter = plr.Character
+    local SelfRootPart, SelfHumanoid = SelfCharacter and SelfCharacter:FindFirstChild("HumanoidRootPart"),
+        SelfCharacter and SelfCharacter:FindFirstChildOfClass("Humanoid")
+    if (SelfCharacter and SelfRootPart and SelfHumanoid) and varsglobal.spin then
+        SelfHumanoid.AutoRotate = false
+        local Angle = -math.atan2(camera.CFrame.LookVector.Z, camera.CFrame.LookVector.X) +
+            tick() * varsglobal.spinspeed % 360
+        SelfRootPart.CFrame = ToYRotation(CFrame.new(SelfRootPart.Position) * CFrame.Angles(0, Angle, 0))
+    elseif (SelfCharacter and SelfRootPart and SelfHumanoid) and not varsglobal.spin then
+        SelfHumanoid.AutoRotate = OriginalAutoRotate
+    end
+end))
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+ThemeManager:SetFolder('dogehub66')
+SaveManager:SetFolder('dogehub66')
+SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:ApplyToGroupbox(stuffz)
+print('load_' .. tostring(counter))
+counter = counter + 1
+local pdlt = othergames.pdelta
+local pdeltatabbox = Tabs.Main:AddLeftTabbox("Project Delta Doge Hub")
+local pdeltatabbox1 = Tabs.Main:AddRightTabbox("Project Delta Doge Hub1")
+local aimtab = pdeltatabbox:AddTab("Combat Features")
+
+local function castgun()
+    if not plr.Character or not workspace.CurrentCamera:FindFirstChild("ViewModel") then return (camera.ViewportSize / 2) end
+    if not workspace.Camera:FindFirstChild("ViewModel"):FindFirstChild("AimPart") then return (camera.ViewportSize / 2) end
+    local from = workspace.Camera.ViewModel:FindFirstChild("AimPart")
+    local ray = Ray.new(from.CFrame.p, (from.CFrame.LookVector).Unit * 1000)
+    local part, position = workspace:FindPartOnRayWithIgnoreList(ray, { plr.Character, camera })
+
+    if part then
+        local result = camera:WorldToViewportPoint(position)
+        return Vector2.new(result.X, result.Y)
+    else
+        return (camera.ViewportSize / 2)
+    end
+end
+RunService.Stepped:Connect(function() if varsglobal.cursor.CustomPos then varsglobal.cursor.Position = castgun() end end)
+print('suckerloaders_' .. tostring(counter))
+counter = counter + 4
+--[[
+aimtab:AddToggle('FUCKPDDDD', {
+    Text = "FUCK UP THE SERVER FPS",
+    Default = false,
+})
+aimtab:AddLabel("@w._.ruby._.w gave me it ^w^!! thx!!")
+aimtab:AddSlider('FUCKPDD!!!!', {
+    Text = 'TABLE INCR',
+    Default = 250,
+    Min = 1,
+    Max = 300,
+    Rounding = 0,
+    Compact = false,
+})
+aimtab:AddSlider('FUCKPDD!!!!!!', {
+    Text = 'TRIES',
+    Default = 2,
+    Min = 1,
+    Max = 5,
+    Rounding = 0,
+    Compact = false,
+})
+aimtab:AddSlider('FUCKPDD!!!!!!!!', {
+    Text = 'DELAY',
+    Default = 0.6,
+    Min = 0.1,
+    Max = 1,
+    Rounding = 2,
+    Compact = false,
+})
+wrap(function()
+    local function rahhh()
+        local function getmaxvalue(val)
+            local mainvalueifonetable = 499999
+            if type(val) ~= "number" then
+                return nil
+            end
+            local calculateperfectval = (mainvalueifonetable/(val+2))
+            return calculateperfectval
+        end
+        local function bomb(tableincrease, tries)
+            local maintable = {}
+            local spammedtable = {}
+
+            table.insert(spammedtable, {})
+            z = spammedtable[1]
+
+            for i = 1, tableincrease do
+                local tableins = {}
+                table.insert(z, tableins)
+                z = tableins
+            end
+
+            local calculatemax = getmaxvalue(tableincrease)
+            local maximum
+
+            if calculatemax then
+                maximum = calculatemax
+            else
+                maximum = 1999999
+            end
+
+            for i = 1, maximum do
+                table.insert(maintable, spammedtable)
+            end
+
+            for i = 1, tries do
+                game.RobloxReplicatedStorage.SetPlayerBlockList:FireServer(maintable)
+            end
+        end
+        game:GetService("NetworkClient"):SetOutgoingKBPSLimit(math.huge)
+        bomb(Options["FUCKPDD!!!!"].Value, Options["FUCKPDD!!!!!!!!"].Value)
+    end
+    while true do
+        game:GetService("NetworkClient"):SetOutgoingKBPSLimit(math.huge)
+        if Options["FUCKPDDDD"].Value then rahhh() end
+        wait(Options["FUCKPDD!!!!!!!!"].Value)
+    end
+end)]]
+
+aimtab:AddLabel("Doge Hub 1", true)
+
+aimtab:AddToggle('nograss', {
+    Text = 'No Grass',
+    Default = false,
+    Tooltip = 'Removes Grasses',
+    Callback = function(first)
+        sethiddenproperty(game:GetService("Workspace").Terrain, "Decoration", not first)
+    end
+})
+
+-- Ensure that `players` is defined correctly and `skins` is accessible.
+local Players = game:GetService("Players")
+local LC = Players.LocalPlayer  -- Correctly define `LC` as the LocalPlayer
+local rp = game:GetService("ReplicatedStorage")
+local skins = {
+	["762x25MAG"] = "Nutcracker",
+	["762x25Rnd71Mag"] = "Arctic",
+	["762x25TTMAG"] = "Watergun",
+	["762x39MAG"] = "DeltaAnime",
+	["762x39Rnd75Mag"] = "Anton",
+	["762x54Rnd10Mag"] = "Permafrost",
+	["9x18vzMag"] = "GiftWrap",
+	["9x19MP443MAG"] = "JollyRoger",
+	["9x19MP5MAG"] = "Permafrost",
+	["9x39Mag"] = "Shoreline",
+	AKMN = "DeltaAnime",
+	FrontAKMN = "DeltaAnime",
+	HandleRK3AKMN = "DeltaAnime",
+	PolymerStockAKMN = "DeltaAnime",
+	HandleAKMN = "Valentine",
+    Tortilla = "Blackout",
+	DV2 = "Cutlass",
+	TacticalFrontAKMN = "AnodizedRed",
+	SvdFront = "Permafrost",
+	MuzzleBrakeAKM = "AnodizedRed",
+	CombatGloves = "Anarchy",
+	CamoShirt = "Anarchy",
+	HandWraps = "SantaCommando",
+	WastelandShirt = "SantaCommando",
+	M4 = "Devil",
+	Lighter = "EarlyAccess",
+	GorkaShirt = "Wetsuit",
+	GhillieTorso = "Arctic",
+	AsVal = "Shoreline",
+	F1 = "Pineapple",
+	Makarov = "Serpant",
+	Mosin = "SkullHunter",
+	PPSH41 = "Nutcracker",
+	SVD = "Permafrost",
+	Saiga12 = "Valentine",
+	TT33 = "Watergun",
+	ZSh = "Woodland",
+	MP5SD  = "Permafrost",
+	MP443 = "Whiteout",
+	IZh81 = "Watergun",
+}
+  -- Ensure `skins` is defined, e.g., skins = { ["ItemName"] = "SkinId" }
+
+
+
+
+
+aimtab:AddButton('Skin Changer', function()
+
+if rp:FindFirstChild("Players") then
+    local playersContainer = rp.Players
+    local player = playersContainer:FindFirstChild(LC.Name)
+    
+    if player then
+        for _, item in player:GetDescendants() do
+            local itemProperties = item:FindFirstChild("ItemProperties")
+            if itemProperties and skins[item.Name] then
+                itemProperties:SetAttribute("Skin", skins[item.Name])
+            end
+        end
+    end
+end
+
+
+ end)
+
+WorldTab:AddButton('Remove SFX', function()
+
+game.ReplicatedStorage.SFX:Destroy()
+
+ end)
+
+WorldTab:AddButton('Remove VFX', function()
+
+game.ReplicatedStorage.VFX:Destroy()
+
+ end)
+
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+
+-- Global variables
+local speedMultiplier = 1 -- Default speed multiplier
+local viewModel = nil
+local animator = nil
+local monitoring = true -- To control the loop
+
+-- Function to change the speed of all currently playing animations
+local function changeAnimationSpeed(multiplier)
+    if animator then
+        for _, animTrack in pairs(animator:GetPlayingAnimationTracks()) do
+            animTrack:AdjustSpeed(multiplier)
+        end
+    end
+end
+
+-- Function to set up the Animator
+local function setupAnimator()
+    viewModel = Workspace:FindFirstChild("Camera") and Workspace.Camera:FindFirstChild("ViewModel")
+    if viewModel then
+        local humanoid = viewModel:FindFirstChild("Humanoid")
+        if humanoid then
+            animator = humanoid:FindFirstChildOfClass("Animator")
+            if animator then
+                -- Apply speed to currently playing animations
+                changeAnimationSpeed(speedMultiplier)
+                
+                -- Adjust speed for any new animations that start playing
+                animator.AnimationPlayed:Connect(function(animTrack)
+                    animTrack:AdjustSpeed(speedMultiplier)
+                end)
+                
+                return true
+            else
+                warn("Animator not found in Humanoid")
+            end
+        else
+            warn("Humanoid not found in ViewModel")
+        end
+    else
+        warn("ViewModel or Camera not found in Workspace")
+    end
+    return false
+end
+
+-- Function to continuously check for ViewModel and update Animator
+local function monitorViewModel()
+    while monitoring do
+        local hasViewModel = setupAnimator()
+
+        if not hasViewModel then
+            animator = nil
+            viewModel = nil
+        end
+
+        wait(1) -- Check every second, adjust as needed
+    end
+end
+
+-- Function to toggle animation speed adjustment
+local function toggleAnimationSpeed(enable)
+    if enable and animator then
+        -- Apply the speed multiplier to currently playing animations
+        changeAnimationSpeed(speedMultiplier)
+    else
+        -- Optional: You might want to reset speed or handle disabling here if needed
+        print("Animation speed adjustment disabled.")
+    end
+end
+
+-- Slider or value control for speedMultiplier
+local function setSpeedMultiplier(value)
+    speedMultiplier = value
+    toggleAnimationSpeed(true) -- Reapply speed with new multiplier
+end
+
+-- Adding Toggle to aimtab
+aimtab:AddToggle('InstantReload', {
+    Text = 'Instant Reload',
+    Tooltip = 'Instant Reload',
+    Default = false,
+    
+    Callback = function(isToggled)
+        if isToggled then
+            -- Enable instant reload and set high speed
+            setSpeedMultiplier(100)
+        else
+            -- Disable instant reload and reset to normal speed
+            setSpeedMultiplier(1)
+        end
+    end
+})
+
+-- Start monitoring the ViewModel in a coroutine to avoid blocking the main thread
+coroutine.wrap(monitorViewModel)()
+
+local function nostalgiaModePd(enabled)
+    if enabled then
+        game.Lighting.Brightness = 14
+        game.Lighting.GlobalShadows = false
+        game.Lighting.Technology = Enum.Technology.Compatibility
+    else
+        game.Lighting.Brightness = 1
+        game.Lighting.GlobalShadows = true
+        game.Lighting.Technology = Enum.Technology.Future
+    end
+end
+
+aimtab:AddToggle('NostalgiaMode', {
+    Text = 'Old Times Mode',
+    Tooltip = 'Old Times Mode',
+    Default = false,
+
+    Callback = function(enabled)
+        if enabled then
+            nostalgiaModePd(true)
+        else
+            nostalgiaModePd(false)
+        end
+    end
+})
+
+aimtab:AddToggle('Aimbot', {
+    Text = 'Aim Bot',
+    Tooltip = 'Locks To Head Or Torso',
+    Default = false,
+
+    Callback = function(first)
+        toggleAimbot()
+    end
+
+    }):AddKeyPicker('aimbotkeybind', {
+    Default = 'None',
+    SyncToggleState = true,
+
+    Mode = 'Toggle',
+
+    Text = 'Aimbot Key Bind',
+    NoUI = false,
+
+    Callback = function(Value)
+    end,
+})
+
+aimtab:AddButton('No Gun Weight', function()
+
+local playerName = game.Players.LocalPlayer.Name
+
+-- Access the player's inventory based on their actual name
+local playerInventory = game.ReplicatedStorage.Players[playerName].Inventory
+
+
+
+-- Loop through all items in the inventory and set the "MovementModifier" attribute
+for _, item in pairs(playerInventory:GetChildren()) do
+    if item:FindFirstChild("ItemProperties") and item.ItemProperties:FindFirstChild("Tool") then
+        item.ItemProperties.Tool:SetAttribute("MovementModifer", "0")
+    end
+end
+
+
+ end)
+
+aimtab:AddSlider('hydration', {
+    Text = 'Hydration Slider',
+    Default = 3700,
+    Min = 0,
+    Max = 3700,
+    Rounding = 3,
+    Compact = true,
+}):OnChanged(function(state)
+    local playerName = game.Players.LocalPlayer.Name
+
+
+local playerInventory = game.ReplicatedStorage.Players[playerName].Status.GameplayVariables
+
+
+playerInventory.Hydration:SetAttribute("Value", state)
+end)
+
+
+aimtab:AddSlider('radiationslider', {
+    Text = 'Radiation Slider',
+    Default = 0,
+    Min = 0,
+    Max = 800,
+    Rounding = 3,
+    Compact = true,
+}):OnChanged(function(state)
+    local playerName = game.Players.LocalPlayer.Name
+
+
+local playerInventory = game.ReplicatedStorage.Players[playerName].Status.GameplayVariables
+
+
+playerInventory.Radiation:SetAttribute("Value", state)
+end)
+
+
+aimtab:AddSlider('legfracture', {
+    Text = 'Leg Fracture Slider',
+    Default = 0,
+    Min = 0,
+    Max = 30,
+    Rounding = 1,
+    Compact = true,
+}):OnChanged(function(state)
+    local playerName = game.Players.LocalPlayer.Name
+
+
+local playerInventory = game.ReplicatedStorage.Players[playerName].Status.GameplayVariables
+
+
+playerInventory.LegFracture:SetAttribute("Value", state)
+end)
+
+
+aimtab:AddSlider('Bleeding', {
+    Text = 'Bleeding Slider',
+    Default = 0,
+    Min = 0,
+    Max = 70,
+    Rounding = 1,
+    Compact = true,
+}):OnChanged(function(state)
+    local playerName = game.Players.LocalPlayer.Name
+
+
+local playerInventory = game.ReplicatedStorage.Players[playerName].Status.GameplayVariables
+
+
+playerInventory.Bleeding:SetAttribute("Value", state)
+end)
+
+
+aimtab:AddSlider('hunger', {
+    Text = 'Hunger Slider',
+    Default = 2000,
+    Min = 0,
+    Max = 2000,
+    Rounding = 3,
+    Compact = true,
+}):OnChanged(function(state)
+    local playerName = game.Players.LocalPlayer.Name
+
+
+local playerInventory = game.ReplicatedStorage.Players[playerName].Status.GameplayVariables
+
+
+playerInventory.Hunger:SetAttribute("Value", state)
+end)
+
+
+aimtab:AddDropdown('raritychanger', {
+    Values = { 'Epic', 'Common', 'Legendary' },
+    Default = 1,
+    Multi = false,
+    Text = 'Rarity Changer',
+    Tooltip = 'Works For All Guns!',
+    Callback = function(state)
+       
+local playerName = game.Players.LocalPlayer.Name
+
+
+local playerInventory = game.ReplicatedStorage.Players[playerName].Inventory
+
+
+for _, item in pairs(playerInventory:GetChildren()) do
+
+    if item:FindFirstChild("ItemProperties") then
+
+        item.ItemProperties:SetAttribute("Rarity", state)
+    end
+end
+
+
+
+    end
+})
+
+aimtab:AddDropdown('aimbottargetpart', {
+    Values = { 'HumanoidRootPart', 'Head' },
+    Default = 2,
+    Multi = false,
+    Text = 'Aimbot Target Part',
+    Tooltip = 'Select a part for targeting (Aimbot)',
+    Callback = function(Value)
+        targetPart = Value -- Update the target part based on dropdown selection
+    end
+})
+
+
+
+local function norecoil()
+
+for i,v in pairs(ammo:GetChildren()) do
+     v:SetAttribute("RecoilStrength", "0")
+end
+
+end
+
+aimtab:AddToggle('InstantHit', {
+    Text = 'Instant Hit',
+    Tooltip = 'Instant Hit',
+    Default = false,
+
+    Callback = function(enabled)
+        -- Locate the AmmoTypes folder in ReplicatedStorage
+        local ammo = game.ReplicatedStorage:FindFirstChild("AmmoTypes")
+        if ammo then
+            -- Iterate through all children of AmmoTypes
+            for _, v in pairs(ammo:GetChildren()) do
+                -- If the toggle is enabled, set MuzzleVelocity to 3200, else revert it to default (you might need to set the correct default value)
+                if enabled then
+                    v:SetAttribute("MuzzleVelocity", 3200)
+                else
+                    v:SetAttribute("MuzzleVelocity", 3100) -- Replace 1500 with the default value you want
+                end
+            end
+        end
+    end
+})
+
+
+-- Create the recoil slider and handle its change event
+aimtab:AddSlider('RecoilStrength', {
+    Text = 'Recoil Slider',
+    Default = 230,
+    Min = 0,
+    Max = 300,
+    Rounding = 0,
+    Compact = false,
+}):OnChanged(function(State)
+    -- Check if the slider value is zero
+    if State == 0 then
+        -- Set the recoil strength to "0" for all children of ammo
+        for i, v in pairs(ammo:GetChildren()) do
+            v:SetAttribute("RecoilStrength", "0")
+        end
+    else
+        -- Set the recoil strength to the slider value for all children of ammo
+        for i, v in pairs(ammo:GetChildren()) do
+            v:SetAttribute("RecoilStrength", State)
+        end
+    end
+end)
+
+
+local function predict_drop(part, entity, projectile_speed, projectile_drop)
+    local distance = (trident.middlepart.Position - part.Position).Magnitude
+    local time_to_hit = (distance / projectile_speed)
+    local final_projectile_speed = projectile_speed * (time_to_hit) * projectile_speed ^ 2
+    time_to_hit = time_to_hit + (distance / final_projectile_speed)
+    local drop_timing = projectile_drop ^ (time_to_hit * projectile_drop) - 1
+    if not (drop_timing ~= drop_timing) then
+        return drop_timing
+    end
+    return 0
+end
+
+aimtab:AddButton('Drop Prediction', function()
+
+predict_drop()
+
+end)
+
+
+aimtab:AddLabel("Default Is 0.118", true)
+
+-- Slider setup
+aimtab:AddSlider('Predictionslider', {
+    Text = 'Prediction Slider',
+    Default = 0.118,
+    Min = 0.1,
+    Max = 0.340,
+    Rounding = 3,
+    Compact = true,
+}):OnChanged(function(state)
+    if type(state) == "number" then
+        predictionFactor = state
+        print("Prediction factor updated to:", predictionFactor)
+    else
+        warn("Slider state is not a number:", state)
+    end
+end)
+
+
+
+-- Get all available materials in Roblox
+local materials = {}
+for _, material in ipairs(Enum.Material:GetEnumItems()) do
+    table.insert(materials, material.Name)
+end
+
+-- Define the material mapping (for quick lookup)
+local materialMapping = {}
+for _, material in ipairs(Enum.Material:GetEnumItems()) do
+    materialMapping[material.Name] = material
+end
+
+-- Dropdown setup with all materials
+aimtab:AddDropdown('dv2materialchanger', {
+    Values = materials,
+    Default = 1,
+    Multi = false,
+    Text = 'DV2 Material Changer',
+    Tooltip = 'Changes The Material Of The DV2',
+    Callback = function(selectedValue)
+        -- Get the material type based on the dropdown selection
+        local materialType = materialMapping[selectedValue]
+        
+        -- Ensure the material type exists in the mapping
+        if materialType then
+            -- Get the item from the specified path
+            local item = game.Workspace:FindFirstChild('Camera')
+                                    :FindFirstChild('ViewModel')
+                                    :FindFirstChild('Item')
+                                    :FindFirstChild('ItemRoot')
+
+            -- Check if the item was found
+            if item then
+                -- Apply the selected material to the item
+                item.Material = materialType
+                item.SurfaceAppearance:Destroy()
+            else
+                warn('Item not found at the specified path.')
+            end
+        else
+            warn('Selected material not recognized.')
+        end
+    end
+})
+
+
+aimtab:AddToggle('hitboxexpander', {
+    Text = 'Bigger Heads',
+    Tooltip = 'Bigger Heads',
+    Default = false,
+
+    Callback = function(first)
+       toggleHeadEffect()
+    end
+})
+
+aimtab:AddButton('Make Doors Invisible', function()
+
+setDoorsMaterialToForceField()
+		
+ end)
+
+-- Ensure this script is a LocalScript
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local camera = game.Workspace.CurrentCamera
+
+-- Adding the slider to adjust FOV
+aimtab:AddSlider('fovslider', {
+    Text = 'FOV Slider',
+    Default = 90,
+    Min = 0, -- Minimum FOV value
+    Max = 120,
+    Rounding = 2,
+    Compact = false,
+}):OnChanged(function(State)
+    -- Check if the camera is available
+    if camera then
+        camera.FieldOfView = State -- Update the FOV of the camera
+    else
+        warn("Camera not found!")
+    end
+end)
+
+
+
+
+
+-- Add the Head Size Slider
+aimtab:AddSlider('HeadSizeSlider', {
+    Text = 'Head Size Slider',
+    Default = 3.5,
+    Min = 1, -- Minimum normal head size
+    Max = 4,
+    Rounding = 3,
+    Compact = false,
+}):OnChanged(function(State)
+    headSizeMultiplier = State -- Update the head size multiplier when the slider changes
+    
+    -- Apply the effect to all players if it is enabled
+    if isEnabled then
+        for _, player in pairs(players:GetPlayers()) do
+            applyHeadEffect(player)
+        end
+    end
+end)
+
+-- Function to check if a target is visible (line-of-sight)
+-- Function to check if a target is visible (line-of-sight)
+-- Function to simulate holding the left mouse button
+-- Function to check if the target is a valid player (or another specific type of target)
+local function isValidTarget(target)
+    if target and target:IsA("BasePart") then
+        local character = target.Parent
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        return humanoid and humanoid.Health > 0
+    end
+    return false
+end
+
+---- Function to simulate holding the left mouse button
+--local function startAutoFire()
+--    while autoFireEnabled do
+--        local target = mouse.Target
+        
+ --       if isValidTarget(target) then
+            virtualInput:SendMouseButtonEvent(0, 0, 0, true, game, 0) -- Hold down left mouse button
+ --       else
+            virtualInput:SendMouseButtonEvent(0, 0, 0, false, game, 0) -- Release left mouse button if no valid target
+ --       end
+        
+ --       wait(0.1) -- Adjust the delay as needed
+  --  end
+    
+    -- Ensure the left mouse button is released when auto-fire is disabled
+--    virtualInput:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+--end
+
+-- Function to toggle auto-firing
+--local function toggleAutoFire()
+--    autoFireEnabled = not autoFireEnabled
+    
+--    if autoFireEnabled then
+--        print("Auto-fire enabled")
+        -- Start auto-firing in a coroutine
+--        coroutine.wrap(startAutoFire)()
+--    else
+ --       print("Auto-fire disabled")
+--    end
+--end
+
+
+--aimtab:AddToggle('atgyatshoot', {
+--    Text = 'Auto Shoot',
+ --   Tooltip = 'Auto Shoots Until That Player You Aim Dies.',
+--    Default = false,
+
+--    Callback = function(first)
+--        toggleAutoFire()
+--    end
+--}):AddKeyPicker('autoshotkeybind', {
+--    Default = 'None',
+--    SyncToggleState = true,
+
+--    Mode = 'Toggle',
+
+--    Text = 'AutoShootKeyBind',
+----    NoUI = false,
+--
+--    Callback = function(Value)
+---    end,
+--})
+
+aimtab:AddToggle('predictiontoggle13', {
+    Text = 'Prediction Toggle',
+    Tooltip = 'Prediction',
+    Default = false,
+
+    Callback = function(first)
+                print("Prediction enabled:", predictionEnabled)
+                togglePrediction()
+    end
+})
+
+-- Aim FOV Slider to adjust prediction value
+--aimtab:AddSlider('Prediction', {
+ --   Text = 'Prediction Slider',
+ --   Default = predictionFactor, -- Default value set here
+ --   Min = 0.1,
+ --   Max = 1,
+  --  Rounding = 2, -- You can set the rounding to 2 decimal places for more precise control
+ --   Compact = false,
+--}):OnChanged(function(state)
+ --   predictionFactor = state -- Update the predictionFactor based on slider value
+--    print("Prediction Factor updated to:", predictionFactor)
+--zend)
+
+local isEnabled883 = false  -- Global variable to track whether the script is enabled or disabled
+local LC = game.Players.LocalPlayer
+
+local function toggleBunnyHop()
+    isEnabled883 = not isEnabled883
+    print("Bunny Hop is now", isEnabled883 and "enabled" or "disabled")
+end
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    if isEnabled883 then
+        LC.Character.Humanoid:SetAttribute("JumpCooldown", 0)
+    end
+end)
+
+aimtab:AddToggle('Bunnyhop', {
+    Text = 'No Jump Cooldown',
+    Tooltip = 'Bunny Hop',
+    Default = false,
+
+    Callback = function(first)
+        toggleBunnyHop()
+    end
+})
+
+
+-- Define the function to update sound IDs
+local function updateSoundIds()
+    -- Fetching the sound objects
+    local hitMarkers = game.ReplicatedStorage:WaitForChild("SFX"):WaitForChild("Hits"):WaitForChild("HitMarkers")
+    local hitMarkers2 = game.ReplicatedStorage:WaitForChild("SFX"):WaitForChild("Hits"):WaitForChild("ProjectileHits")
+    
+    -- Defining the sounds dictionary with their corresponding instances
+    local sounds = {
+        Helmet = hitMarkers:FindFirstChild("Helmet"),
+        BodyArmor = hitMarkers:FindFirstChild("BodyArmor"),
+        Hit2 = hitMarkers2:FindFirstChild("Hit"),
+        Bodyshot = hitMarkers:FindFirstChild("Bodyshot"),
+        Headshot = hitMarkers:FindFirstChild("Headshot")
+    }
+
+    -- Loop through each sound and update its SoundId
+    for name, sound in pairs(sounds) do
+        if sound then
+            sound.SoundId = "rbxassetid://5043539486"
+            print(name .. " SoundId updated to: " .. sound.SoundId)
+        else
+            warn(name .. " sound not found")
+        end
+    end
+end
+
+
+
+-- Adding a button to change the hit sounds
+aimtab:AddButton('Different Hit Sounds', function()
+    updateSoundIds()
+    print("Sound IDs updated")
+end)
+
+
+local isCheckingVisibility = false
+local textLabel = nil
+local connection = nil
+
+-- Function to create the visibility text label
+local function createVisibilityText()
+    if not textLabel then
+        local screenGui = Instance.new("ScreenGui")
+        screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+        textLabel = Instance.new("TextLabel")
+        textLabel.Parent = screenGui
+        textLabel.Text = ""
+        textLabel.TextColor3 = Color3.new(0, 1, 0)
+        textLabel.BackgroundTransparency = 1
+        textLabel.Position = UDim2.new(0.5, 0, 0.9, 0) -- Positioning slightly down the middle
+        textLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+        textLabel.Font = Enum.Font.SourceSansBold
+        textLabel.TextSize = 24 -- Medium-sized text
+    end
+end
+
+-- Function to check if the player is visible
+local function isPlayerVisible(target)
+    if target and target.Parent:FindFirstChild("HumanoidRootPart") then
+        local camera = workspace.CurrentCamera
+        local humanoidRootPart = target.Parent.HumanoidRootPart
+        local ray = Ray.new(camera.CFrame.Position, (humanoidRootPart.Position - camera.CFrame.Position).unit * 5000)
+        local part, position = workspace:FindPartOnRayWithIgnoreList(ray, {camera, game.Players.LocalPlayer.Character})
+
+        if part and part:IsDescendantOf(target.Parent) then
+            return true
+        end
+    end
+    return false
+end
+
+-- Function to toggle visibility checking
+local function toggleVisibilityCheck()
+    isCheckingVisibility = not isCheckingVisibility
+
+    if isCheckingVisibility then
+        createVisibilityText()
+
+        connection = game:GetService("RunService").RenderStepped:Connect(function()
+            local target = game.Players.LocalPlayer:GetMouse().Target
+            if isPlayerVisible(target) then
+                textLabel.Text = "Player Visible"
+            else
+                textLabel.Text = ""
+            end
+        end)
+    else
+        if connection then
+            connection:Disconnect()
+            connection = nil
+        end
+        if textLabel then
+            textLabel.Text = ""
+        end
+    end
+end
+
+-- Example usage: toggle visibility checking on/off
+--toggleVisibilityCheck() -- Call this to enable or disable the function
+
+
+--aimtab:AddToggle('faketoggle1', {
+  --  Text = 'Better Aimbot',
+  --  Tooltip = 'Better Aimbot',
+ --   Default = false,
+
+  --  Callback = function(first)
+        
+ --   end
+--})
+
+--aimtab:AddToggle('automatic131', {
+--    Text = 'Automatic Prediction Adjust',
+--    Tooltip = 'Automatic Prediction Adjust',
+--    Default = false,
+--
+--    Callback = function(first)
+--       toggleAdjustPrediction()
+--    end
+--})
+
+--toggleSwimmingState()
+
+
+aimtab:AddToggle('walkunderwater', {
+    Text = 'Walk Under Water',
+    Tooltip = 'Walk Under The Water',
+    Default = false,
+
+    Callback = function(first)
+        toggleSwimmingState()
+    end
+})
+
+
+
+
+local UserInputService3es = game:GetService("UserInputService")
+local Players3es = game:GetService("Players")
+local RunService3es = game:GetService("RunService")
+local Workspace3es = game:GetService("Workspace")
+
+local player3es = Players3es.LocalPlayer
+local mouse3es = player3es:GetMouse()
+local keybind3es = Enum.KeyCode.G  --- for retard niggers this is keybind
+local aimLockEnabled3es = false  --- Toggle for enabling/disabling aimlock
+local aimLock3es = false  --- To track if aimlock is currently active
+local lockedPlayer3es = nil
+
+local function findClosestPlayerToCursor3es()
+    local closestPlayer3es = nil
+    local shortestDistance3es = math.huge
+    for _, otherPlayer3es in pairs(Players3es:GetPlayers()) do
+        if otherPlayer3es ~= player3es and otherPlayer3es.Character and otherPlayer3es.Character:FindFirstChild("HumanoidRootPart") then
+            local screenPosition3es, onScreen3es = Workspace3es.CurrentCamera:WorldToScreenPoint(otherPlayer3es.Character.HumanoidRootPart.Position)
+            if onScreen3es then
+                local distanceFromMouse3es = (Vector2.new(screenPosition3es.X, screenPosition3es.Y) - Vector2.new(mouse3es.X, mouse3es.Y)).magnitude
+                if distanceFromMouse3es < shortestDistance3es then
+                    shortestDistance3es = distanceFromMouse3es
+                    closestPlayer3es = otherPlayer3es
+                end
+            end
+        end
+    end
+    return closestPlayer3es
+end
+
+local function teleportAndLockToHead3es()
+    local closestPlayer3es = findClosestPlayerToCursor3es()
+    if closestPlayer3es and player3es.Character and player3es.Character:FindFirstChild("HumanoidRootPart") then
+        local head3es = closestPlayer3es.Character:FindFirstChild("Head")
+        if head3es then
+            local targetPosition3es = closestPlayer3es.Character.HumanoidRootPart.Position - (closestPlayer3es.Character.HumanoidRootPart.CFrame.LookVector * 5)
+            local targetOrientation3es = closestPlayer3es.Character.HumanoidRootPart.CFrame.LookVector
+
+            player3es.Character.HumanoidRootPart.Anchored = true
+            RunService3es.Stepped:Wait()
+
+            player3es.Character.HumanoidRootPart.CFrame = CFrame.new(targetPosition3es, targetPosition3es + targetOrientation3es)
+            RunService3es.Stepped:Wait()
+            player3es.Character.HumanoidRootPart.Anchored = false
+
+            Workspace3es.CurrentCamera.CFrame = CFrame.new(Workspace3es.CurrentCamera.CFrame.Position, head3es.Position)
+            aimLock3es = true
+            lockedPlayer3es = closestPlayer3es
+
+            RunService3es.RenderStepped:Connect(function()
+                if aimLock3es and lockedPlayer3es and Players3es:FindFirstChild(lockedPlayer3es.Name) then
+                    local head3es = lockedPlayer3es.Character:FindFirstChild("Head")
+                    if head3es then
+                        Workspace3es.CurrentCamera.CFrame = CFrame.new(Workspace3es.CurrentCamera.CFrame.Position, head3es.Position)
+                    end
+                end
+            end)
+        end
+    end
+end
+
+UserInputService3es.InputBegan:Connect(function(input3es, isProcessed3es)
+    if not isProcessed3es and input3es.KeyCode == keybind3es then
+        if aimLockEnabled3es then
+            aimLock3es = false
+            lockedPlayer3es = nil
+            aimLockEnabled3es = false
+        else
+            teleportAndLockToHead3es()
+            aimLockEnabled3es = true
+        end
+    end
+end)
+
+UserInputService3es.InputEnded:Connect(function(input3es, isProcessed3es)
+    if not isProcessed3es and input3es.KeyCode == keybind3es then
+        aimLock3es = false
+        lockedPlayer3es = nil
+    end
+end)
+
+player3es.CameraMode = Enum.CameraMode.LockFirstPerson
+
+
+aimtab:AddLabel("To Use TP Kill Press G", true)
+--aimtab:AddToggle('toggletpkill', {
+--    Text = 'Toggle TP Kill',
+ --   Tooltip = 'Toggle TP Kill',
+ ----   Default = false,
+
+ --   Callback = function(first)
+----        if first then
+            -- Toggle is turned on
+ --           aimLockEnabled3es = true
+--            print("TP Kill Enabled")
+ --       else
+            -- Toggle is turned off
+ --           aimLockEnabled3es = false
+ --           print("TP Kill Disabled")
+--        end
+--    end
+--})
+
+local Utility = {
+    Drawings = { };
+    Objects = { };
+    BindToRenders = { };
+    Fonts = { }
+}
+
+local tracersEnabled = false -- Initial state of tracers
+
+--- Lighting shits world
+local Lighting = game:GetService("Lighting")
+local RunService = game:GetService("RunService")
+local Terrain = workspace:FindFirstChildOfClass("Terrain")
+
+local isFiring = false
+local UserInputService = game:GetService("UserInputService")
+
+-- Function to toggle tracers on and off
+function Utility:ToggleTracers(enable)
+    tracersEnabled = enable
+end
+
+-- Function to check for ViewModel in the Camera
+function Utility:HasViewModel()
+    return workspace:FindFirstChild("Camera") and workspace.Camera:FindFirstChild("ViewModel") ~= nil
+end
+
+-- Function to create bullet tracers with gradual transparency fading and decals on all sides
+function Utility:CreateBullets(Position, From)
+    if not tracersEnabled or not self:HasViewModel() then
+        return -- Do nothing if tracers are disabled or there's no ViewModel
+    end
+
+    local direction = (Position - From).unit -- Calculate the direction vector
+
+    local BulletTracers = Instance.new("Part")
+    BulletTracers.Anchored = true
+    BulletTracers.CanCollide = false
+    BulletTracers.Material = Enum.Material.ForceField
+    BulletTracers.Color = Color3.fromRGB(119, 120, 255)
+    BulletTracers.Size = Vector3.new(0.1, 0.1, (From - Position).magnitude)
+    BulletTracers.CFrame = CFrame.new(From, Position) * CFrame.new(0, 0, -BulletTracers.Size.Z / 2)
+    BulletTracers.Name = "BulletTracers"
+    BulletTracers.Transparency = 0
+    BulletTracers.Parent = game.Workspace.NoCollision
+
+    -- Function to add decals to all sides of the part
+    local function addDecal(face)
+        local decal = Instance.new("Decal")
+        decal.Texture = "rbxassetid://7151778311"
+        decal.Face = face
+        decal.Transparency = 0
+        decal.Parent = BulletTracers
+    end
+
+    -- Add decals to each face of the part
+    addDecal(Enum.NormalId.Front)
+    addDecal(Enum.NormalId.Back)
+    addDecal(Enum.NormalId.Top)
+    addDecal(Enum.NormalId.Bottom)
+    addDecal(Enum.NormalId.Left)
+    addDecal(Enum.NormalId.Right)
+
+    -- Gradually fade the tracer out, including the decals
+    for i = 0, 1, 0.05 do
+        BulletTracers.Transparency = i
+        for _, decal in ipairs(BulletTracers:GetChildren()) do
+            if decal:IsA("Decal") then
+                decal.Transparency = i
+            end
+        end
+        wait(0.1) -- Adjust for faster or slower fading
+    end
+    
+    BulletTracers:Destroy()
+end
+
+-- Function to fire the weapon
+function FireWeapon()
+    local gunPosition = game.Players.LocalPlayer.Character.Head.Position -- Replace with the actual gun position
+    local mouse = game.Players.LocalPlayer:GetMouse()
+    local hitPosition = mouse.Hit.p -- Get the mouse hit position
+
+    -- Call the CreateBullets function
+    Utility:CreateBullets(hitPosition, gunPosition)
+end
+
+-- Detect when the mouse button is pressed
+UserInputService.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        isFiring = true
+
+        -- Continuously fire while holding down the button
+        spawn(function()
+            while isFiring do
+                FireWeapon()
+                wait(0.1) -- Adjust this delay to control the firing rate
+            end
+        end)
+    end
+end)
+
+-- Detect when the mouse button is released
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        isFiring = false
+    end
+end)
+
+-- Add a toggle for the tracers in the UI
+aimtab:AddToggle('tracers', {
+    Text = 'Tracers',
+    Tooltip = 'Toggle tracers on or off',
+    Default = tracersEnabled, -- Initialize with the current state
+    Callback = function(enabled)
+        Utility:ToggleTracers(enabled) -- Enable or disable based on toggle
+    end
+})
+
+
+aimtab:AddButton('No Drag', function()
+
+-- Function to set ammo drag
+local function setAmmoDrag(first)
+    local ammoTypes = game.ReplicatedStorage:FindFirstChild("AmmoTypes")
+    if not ammoTypes then
+        warn("AmmoTypes not found in ReplicatedStorage")
+        return
+    end
+
+    for _, ammoType in pairs(ammoTypes:GetChildren()) do
+        local dragValue = first and "0" or "DefaultDrag"
+        ammoType:SetAttribute("Drag", dragValue)
+    end
+end
+
+-- Call the setAmmoDrag function (example usage)
+setAmmoDrag(true) -- sets Drag to "0"
+
+
+ end)
+
+aimtab:AddButton('No Spread', function()
+
+local ammo = game.ReplicatedStorage:FindFirstChild("AmmoTypes")
+        if ammo then
+            for _, v in pairs(ammo:GetChildren()) do
+                v:SetAttribute("ProjectileWidth", first and "0" or "DefaultWidth")
+            end
+        else
+            warn("AmmoTypes not found in ReplicatedStorage")
+        end
+
+
+
+ end)
+
+local jesusEnabled = false
+local jesusFolder = workspace:FindFirstChild("JesusFolder") or Instance.new("Folder", workspace)
+jesusFolder.Name = "JesusFolder"
+
+local function onJesusToggle(enabled)
+    jesusEnabled = enabled
+
+    -- If disabled, clear the platforms and stop the function
+    if not jesusEnabled then
+        for _, v in pairs(jesusFolder:GetChildren()) do
+            v:Destroy()
+        end
+        return
+    end
+
+    -- Continuously check and create platforms if enabled
+    while jesusEnabled do
+        task.wait(0.1)
+
+        local player = game.Players.LocalPlayer
+        local character = player.Character
+
+        if not character then
+            continue
+        end
+
+        local head = character:FindFirstChild("Head")
+        if not head then continue end
+
+        local rayOrigin = head.Position + Vector3.new(0, 150, 0) + workspace.CurrentCamera.CFrame.LookVector * 5
+        local rayDirection = Vector3.new(0, -300, 0)
+        local rayParams = RaycastParams.new()
+        rayParams.FilterType = Enum.RaycastFilterType.Exclude
+        rayParams.FilterDescendantsInstances = {character}
+
+        local rayResult = workspace:Raycast(rayOrigin, rayDirection, rayParams)
+
+        if rayResult and rayResult.Material == Enum.Material.Water then
+            local platform = Instance.new("Part")
+            platform.Size = Vector3.new(500, 1, 500)
+            platform.Anchored = true
+            platform.CanCollide = true
+            platform.Position = rayResult.Position + Vector3.new(0, 0.3, 0) -- Slightly above water surface
+            platform.Material = Enum.Material.ForceField
+            platform.Parent = jesusFolder
+        end
+    end
+end
+-- Toggle implementation
+aimtab:AddToggle('jesus', {
+    Text = 'Walk On Water',
+    Tooltip = 'Lets You Walk On Water',
+    Default = false,
+
+    Callback = function(value)
+        onJesusToggle(value)
+    end
+})
+
+
+
+
+--aimtab:AddToggle('WalkOnWater', {
+--    Text = 'Walk On Water',
+--    Tooltip = 'Lets You Walk On Water',
+--    Default = false,
+
+--    Callback = function(first)
+ --           local character = LC.Character or LC.CharacterAdded:Wait()
+--            local part = character:FindFirstChild("Head")
+ --           local rayparams = RaycastParams.new()
+ --           rayparams.FilterType = Enum.RaycastFilterType.Exclude
+ --   
+  --          rayparams.FilterDescendantsInstances = {character}
+    
+ --   end
+--})
+
+aimtab:AddButton('Remove Scope From Gun', function()
+
+
+game.workspace:FindFirstChild("Camera"):FindFirstChild("ViewModel"):FindFirstChild("Item"):FindFirstChild("Attachments"):FindFirstChild("Sight"):Destroy()
+
+ end)
+
+aimtab:AddButton('Disable OKP7 SCOPE GUI', function()
+
+
+game.workspace:FindFirstChild("Camera"):FindFirstChild("ViewModel"):FindFirstChild("Item"):FindFirstChild("Attachments"):FindFirstChild("Sight"):FindFirstChild("OKP7"):FindFirstChild("Reticle"):FindFirstChild("ScopeGui"):Destroy()
+
+ end)
+
+aimtab:AddButton('Remove Gloves From Viewmodel', function()
+
+
+game.workspace:FindFirstChild("Camera"):FindFirstChild("ViewModel"):FindFirstChild("CombatGloves"):Destroy()	
+
+ end)
+
+aimtab:AddToggle('VisibleText', {
+    Text = 'Visible Text',
+    Tooltip = 'Tells you if the user you aim is visible or not',
+    Default = false,
+
+    Callback = function(first)
+        toggleVisibilityCheck()
+    end
+})
+
+pdlt.exitespfun = function(drop)
+    local dropesp = Drawing.new("Text")
+    dropesp.Visible = false
+    dropesp.Center = true
+    dropesp.Outline = true
+    dropesp.Font = varsglobal.visuals.font
+    dropesp.Size = 13
+    local renderstepped
+    renderstepped = RunService.Stepped:Connect(LPH_JIT_MAX(function()
+        dropesp.Font = varsglobal.visuals.font
+        if Toggles["exitesppdlt"].Value and drop then
+            dropesp.Color = Options.exitespcolor.Value
+            local drop_pos, drop_onscreen = camera:WorldToViewportPoint(drop.Position)
+            if drop_onscreen then
+                dropesp.Position = Vector2.new(drop_pos.X, drop_pos.Y)
+                dropesp.Text = drop.Name .. "\n[" .. math.floor((camera.CFrame.p - drop.Position).Magnitude * 0.28) ..
+                    "]"
+                dropesp.Visible = true
+            else
+                dropesp.Visible = false
+            end
+        else
+            dropesp.Visible = false
+            dropesp:Remove()
+            renderstepped:Disconnect()
+        end
+    end))
+end
+
+
+
+aimtab:AddToggle('exitesppdlt', {
+    Text = 'exit esp',
+    Tooltip = 'Shows Exits',
+    Default = false,
+
+    Callback = function(first)
+        if first then
+            for _, drop in next, workspace.NoCollision.ExitLocations:GetChildren() do
+                pdlt.exitespfun(drop)
+            end
+            workspace.NoCollision.ExitLocations.ChildAdded:Connect(function(drop)
+                pdlt.exitespfun(drop)
+            end)
+        end
+    end
+}):AddColorPicker('exitespcolor', {
+    Default = Color3.new(1, 1, 1),
+    Title = 'esp color',
+    Transparency = 0,
+})
+
+
+aimtab:AddButton('Remove Mag From Viewmodel', function()
+
+
+local camera = game.Workspace:FindFirstChild("Camera")
+if camera then
+    local viewModel = camera:FindFirstChild("ViewModel")
+    if viewModel then
+        local item = viewModel:FindFirstChild("Item")
+        if item then
+            local attachments = item:FindFirstChild("Attachments")
+            if attachments then
+                local magazine = attachments:FindFirstChild("Magazine")
+                if magazine then
+                    magazine:Destroy()
+                else
+                    warn("Magazine not found in Attachments")
+                end
+            else
+                warn("Attachments not found in Item")
+            end
+        else
+            warn("Item not found in ViewModel")
+        end
+    else
+        warn("ViewModel not found in Camera")
+    end
+else
+    warn("Camera not found in Workspace")
+end
+
+
+ end)
+print('number_' .. tostring(counter))
+counter = counter + 1
+local charactertab = pdeltatabbox1:AddTab("misc")
+do
+    if game.PlaceId == 7336302630 then
+        local lagger_debouce = 0
+        local lagger_strenght = 1000
+        local lagger_auto = false
+        local function lag(...)
+            LPH_JIT_MAX(function()
+                if lagger_debouce < tick() then
+                    if (camera.CFrame.p - Vector3.new(-136.8913116455078, 22.075862884521484, -415.0973815917969)).Magnitude < 15 then
+                        lagger_debouce = tick() + lagger_strenght / 1000 * 1.6
+                        for i = 1, lagger_strenght do
+                            coroutine.resume(coroutine.create(function()
+                                local args = {
+                                    [1] = workspace.Model.MeshPart,
+                                    [2] = Vector3.new(-136.8913116455078, 22.075862884521484, -415.0973815917969),
+                                    [3] = Vector3.new(-0.6733897924423218, -0.06580131500959396, 0.7363536357879639),
+                                    [4] = Enum.Material.Metal,
+                                    [5] = Vector3.new(0.4024893045425415, 0.8358040452003479, -0.373408704996109)
+                                }
+                                game:GetService("ReplicatedStorage").Remotes.MeleeReplicate:FireServer(unpack(args))
+                                game:GetService("NetworkClient"):SetOutgoingKBPSLimit(math.huge)
+                            end))
+                        end
+                    else
+                        Library:Notify("too far")
+                    end
+                else
+                    Library:Notify("please wait " .. tostring(math.round(lagger_debouce - tick())) .. " seconds")
+                end
+            end)
+            end
+            end
+            end
+ 
+   
+local Target
+local CircleOutline = Drawing.new("Circle")
+local CircleInline = Drawing.new("Circle")
+CircleInline.Transparency = 1
+CircleInline.Thickness = 1
+CircleInline.ZIndex = 2
+CircleOutline.Thickness = 3
+CircleOutline.Color = Color3.new()
+CircleOutline.ZIndex = 1
+
+pdlt.corpseespfun = function(drop)
+    local dropesp = Drawing.new("Text")
+    dropesp.Visible = false
+    dropesp.Center = true
+    dropesp.Outline = true
+    dropesp.Font = varsglobal.visuals.font
+    dropesp.Size = 13
+    local renderstepped
+    renderstepped = RunService.Stepped:Connect(LPH_JIT_MAX(function()
+        dropesp.Font = varsglobal.visuals.font
+        if pdlt.corpseesp and drop then
+            if drop:FindFirstChildOfClass("Humanoid") and drop:FindFirstChildOfClass("MeshPart") then
+                dropesp.Color = pdlt.corpsecolor
+                local drop_pos, drop_onscreen = camera:WorldToViewportPoint(drop:FindFirstChildOfClass("MeshPart")
+                    .Position)
+                if drop_onscreen then
+                    dropesp.Position = Vector2.new(drop_pos.X, drop_pos.Y)
+                    dropesp.Text = drop.Name .. "'s " .. "Corpse"
+                    dropesp.Visible = true
+                else
+                    dropesp.Visible = false
+                end
+            else
+                dropesp.Visible = false
+            end
+        else
+            dropesp.Visible = false
+            dropesp:Remove()
+            renderstepped:Disconnect()
+        end
+    end))
+end
+
+Library:Notify("Doge Hub V1")
+Library:Notify(executorname33)
+Library:Notify("Main Code By Swimhub")
+Library:Notify("Optimization Loaded")
+wait(1)
+Library:Notify("Loading Silent Aim By Pec")
+wait(0.4)
+Library:Notify("Loaded")
+
+pdlt.AIespfun = function(drop)
+    local dropesp = Drawing.new("Text")
+    dropesp.Visible = false
+    dropesp.Center = true
+    dropesp.Outline = true
+    dropesp.Font = varsglobal.visuals.font
+    dropesp.Size = 13
+    local renderstepped
+    renderstepped = RunService.Stepped:Connect(LPH_JIT_MAX(function()
+        dropesp.Font = varsglobal.visuals.font
+        if pdlt.AIesp and drop then
+            dropesp.Color = pdlt.AIcolor
+            if drop:FindFirstChildOfClass("Humanoid") and drop:FindFirstChild("Head") and drop:FindFirstChildOfClass("Humanoid").Health > 0 then
+                local drop_pos, drop_onscreen = camera:WorldToViewportPoint(drop:FindFirstChild("Head").Position)
+                if drop_onscreen then
+                    dropesp.Position = Vector2.new(drop_pos.X, drop_pos.Y)
+                    dropesp.Text = drop.Name ..
+                        "\n" ..
+                        math.round(drop:FindFirstChildOfClass("Humanoid").Health) ..
+                        "hp" ..
+                        "\n" .. math.floor((camera.CFrame.p - drop:FindFirstChild("Head").Position).Magnitude * 0.28)
+                    dropesp.Visible = true
+                else
+                    dropesp.Visible = false
+                end
+            else
+                dropesp.Visible = false
+            end
+        else
+            dropesp.Visible = false
+            dropesp:Remove()
+            renderstepped:Disconnect()
+        end
+    end))
+end
+aimtab:AddToggle('sil1e2nw22', {
+    Text = 'corpse esp',
+    Tooltip = 'Shows Corpses',
+    Default = false,
+
+    Callback = function(first)
+        pdlt.corpseesp = first
+        if first then
+            for _, drop in next, workspace.DroppedItems:GetChildren() do
+                if drop:FindFirstChildOfClass("Humanoid") then
+                    pdlt.corpseespfun(drop)
+                end
+            end
+            workspace.DroppedItems.ChildAdded:Connect(function(drop)
+                if drop:FindFirstChildOfClass("Humanoid") then
+                    pdlt.corpseespfun(drop)
+                end
+            end)
+        end
+    end
+}):AddColorPicker('fovc1114olor', {
+    Default = Color3.new(1, 1, 1),
+    Title = 'esp color',
+    Transparency = 0,
+    Callback = function(Value)
+        pdlt.corpsecolor = Value
+    end
+})
+aimtab:AddToggle('sil21e2nw22', {
+    Text = 'ai esp',
+    Tooltip = 'AI Esp',
+    Default = false,
+
+    Callback = function(first)
+        pdlt.AIesp = first
+        if first then
+            for _, drop in next, game:GetService("Workspace").AiZones:GetDescendants() do
+                if drop:FindFirstChildOfClass("Humanoid") and drop:FindFirstChildOfClass("MeshPart") and drop:FindFirstChildOfClass("Humanoid").Health > 0 then
+                    pdlt.AIespfun(drop)
+                end
+            end
+            for _, folder in next, game:GetService("Workspace").AiZones:GetChildren() do
+                folder.ChildAdded:Connect(function(drop)
+                    if drop.Parent and drop.Parent:FindFirstChildOfClass("Humanoid") and drop.Parent:FindFirstChildOfClass("MeshPart") and drop:FindFirstChildOfClass("Humanoid").Health > 0 then
+                        pdlt.AIespfun(drop.Parent)
+                    end
+                end)
+            end
+        end
+    end
+}):AddColorPicker('fo44vc1114olor', {
+    Default = Color3.new(1, 1, 1),
+    Title = 'ai color',
+    Transparency = 0,
+    Callback = function(Value)
+        pdlt.AIcolor = Value
+    end
+})
+local function IsTargetVisible(target)
+    if not plr.Character then return false end
+    if not target then return false end
+    if not camera:FindFirstChildOfClass("Model") then return false end
+    if not camera:FindFirstChildOfClass("Model"):FindFirstChild("AimPart") then return false end
+    local params = RaycastParams.new()
+    params.FilterType = Enum.RaycastFilterType.Exclude
+    params.FilterDescendantsInstances = { plr.Character, camera, workspace.NoCollision }
+    params.IgnoreWater = true
+    params.CollisionGroup = "WeaponRay"
+    local from = workspace.Camera.ViewModel:FindFirstChild("AimPart")
+    local part, _ = workspace:Raycast(from.CFrame.p, (target.Position - from.CFrame.p).Unit * 6000, params)
+    if part.Instance and part.Instance:IsDescendantOf(target.Parent) then
+        local humanoid = target.Parent:FindFirstChildOfClass("Humanoid")
+        if humanoid and humanoid.Parent == target.Parent then
+            return true
+        end
+    end
+    return false
+end
+-- Services and Variables
+-- Services and Variables
+-- Services and Variables
+-- Services and Variables
+local UserInputService = game:GetService("UserInputService")
+local camera = workspace.CurrentCamera
+local isSilentAimEnabled = false
+local fovRadius = 100
+local fovCircleee93s3
+local targetCharacteree93s3
+local fakeCameraee93s3
+local predictionvaluesr33 = 0.125  -- Prediction value (deltaTime) for future position
+
+-- Function to create the FOV circle UI element
+local function createFovCircleee93s3()
+    local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    local screenGui = Instance.new("ScreenGui", playerGui)
+    screenGui.Name = "FovGui"
+
+    fovCircleee93s3 = Instance.new("Frame", screenGui)
+    fovCircleee93s3.Name = "FovCircleee93s3"
+    fovCircleee93s3.Size = UDim2.new(0, fovRadius * 2, 0, fovRadius * 2)
+    fovCircleee93s3.Position = UDim2.new(0.5, -fovRadius, 0.5, -fovRadius)
+    fovCircleee93s3.BackgroundTransparency = 1
+    fovCircleee93s3.AnchorPoint = Vector2.new(0.5, 0.5)
+
+    local outline = Instance.new("ImageLabel", fovCircleee93s3)
+    outline.Size = UDim2.new(1, 0, 1, 0)
+    outline.BackgroundTransparency = 1
+    outline.Image = "rbxassetid://7075853722"
+    outline.ImageTransparency = 0.5
+    outline.AnchorPoint = Vector2.new(0.5, 0.5)
+    outline.Position = UDim2.new(0.5, 0, 0.5, 0)
+
+    fovCircleee93s3.Visible = false
+end
+
+-- Function to create the Fake Camera part
+local function createFakeCameraee93s3()
+    fakeCameraee93s3 = Instance.new("Part")
+    fakeCameraee93s3.Name = "FakeCameraee93s3"
+    fakeCameraee93s3.Size = Vector3.new(1, 1, 1)
+    fakeCameraee93s3.Anchored = true
+    fakeCameraee93s3.CanCollide = false
+    fakeCameraee93s3.Transparency = 1
+    fakeCameraee93s3.Parent = workspace
+end
+
+-- Function to predict target position based on velocity
+local function predictTargetPosition(target, deltaTime)
+    local head = target:FindFirstChild("Head")
+    if head and target:FindFirstChild("HumanoidRootPart") then
+        local humanoidRootPart = target.HumanoidRootPart
+        local velocity = humanoidRootPart.AssemblyLinearVelocity
+        local currentPosition = head.Position
+        return currentPosition + velocity * deltaTime
+    end
+    return nil
+end
+
+-- Function to find the enemy within the FOV circle
+local function findTargetWithinFovCircle()
+    local player = game.Players.LocalPlayer
+    local mouse = player:GetMouse()
+    local unitRay = camera:ScreenPointToRay(mouse.X, mouse.Y)
+    local ray = Ray.new(unitRay.Origin, unitRay.Direction * 5000)
+    local hit, position = workspace:FindPartOnRay(ray, player.Character)
+
+    if hit and hit.Parent then
+        local character = hit.Parent
+        if character:FindFirstChild("Head") and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0 then
+            -- Check if the target is within the FOV circle
+            local screenPoint = camera:WorldToScreenPoint(character.Head.Position)
+            local distanceFromCenter = (Vector2.new(screenPoint.X, screenPoint.Y) - Vector2.new(mouse.X, mouse.Y)).Magnitude
+            if distanceFromCenter <= fovRadius then
+                return character
+            end
+        end
+    end
+
+    return nil
+end
+
+-- Function to handle silent aim with prediction
+local function handleSilentAimee93s3()
+    if not isSilentAimEnabled or not UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
+        return
+    end
+
+    if not targetCharacteree93s3 then
+        targetCharacteree93s3 = findTargetWithinFovCircle()
+    end
+
+    if targetCharacteree93s3 then
+        local head = targetCharacteree93s3:FindFirstChild("Head")
+        if head then
+            -- Predict target's future position using predictionvaluesr33
+            local predictedPosition = predictTargetPosition(targetCharacteree93s3, predictionvaluesr33)
+
+            -- Update Fake Camera to point at the predicted position or head
+            if fakeCameraee93s3 then
+                fakeCameraee93s3.CFrame = CFrame.new(camera.CFrame.Position, predictedPosition or head.Position)
+            end
+
+            -- Simulate the camera aiming towards the target
+            if camera:FindFirstChild("ViewModel") then
+                local vm = camera.ViewModel
+                local ap = vm:FindFirstChild("AimPart")
+                local apc = vm:FindFirstChild("AimPartCanted")
+
+                if ap and apc then
+                    -- Aim towards the predicted position or head
+                    local aimPosition = predictedPosition or head.Position
+                    ap.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
+                    apc.CFrame = CFrame.new(camera.CFrame.Position, aimPosition)
+                end
+            end
+        end
+    end
+end
+
+-- Function to update FOV circle visibility and position
+local function updateFovCircleee93s3()
+    local mouse = game.Players.LocalPlayer:GetMouse()
+    if fovCircleee93s3 then
+        fovCircleee93s3.Position = UDim2.new(0, mouse.X - fovRadius, 0, mouse.Y - fovRadius)
+        fovCircleee93s3.Visible = isSilentAimEnabled
+    end
+end
+
+-- Initialize the FOV circle and fake camera
+createFovCircleee93s3()
+createFakeCameraee93s3()
+
+-- Example loop to continuously check and update
+game:GetService("RunService").RenderStepped:Connect(function()
+    updateFovCircleee93s3()
+    handleSilentAimee93s3()
+end)
+
+aimtab:AddToggle('silenw23', {
+    Text = 'old silent aim',
+    Default = false,
+
+    Callback = function(first)
+        pdlt.silentaim = first
+    end
+})
+
+aimtab:AddSlider('silentpred', {
+    Text = 'Silent Prediction',
+    Default = predictionvaluesr33,
+    Min = 0.1,
+    Max = 0.700,
+    Rounding = 3,
+    Compact = true,
+}):OnChanged(function(value)
+    predictionvaluesr33 = value
+end)
+
+-- Initialize the UI toggle
+aimtab:AddToggle('silenw22', {
+    Text = 'Silent Aim',
+    Tooltip = 'Toggle Silent Aim ❤️PEC❤️',
+    Default = false,
+    Callback = function(isEnabled)
+        isSilentAimEnabled = isEnabled
+        targetCharacteree93s3 = nil  -- Reset locked character when toggling
+        updateFovCircleee93s3()
+        -- Initialize the FOV circle and fake camera
+createFovCircleee93s3()
+createFakeCameraee93s3()
+    end
+}):AddKeyPicker('silentaimbind', {
+    Default = 'None',
+    SyncToggleState = true,
+
+    Mode = 'Toggle',
+
+    Text = 'Silent Aim Bind (Pec ❤️)',
+    NoUI = false,
+
+    Callback = function(Value)
+    end,
+})
+
+-- Listen for mouse button down (right-click) to lock aim
+local userInputService = game:GetService("UserInputService")
+userInputService.InputBegan:Connect(function(input, gameProcessed)
+    if input.UserInputType == Enum.UserInputType.MouseButton2 and not gameProcessed then  -- Right mouse button
+        if isSilentAimEnabled then
+            targetCharacteree93s3 = findTargetWithinFovee93s3()
+        end
+    end
+end)
+
+-- Listen for mouse button up (right-click) to unlock aim
+userInputService.InputEnded:Connect(function(input, gameProcessed)
+    if input.UserInputType == Enum.UserInputType.MouseButton2 and not gameProcessed then  -- Right mouse button
+        targetCharacteree93s3 = nil  -- Reset locked character when the right mouse button is released
+    end
+end)
+
+-- Continuously update silent aim and FOV circle
+game:GetService("RunService").RenderStepped:Connect(function()
+    if isSilentAimEnabled and userInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
+        handleSilentAimee93s3()
+    end
+    updateFovCircleee93s3()
+end)
+
+-- Initialize the FOV circle and Fake Camera
+createFovCircleee93s3()
+createFakeCameraee93s3()
+
+aimtab:AddToggle('silen1w22', {
+    Text = 'npc aim',
+    Tooltip = 'Npc Aim (Cooked)',
+    Default = false,
+
+    Callback = function(first)
+        pdlt.npcsilentaim = first
+    end
+}):AddKeyPicker('npcaimbind', {
+    Default = 'None',
+    SyncToggleState = true,
+
+    Mode = 'Toggle',
+
+    Text = 'npc aim bind',
+    NoUI = false,
+
+    Callback = function(Value)
+    end,
+})
+aimtab:AddToggle('si111123lenw22', {
+    Text = 'wallcheck',
+    Tooltip = 'Wallcheck',
+    Default = false,
+
+    Callback = function(first)
+        pdlt.silentaimwall = first
+    end
+})
+aimtab:AddDropdown('SilentAimHitPartjb', {
+    Values = { 'HumanoidRootPart', 'Head' },
+    Default = 1,
+    Multi = false,
+
+    Text = 'silent aim part',
+    Tooltip = 'select part',
+
+    Callback = function(Value)
+        pdlt.silentaimpart = Value
+    end
+})
+aimtab:AddToggle('dra11wfov', {
+    Text = 'draw fov',
+    Tooltip = 'Create Fov',
+    Default = false,
+    Callback = function(first)
+        pdlt.drawfov = first
+    end
+}):AddColorPicker('fovc11olor', {
+    Default = Color3.new(1, 1, 1),
+    Title = 'fov color',
+    Transparency = 0,
+
+    Callback = function(Value)
+        pdlt.fovcolor = Value
+    end
+})
+aimtab:AddToggle('fov11outline', {
+    Text = 'Fov Outline',
+    Default = false,
+    Tooltip = 'Draw Outline',
+    Callback = function(first)
+        pdlt.fovoutline = first
+    end
+})
+aimtab:AddSlider('aimfov', {
+    Text = 'aim fov',
+    Default = 60,
+    Min = 0,
+    Max = 360,
+    Rounding = 0,
+    Compact = false,
+}):OnChanged(function(State)
+    pdlt.aimfov = State
+end)
+aimtab:AddSlider('a1imfov', {
+    Text = 'p2c fov sides',
+    Default = 100,
+    Min = 0,
+    Max = 100,
+    Rounding = 0,
+    Compact = false,
+}):OnChanged(function(State)
+    pdlt.p2cmode = State
+end)
+
+aimtab:AddButton("remove foliage", function()
+    for _, v in pairs(workspace.SpawnerZones:GetDescendants()) do
+        if v.ClassName == "MeshPart" and v:FindFirstChildOfClass("SurfaceAppearance") then
+            v:Destroy()
+        end
+    end
+    workspace.SpawnerZones.DescendantAdded:Connect(function(inst)
+        if inst.ClassName == "MeshPart" and inst:FindFirstChildOfClass("SurfaceAppearance") then
+            inst:Destroy()
+        end
+    end)
+end)
+do
+    local gamesetting = {
+        killaura = false,
+        killaurarange = 10,
+        killauradelay = 0,
+        speed = false,
+        speedmode = 0, -- 0 = Basic speed, 1 = Bhop speed
+        speedspeed = 1,
+        jumpmode = 1,  -- 0 = Vanilla, 1 = Velocity
+        jumpheight = 0.4,
+        flight = false,
+        flightmode = 0, -- 0 = Damageless mode, 1 = Damage mode
+        flightspeed = 1,
+        phase = false,
+        noenvdmg = false,
+        xrayores = false,
+    }
+    local userinput = game:GetService("UserInputService")
+    local flycontrol = {
+        space = false,
+        shift = false,
+        w = false,
+        a = false,
+        s = false,
+        d = false,
+    }
+
+    userinput.InputBegan:Connect(function(input)
+        if input.KeyCode == Enum.KeyCode.W then
+            flycontrol.w = true
+        elseif input.KeyCode == Enum.KeyCode.A then
+            flycontrol.a = true
+        elseif input.KeyCode == Enum.KeyCode.S then
+            flycontrol.s = true
+        elseif input.KeyCode == Enum.KeyCode.D then
+            flycontrol.d = true
+        elseif input.KeyCode == Enum.KeyCode.Space then
+            flycontrol.space = true
+        elseif input.KeyCode == Enum.KeyCode.LeftShift then
+            flycontrol.shift = true
+        end
+    end)
+    userinput.InputEnded:Connect(function(input)
+        if input.KeyCode == Enum.KeyCode.W then
+            flycontrol.w = false
+        elseif input.KeyCode == Enum.KeyCode.A then
+            flycontrol.a = false
+        elseif input.KeyCode == Enum.KeyCode.S then
+            flycontrol.s = false
+        elseif input.KeyCode == Enum.KeyCode.D then
+            flycontrol.d = false
+        elseif input.KeyCode == Enum.KeyCode.Space then
+            flycontrol.space = false
+        elseif input.KeyCode == Enum.KeyCode.LeftShift then
+            flycontrol.shift = false
+        end
+    end)
+    charactertab:AddToggle('flight', {
+        Text = 'flight',
+        Default = false,
+        Callback = function(first)
+            gamesetting.flight = first
+        end
+    }):AddKeyPicker('flight_key',
+        {
+            Default = 'nil',
+            SyncToggleState = true,
+            Mode = 'Toggle',
+            Text = 'flight',
+            NoUI = false,
+            Callback = function(
+                Value)
+            end
+        })
+    charactertab:AddSlider('flightspeed',
+        { Text = 'flight speed', Default = 5, Min = 0.1, Max = 59, Rounding = 1, Compact = true }):OnChanged(function(
+        first)
+        gamesetting.flightspeed = first
+    end)
+    RunService.Heartbeat:Connect(LPH_NO_VIRTUALIZE(function(delta) -- physics
+        if gamesetting.flight and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            local s = gamesetting.flightspeed * 10 * delta
+            local fc = flycontrol
+            local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
+            local cf = hrp.CFrame
+            hrp.CFrame = cf *
+                CFrame.new((fc.d and s or 0) - (fc.a and s or 0), (fc.space and s or 0) - (fc.shift and s or 0),
+                    (fc.s and s or 0) - (fc.w and s or 0))
+            cf = cf *
+                CFrame.new((fc.d and s or 0) - (fc.a and s or 0), (fc.space and s or 0) - (fc.shift and s or 0),
+                    (fc.s and s or 0) - (fc.w and s or 0))
+            wrap(function()
+                for _, v in pairs(plr.Character:GetDescendants()) do
+                    if v.IsA(v, "BasePart") then
+                        v.Velocity, v.RotVelocity = Vector3.new(0, 0, 0), Vector3.new(0, 0, 0)
+                    end
+                end
+            end)
+        end
+    end))
+end
+do
+    local enabled = false
+    local peek228 = false
+    local speed = 1
+    charactertab:AddToggle("spidor_toggle", {
+        Text = "spider",
+        Default = false,
+        Callback = function(first)
+            enabled = first
+        end
+    }):AddKeyPicker('spider_bind',
+        { Default = 'None', SyncToggleState = true, Mode = 'Toggle', Text = 'spider bind', NoUI = false });
+    charactertab:AddSlider('spidor_speed',
+        { Text = 'spider speed', Default = 0, Min = 0, Max = 1, Rounding = 2, Compact = false }):OnChanged(function(abb)
+        speed =
+            abb * 5
+    end)
+    local function seewalls(pos, lookvector)
+        if pos and lookvector then
+            local ray = Ray.new(pos, (lookvector).Unit * 2)
+            local part = workspace:FindPartOnRayWithIgnoreList(ray, { plr.Character, camera })
+
+            if part then
+                return true
+            else
+                return false
+            end
+        else
+            return false
+        end
+    end
+    RunService.Stepped:Connect(LPH_NO_VIRTUALIZE(function()
+        local chr = plr.Character
+        local delta = RunService.Heartbeat:Wait()
+        if chr and chr:FindFirstChild("HumanoidRootPart") then
+            local hrp = chr:FindFirstChild("HumanoidRootPart")
+            local result
+            --print(peek228)
+            if peek228 then
+                result = seewalls(hrp.CFrame.p, hrp.CFrame.LookVector)
+            else
+                local cframe = hrp.CFrame * CFrame.new(0, -2.5, 0)
+                result = seewalls(cframe.p, cframe.LookVector)
+            end
+            if enabled and result then
+                hrp.CFrame = hrp.CFrame * CFrame.new(0, speed * 10 * delta, 0)
+                wrap(function()
+                    for _, v in pairs(plr.Character:GetDescendants()) do
+                        if v.IsA(v, "BasePart") then
+                            v.Velocity, v.RotVelocity = Vector3.new(0, 0, 0), Vector3.new(0, 0, 0)
+                        end
+                    end
+                end)
+            end
+        end
+    end))
+end
+charactertab:AddToggle("gaysexvisor", { Text = "Remove Visors", Default = false }):OnChanged(function(aa)
+    pdlt.novisor = aa
+end)
+charactertab:AddToggle("nigtard", { Text = "toggle chams", Default = false })
+charactertab:AddToggle("localcham", { Text = "character chams", Default = false }):AddColorPicker('ccc',
+    { Default = Color3.new(1, 1, 1), Title = 'character chams color' })
+charactertab:AddToggle("ac", { Text = "arm chams", Default = false }):AddColorPicker('acc',
+    { Default = Color3.new(1, 1, 1), Title = 'arm chams color' })
+charactertab:AddToggle("gm", { Text = "gun chams", Default = false }):AddColorPicker('gcc',
+    { Default = Color3.new(1, 1, 1), Title = 'gun chams color' })
+charactertab:AddDropdown("ccm",
+    { Text = "character chams material", Default = "SmoothPlastic", Values = { "ForceField", "Neon", "SmoothPlastic", "Glass" } })
+charactertab:AddDropdown("acm",
+    { Text = "arm chams material", Default = "SmoothPlastic", Values = { "ForceField", "Neon", "SmoothPlastic", "Glass" } })
+charactertab:AddDropdown("gcm",
+    { Text = "gun chams material", Default = "SmoothPlastic", Values = { "ForceField", "Neon", "SmoothPlastic", "Glass" } });
+(function()
+    charactertab:AddToggle('showmazafak', { Text = 'inventory viewer', Default = false, Callback = function(v) end })
+    charactertab:AddSlider('mazafak_x', { Text = 'X', Default = 200, Min = 0, Max = 700, Rounding = 0, Compact = true })
+    charactertab:AddSlider('mazafak_y', { Text = 'Y', Default = 200, Min = 0, Max = 700, Rounding = 0, Compact = true })
+    charactertab:AddSlider('mazafak_d',
+        { Text = 'Delay', Default = 0.25, Min = 0, Max = 1, Rounding = 2, Compact = true })
+    charactertab:AddLabel("viewmodel offset")
+    charactertab:AddSlider('view_x', { Text = 'X', Default = 0, Min = -5, Max = 5, Rounding = 2, Compact = true })
+    charactertab:AddSlider('view_y', { Text = 'Y', Default = 0, Min = -5, Max = 5, Rounding = 2, Compact = true })
+    charactertab:AddSlider('view_z', { Text = 'Z', Default = 0, Min = -5, Max = 5, Rounding = 2, Compact = true })
+    local RunService = game:GetService("RunService")
+    local inv_originalpos = Vector2.new(200, 200)
+
+    local draw, inventory, objects = {}, { objs = {} }, {}
+    function draw:new(type, props)
+        local obj = Drawing.new(type)
+        for i, v in pairs(props) do
+            obj[i] = v
+        end
+        objects[#objects + 1] = obj
+        return obj
+    end
+
+    function draw:removeall()
+        for i, v in pairs(objects) do
+            v:Remove()
+        end
+    end
+
+    function draw:changevis(value)
+        for i, v in pairs(objects) do
+            v.Visible = value
+        end
+    end
+
+    function inventory:add(_text, _size)
+        local text = draw:new("Text", {
+            Text = _text,
+            Size = _size,
+            Font = varsglobal.visuals.font,
+            Outline = true,
+            Center = false,
+            Position = inv_originalpos + Vector2.new(0, (_size + 1) * #inventory.objs),
+            Transparency = 1,
+            Visible = true,
+            Color = Color3.new(1, 1, 1),
+            ZIndex = 1,
+        })
+        inventory.objs[#inventory.objs + 1] = text
+    end
+
+    function inventory:refresh()
+        for i, v in pairs(inventory.objs) do
+            v:Remove(); inventory.objs[i] = nil;
+        end
+    end
+
+    function inventory:update(__name)
+        local rplayers = game:GetService("ReplicatedStorage").Players
+        local updateon
+        for _, rplayer in next, rplayers:GetChildren() do
+            if __name == rplayer.Name then
+                updateon = rplayer
+            end
+        end
+        if not updateon then return inventory:refresh() end
+        inventory:add("" .. updateon.Name .. " Inventory", 13)
+        inventory:add("[Hotbar]", 13)
+        for _, item in next, updateon.Inventory:GetChildren() do
+            inventory:add("    " .. item.Name, 13)
+        end
+        inventory:add("[Clothing]", 13)
+        for _, item in next, updateon.Clothing:GetChildren() do
+            inventory:add("    " .. item.Name, 13)
+            if item:FindFirstChild("Inventory") and #item.Inventory:GetChildren() ~= 0 then
+                for _, subitem in next, item.Inventory:GetChildren() do
+                    if subitem.ItemProperties:GetAttribute("Amount") then
+                        inventory:add("        " .. subitem.Name ..
+                            " => x" .. subitem.ItemProperties:GetAttribute("Amount"), 13)
+                    else
+                        inventory:add("        " .. subitem.Name, 13)
+                    end
+                end
+            end
+        end
+        inventory:add("[Equipment]", 13)
+        for _, item in next, updateon.Equipment:GetChildren() do
+            inventory:add("    " .. item.Name, 13)
+        end
+    end
+
+    local FrameTimer = tick()
+    local function pos(vm)
+        repeat task.wait() until vm.Name == "ViewModel"
+        local hrp = vm:FindFirstChild("HumanoidRootPart")
+        local vec = Vector3.new(Options["view_x"].Value, Options["view_y"].Value, Options["view_z"].Value)
+        local LUA_W = hrp:FindFirstChild("LeftUpperArm")
+        local RUA_W = hrp:FindFirstChild("RightUpperArm")
+        local IR_W = hrp:FindFirstChild("ItemRoot")
+        if LUA_W and RUA_W and IR_W then
+            LUA_W.C0 = LUA_W.C0 + vec
+            RUA_W.C0 = RUA_W.C0 + vec
+            IR_W.C0 = IR_W.C0 + vec
+        end
+    end
+    local function chams()
+        LPH_JIT_MAX(function()
+            repeat task.wait() until camera:FindFirstChildOfClass("Model").Name == "ViewModel"
+            local vm = camera:FindFirstChildOfClass("Model")
+            local hrp = vm:FindFirstChild("HumanoidRootPart")
+            if Toggles["nigtard"].Value then
+                local ItemView = vm:FindFirstChild("Item")
+                if Toggles.localcham.Value and plr.Character then -- body
+                    for _, v in pairs(plr.Character:GetChildren()) do
+                        if v.ClassName == "MeshPart" then
+                            v.Material = (Options.ccm.Value) -- local player chams mat
+                            v.Color = (Options.ccc.Value) -- local player chams color
+                        end
+                    end
+                end
+                if ItemView and Toggles.gm.Value then -- gun
+                    for _, v in pairs(ItemView:GetDescendants()) do
+                        if v.ClassName == "MeshPart" or v.ClassName == "Part" then
+                            v.Material = (Options.gcm.Value) -- gun mat
+                            v.Color = (Options.gcc.Value) -- gun color
+                        end
+                        if v:FindFirstChildOfClass("SurfaceAppearance") then
+                            v:FindFirstChildOfClass("SurfaceAppearance"):Destroy()
+                        end
+                    end
+                end
+                if Toggles.ac.Value then
+                    for _, vm_item in pairs(vm:GetChildren()) do
+                        if vm_item.ClassName == "MeshPart" then
+                            if vm_item.Name:find("Hand") or vm_item.Name:find("Arm") then
+                                vm_item.Material = (Options.acm.Value) -- hands mat
+                                vm_item.Color = (Options.acc.Value) -- hands color
+                            end
+                        end
+                        if vm_item.ClassName == "Model" and (vm_item:FindFirstChild("LL") or vm_item:FindFirstChild("LH")) then
+                            for _, shirt_item in pairs(vm_item:GetChildren()) do
+                                if shirt_item:FindFirstChildOfClass("SurfaceAppearance") then
+                                    shirt_item
+                                        :FindFirstChildOfClass("SurfaceAppearance"):Destroy()
+                                end
+                                shirt_item.Material = (Options.acm.Value)
+                                shirt_item.Color = (Options.acc.Value)
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    end
+    camera.DescendantAdded:Connect(chams)
+    camera.ChildAdded:Connect(pos)
+    RunService.Stepped:Connect(function()
+        inv_originalpos = Vector2.new(Options.mazafak_x.Value, Options.mazafak_y.Value)
+        if plr.PlayerGui:FindFirstChild("MainGui") then
+            plr.PlayerGui.MainGui.MainFrame.ScreenEffects.Visor.Visible = not
+                pdlt.novisor
+        end
+        if (tick() - FrameTimer) >= Options.mazafak_d.Value then
+            FrameTimer = tick();
+            inventory:refresh()
+            if Toggles.showmazafak.Value then
+                if Target then
+                    local name = Target.Parent.Name
+                    inventory:update(name)
+                end
+            end
+        end;
+    end)
+end)();
+local expargs = { Raycast = { ArgCountRequired = 3, Args = { "Vector3", "Vector3", "RaycastParams" } } }
+local function valargs(Args, RayMethod)
+    local Matches = 0
+    if #Args < RayMethod.ArgCountRequired then
+        return false
+    end
+    for Pos, Argument in next, Args do
+        if typeof(Argument) == RayMethod.Args[Pos] then
+            Matches = Matches + 1
+        end
+    end
+    return Matches >= RayMethod.ArgCountRequired
+end
+local CHEAT_CLIENT = {}
+function CHEAT_CLIENT:get_target()
+    local current_target = nil
+    local maximum_distance = pdlt.aimfov
+    LPH_NO_VIRTUALIZE(function()
+        
+        for i, v in pairs(plrs:GetPlayers()) do
+            if v ~= plr then
+                if v.Character and v.Character:FindFirstChild(pdlt.silentaimpart) then
+                    local position, on_screen = camera:WorldToViewportPoint(v.Character:FindFirstChild(pdlt
+                        .silentaimpart)
+                        .Position)
+                    if on_screen then
+                        local distance = (Vector2.new(position.X, position.Y - game.GuiService:GetGuiInset(game.GuiService).Y) - Vector2.new(mouse.X, mouse.Y))
+                            .Magnitude
+                        if distance < maximum_distance then
+                            current_target = v.Character:FindFirstChild(pdlt.silentaimpart)
+                            maximum_distance = distance
+                        end
+                    end
+                end
+            end
+        end
+        if pdlt.npcsilentaim then
+            for _, __no in pairs(game:GetService("Workspace").AiZones:GetChildren()) do
+                for _, v in pairs(__no:GetChildren()) do
+                    if (v:FindFirstChildOfClass("Humanoid") and v:FindFirstChild(pdlt.silentaimpart)) then
+                        local Position, OnScreen = camera:WorldToScreenPoint(v:FindFirstChild(pdlt.silentaimpart)
+                        .Position)
+                        local Distance = (Vector2.new(Position.X, Position.Y) - Vector2.new(mouse.X, mouse.Y)).Magnitude
+                        if (Distance < maximum_distance and OnScreen) then
+                            maximum_distance = Distance
+                            current_target = v:FindFirstChild(pdlt.silentaimpart)
+                        end
+                    end
+                end
+            end
+        end
+    end)()
+    return current_target
+end
+
+local inset = game:service("GuiService"):GetGuiInset().Y
+RunService.Stepped:Connect(LPH_JIT_MAX(function()
+    CircleOutline.Position = (Vector2.new(mouse.X, mouse.Y + inset))
+    CircleInline.Position = (Vector2.new(mouse.X, mouse.Y + inset))
+    CircleInline.Radius = pdlt.aimfov
+    CircleInline.Color = pdlt.fovcolor
+    CircleInline.Visible = pdlt.drawfov
+    CircleOutline.Radius = pdlt.aimfov
+    CircleOutline.Visible = (pdlt.drawfov and pdlt.fovoutline)
+    CircleOutline.NumSides = pdlt.p2cmode
+    CircleInline.NumSides = pdlt.p2cmode
+    Target = pdlt.silentaim and CHEAT_CLIENT:get_target() or nil
+    if Target then
+        for i, v in Target:GetChildren() do
+            if v.ClassName == "WeldConstraint" and v.Part1 == Target.Parent.FaceHitBox then
+                v.Enabled = false
+                Target.Parent.FaceHitBox.Anchored = true
+            end
+        end
+    end
+    local vm = Target and camera:FindFirstChild("ViewModel") or nil
+    local aimpart = vm and vm:FindFirstChild("AimPart") or nil
+    local vis = pdlt.silentaimwall and IsTargetVisible(Target) or not pdlt.silentaimwall
+    if (aimpart) and vis then
+        if aimpart then
+            Target.Parent.FaceHitBox.CFrame = aimpart.CFrame * CFrame.Angles(0, math.pi, 0) *
+            CFrame.new(0, 0, 10)                                                                                   -- * CFrame.new(0, 0, -5)
+        end
+    end
+end))
+--[[local __index; __index = hookmetamethod(game, "__index", function(self, idx, val)
+    if self == camera and idx == "CFrame" then
+        if varsglobal.thirdperson then
+            val = val + camera.CFrame.LookVector * -varsglobal.thirdpdist
+        end
+    end
+    return __index(self, idx, val)
+end)
+]]
+--[[local __newindex; __newindex = hookmetamethod(game, "__newindex", function(self, idx, val)
+    if self == camera and idx == "CFrame" then
+        if varsglobal.thirdperson then 
+            val = val + camera.CFrame.LookVector * -varsglobal.thirdpdist
+        end
+    end
+    return __newindex(self, idx, val)
+end)
+local rawmeta = getrawmetatable(game);
+setreadonly(rawmeta, false)
+local __namecall = rawmeta.__namecall
+rawmeta.__namecall = function(self, ...)
+    --local Method = (getnamecallmethod()):lower()
+    local args = { ... }
+    if pdlt.silentaim and valargs(args, expargs.Raycast) then
+        local func_name = debug.getinfo(2).name
+        if (func_name ~= "WallCollision" and func_name ~= "IsTargetVisible" and func_name ~= "update") and valargs(args, expargs.Raycast) then
+        --print(debug.getinfo(3).name)
+            local A_Origin = args[1]
+            local HitPart = Target
+            if HitPart then
+                args[2] = (HitPart.Position - A_Origin).Unit * 6000
+                return __namecall(self, unpack(args))
+            end
+        end
+    end
+    return __namecall(self, ...)
+end]]
